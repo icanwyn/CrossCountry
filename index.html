@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,22 +38,17 @@
   button:disabled { cursor: not-allowed; opacity: 0.4; }
   input::placeholder { color: var(--ink-dim); opacity: 0.6; }
 
-  .hdr {
-    border-bottom: 1px solid var(--line);
-    padding: 18px 24px;
+  .hdr { border-bottom: 1px solid var(--line); padding: 18px 24px;
     display: flex; align-items: baseline; justify-content: space-between;
-    gap: 16px; background: rgba(0,0,0,0.2); flex-wrap: wrap;
-  }
+    gap: 16px; background: rgba(0,0,0,0.2); flex-wrap: wrap; }
   .hdr .logo { font-family: 'Bebas Neue', sans-serif; font-size: 34px; line-height: 1; color: var(--accent); }
   .hdr .logo span { color: var(--ink); }
   .hdr .sub { font-size: 11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.15em; }
   .hdr .left { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
   .hdr .right { display: flex; align-items: center; gap: 14px; }
 
-  .btn {
-    padding: 12px 22px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.08em; font-size: 12px; transition: transform 0.1s, opacity 0.2s;
-  }
+  .btn { padding: 12px 22px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; font-size: 12px; transition: transform 0.1s, opacity 0.2s; }
   .btn:active { transform: translateY(1px); }
   .btn-primary { background: var(--accent); color: #000; border: 2px solid var(--accent); }
   .btn-secondary { background: transparent; color: var(--ink); border: 2px solid var(--line); }
@@ -61,10 +57,8 @@
   .btn-lime { background: var(--accent2); color: #000; border: 2px solid var(--accent2); }
 
   .field-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-dim); margin-bottom: 6px; font-family: 'Inter', sans-serif; }
-  .field-input {
-    width: 100%; padding: 12px 14px; background: var(--panel2);
-    border: 1px solid var(--line); color: var(--ink); font-size: 16px; outline: none;
-  }
+  .field-input { width: 100%; padding: 12px 14px; background: var(--panel2);
+    border: 1px solid var(--line); color: var(--ink); font-size: 16px; outline: none; }
   .field-input:focus { border-color: var(--accent); }
 
   .panel { background: var(--panel); border: 1px solid var(--line); }
@@ -93,38 +87,28 @@
 
   .timer-grid { display: grid; grid-template-columns: 1fr 320px; min-height: calc(100vh - 73px); }
   @media (max-width: 900px) { .timer-grid { grid-template-columns: 1fr; } }
-  .clock {
-    font-size: min(220px, 22vw); line-height: 0.85; color: var(--accent);
+  .clock { font-size: min(220px, 22vw); line-height: 0.85; color: var(--accent);
     font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
-    font-family: 'Bebas Neue', sans-serif;
-  }
+    font-family: 'Bebas Neue', sans-serif; }
   .clock.idle { color: var(--ink-dim); }
-  .tap-btn {
-    width: 100%; padding: 80px 0; font-size: 88px;
+  .tap-btn { width: 100%; padding: 80px 0; font-size: 88px;
     font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.1em;
     background: var(--accent); color: #000; border: none; cursor: pointer;
-    transition: background 0.1s;
-  }
+    transition: background 0.1s; }
   .tap-btn:active { background: #fff; }
-  .start-btn {
-    width: 100%; padding: 60px 0; font-size: 56px;
+  .start-btn { width: 100%; padding: 60px 0; font-size: 56px;
     font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.1em;
-    background: var(--accent2); color: #000; border: none; cursor: pointer;
-  }
+    background: var(--accent2); color: #000; border: none; cursor: pointer; }
 
-  .bib-input {
-    width: 100%; padding: 24px 28px; font-size: 72px;
+  .bib-input { width: 100%; padding: 24px 28px; font-size: 72px;
     letter-spacing: 0.2em; text-align: center;
     background: var(--panel2); border: 2px solid var(--accent);
     color: var(--ink); outline: none; font-variant-numeric: tabular-nums;
-    font-family: 'JetBrains Mono', monospace;
-  }
+    font-family: 'JetBrains Mono', monospace; }
   .bib-input:disabled { opacity: 0.5; border-color: var(--line); }
 
-  .role-card {
-    background: var(--panel); border: 1px solid var(--line); padding: 28px;
-    cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
-  }
+  .role-card { background: var(--panel); border: 1px solid var(--line); padding: 28px;
+    cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
   .role-card.disabled { opacity: 0.5; cursor: not-allowed; }
   .role-card:not(.disabled):hover { border-color: var(--accent); }
   .role-card .num { font-size: 10px; letter-spacing: 0.25em; margin-bottom: 12px;
@@ -149,31 +133,21 @@
   .wrap-narrow { max-width: 640px; margin: 60px auto; padding: 0 24px; }
   .wrap-wide { max-width: 900px; margin: 0 auto; padding: 60px 24px; }
 
-  /* Auth modal */
-  .modal-back {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,0.7);
     display: flex; align-items: center; justify-content: center; z-index: 100;
-    padding: 20px;
-  }
-  .modal {
-    background: var(--panel); border: 1px solid var(--accent);
-    padding: 32px; max-width: 440px; width: 100%;
-  }
+    padding: 20px; }
+  .modal { background: var(--panel); border: 1px solid var(--accent);
+    padding: 32px; max-width: 440px; width: 100%; }
 </style>
 </head>
 <body>
 <div id="app"></div>
 <div id="modal-root"></div>
 
-
-
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
 <script>
-/* =====================================================================
- * CONFIG
- * ===================================================================== */
+/* CONFIG */
 const SUPABASE_URL  = "https://twfjsvmwmtnowdehzltz.supabase.co";
 const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Zmpzdm13bXRub3dkZWh6bHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4OTA5MDcsImV4cCI6MjA5NDQ2NjkwN30.a8Xi7jPE9rDgKf7-8CWGoGIGKQ0I3lJkYs2YWz5JrvY";
 
@@ -181,9 +155,7 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
   realtime: { params: { eventsPerSecond: 20 } }
 });
 
-/* =====================================================================
- * HELPERS
- * ===================================================================== */
+/* HELPERS */
 const pad = (n, w = 2) => String(n).padStart(w, "0");
 const fmtTime = (ms) => {
   if (ms == null) return "--:--.--";
@@ -213,9 +185,7 @@ const parseCSV = (text) => {
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const $ = (id) => document.getElementById(id);
 
-/* =====================================================================
- * AUTH — session tokens cached in localStorage per meet
- * ===================================================================== */
+/* AUTH */
 const Auth = {
   tokenKey: (code) => `xc.tok.${code}`,
   get(code)  { return localStorage.getItem(this.tokenKey(code)); },
@@ -224,9 +194,7 @@ const Auth = {
   isAuthed(code) { return !!this.get(code); },
 };
 
-/* =====================================================================
- * SCORING — official XC rules
- * ===================================================================== */
+/* SCORING */
 function scoreMeet(results, runnersByBib) {
   const sorted = [...results].sort((a, b) => a.place - b.place);
   const teamFinisherCount = {};
@@ -242,12 +210,8 @@ function scoreMeet(results, runnersByBib) {
   for (const r of sorted) {
     const runner = runnersByBib[r.bib];
     if (!runner) continue;
-    if (scoring.has(runner.team)) {
-      adj++;
-      placed.push({ ...r, runner, scorePlace: adj });
-    } else {
-      placed.push({ ...r, runner, scorePlace: null });
-    }
+    if (scoring.has(runner.team)) { adj++; placed.push({ ...r, runner, scorePlace: adj }); }
+    else { placed.push({ ...r, runner, scorePlace: null }); }
   }
 
   const byTeam = {};
@@ -261,12 +225,10 @@ function scoreMeet(results, runnersByBib) {
     const isScoring = scoring.has(team);
     const top5 = isScoring ? rs.slice(0, 5).map(r => r.scorePlace) : [];
     const total = isScoring ? top5.reduce((a, b) => a + b, 0) : null;
-    return {
-      team, finishers: rs.length, isScoring, total,
+    return { team, finishers: rs.length, isScoring, total,
       sixth: isScoring && rs[5] ? rs[5].scorePlace : null,
       seventh: isScoring && rs[6] ? rs[6].scorePlace : null,
-      runners: rs,
-    };
+      runners: rs };
   });
 
   teams.sort((a, b) => {
@@ -282,28 +244,12 @@ function scoreMeet(results, runnersByBib) {
   return teams.map(t => ({ ...t, rank: t.isScoring ? ++rank : null }));
 }
 
-/* =====================================================================
- * STATE + REALTIME
- * Hash routes:
- *   #/                       landing
- *   #/create                 create meet
- *   #/m/ABC123               hub
- *   #/m/ABC123/roster        coach roster intake
- *   #/m/ABC123/timer         start-line timer
- *   #/m/ABC123/recorder      chute recorder
- *   #/m/ABC123/results       live results
- * ===================================================================== */
+/* STATE */
 const State = {
   route: { name: "landing" },
-  meet: null,
-  teams: [],
-  runners: [],
-  runnersByBib: {},
-  taps: [],
-  results: [],
-  channel: null,
-  connected: false,
-  tickTimer: null,
+  meet: null, teams: [], runners: [], runnersByBib: {},
+  taps: [], results: [],
+  channel: null, connected: false, tickTimer: null, loading: false,
 };
 
 function parseHash() {
@@ -325,7 +271,12 @@ async function handleRoute() {
   State.route = next;
 
   if (next.name !== "meet" && wasMeet) await teardownMeet();
-  if (next.name === "meet" && !sameMeet) await loadMeet(next.code);
+  if (next.name === "meet" && !sameMeet) {
+    State.loading = true;
+    render();
+    await loadMeet(next.code);
+    State.loading = false;
+  }
   render();
 }
 
@@ -334,7 +285,7 @@ async function loadMeet(code) {
   setConnected(false);
 
   const { data: meet, error } = await sb.from("public_meets").select("*").eq("code", code).maybeSingle();
-  if (error) console.error(error);
+  if (error) console.error("loadMeet error:", error);
   State.meet = meet || null;
   if (!meet) { render(); return; }
 
@@ -359,7 +310,10 @@ async function loadMeet(code) {
     .on("postgres_changes", { event: "*", schema: "public", table: "runners", filter: `meet_code=eq.${code}` }, handleRunnerChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "taps",    filter: `meet_code=eq.${code}` }, handleTapChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "results", filter: `meet_code=eq.${code}` }, handleResultChange)
-    .subscribe((status) => { setConnected(status === "SUBSCRIBED"); });
+    .subscribe((status) => {
+      console.log("realtime status:", status);
+      setConnected(status === "SUBSCRIBED");
+    });
 }
 
 async function teardownMeet() {
@@ -380,14 +334,16 @@ function setConnected(b) {
 
 function handleMeetChange(payload) {
   if (payload.eventType === "DELETE") { State.meet = null; render(); return; }
-  // strip password_hash if present
   const { password_hash, ...rest } = payload.new || {};
   State.meet = { ...State.meet, ...rest };
   render();
 }
 function handleTeamChange(payload) {
-  if (payload.eventType === "INSERT") State.teams.push(payload.new);
-  else if (payload.eventType === "DELETE") State.teams = State.teams.filter(t => t.name !== payload.old.name);
+  if (payload.eventType === "INSERT") {
+    if (!State.teams.find(t => t.name === payload.new.name)) State.teams.push(payload.new);
+  } else if (payload.eventType === "DELETE") {
+    State.teams = State.teams.filter(t => t.name !== payload.old.name);
+  }
   State.teams.sort((a, b) => a.team_index - b.team_index);
   render();
 }
@@ -426,10 +382,7 @@ function handleResultChange(payload) {
   render();
 }
 
-/* =====================================================================
- * AUTH-GATED ACTIONS
- * Show password modal if no token. On success, call the action.
- * ===================================================================== */
+/* AUTH-GATED */
 function ensureAuth(code, onAuthed) {
   if (Auth.isAuthed(code)) { onAuthed(); return; }
   showLoginModal(code, onAuthed);
@@ -443,7 +396,7 @@ function showLoginModal(code, onAuthed) {
         <div class="mono" style="font-size:10px;color:var(--accent);letter-spacing:0.25em;margin-bottom:8px;">DIRECTOR ACCESS</div>
         <div class="display" style="font-size:36px;margin-bottom:6px;">UNLOCK</div>
         <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-bottom:22px;">
-          Enter the director password set when this meet was created. The token will be saved on this device until the meet ends.
+          Enter the director password set when this meet was created.
         </div>
         <div class="field-label">Password</div>
         <input id="auth-pwd" type="password" class="field-input" autofocus />
@@ -472,7 +425,7 @@ function showLoginModal(code, onAuthed) {
     }
     Auth.set(code, token);
     closeModal();
-    render(); // refresh badge
+    render();
     onAuthed();
   };
 
@@ -483,19 +436,18 @@ function showLoginModal(code, onAuthed) {
 function closeModal() { $("modal-root").innerHTML = ""; }
 
 function logout() {
-  if (!confirm("Lock this device? You'll need the password to make changes again.")) return;
+  if (!confirm("Lock this device?")) return;
   Auth.clear(State.meet.code);
   render();
 }
 
-/* =====================================================================
- * RENDER ROUTER
- * ===================================================================== */
+/* RENDER ROUTER */
 function render() {
   const r = State.route;
   if (r.name === "landing") return renderLanding();
   if (r.name === "create")  return renderCreate();
   if (r.name === "meet") {
+    if (State.loading) return renderLoading();
     if (!State.meet) return renderNotFound(r.code);
     if (r.view === "hub")      return renderHub();
     if (r.view === "roster")   return renderRoster();
@@ -505,9 +457,10 @@ function render() {
   }
 }
 
-/* =====================================================================
- * VIEWS
- * ===================================================================== */
+function renderLoading() {
+  $("app").innerHTML = `${header("LOADING…")}<div style="max-width:600px;margin:80px auto;padding:24px;text-align:center;"><div class="display" style="font-size:48px;color:var(--ink-dim);">LOADING MEET…</div></div>`;
+}
+
 function header(subtitle, rightHTML = "") {
   const showLock = State.route.name === "meet" && State.meet;
   const isAuthed = showLock && Auth.isAuthed(State.meet.code);
@@ -526,22 +479,19 @@ function header(subtitle, rightHTML = "") {
     </div>`;
 }
 
-/* ---- Landing ---- */
 function renderLanding() {
   $("app").innerHTML = `
     ${header("OFFICIAL TIMING")}
     <div class="wrap-wide">
       <div class="display land-hero">THE CLOCK<br><span style="color:var(--accent)">DOESN'T LIE.</span></div>
       <div class="ui" style="font-size:16px;color:var(--ink-dim);max-width:520px;margin-bottom:48px;">
-        Multi-coach roster intake, dual-operator timing, official cross country scoring. Built for the chute.
+        Multi-coach roster intake, dual-operator timing, official cross country scoring.
       </div>
       <div class="grid-2">
         <div class="panel" style="padding:28px;">
           <div class="mono" style="font-size:11px;color:var(--accent);letter-spacing:0.15em;margin-bottom:14px;">01 / MEET DIRECTOR</div>
           <div class="display" style="font-size:32px;margin-bottom:14px;">NEW MEET</div>
-          <div class="ui" style="font-size:14px;color:var(--ink-dim);margin-bottom:22px;">
-            Create a meet, set a director password, and share the 6-char code + password with operators.
-          </div>
+          <div class="ui" style="font-size:14px;color:var(--ink-dim);margin-bottom:22px;">Create a meet and share the code + password.</div>
           <button class="btn btn-primary" onclick="go('create')">Create Meet →</button>
         </div>
         <div class="panel" style="padding:28px;">
@@ -563,7 +513,6 @@ function doJoin() {
   go(`m/${v}`);
 }
 
-/* ---- Create ---- */
 function renderCreate() {
   const code = newMeetCode();
   $("app").innerHTML = `
@@ -573,7 +522,6 @@ function renderCreate() {
       <div class="panel" style="padding:28px;">
         <div class="field-label">Meet Name</div>
         <input id="meet-name" class="field-input" placeholder="Tri-County Invitational" />
-
         <div style="margin-top:18px;">
           <div class="field-label">Director Password (share with operators)</div>
           <input id="meet-pwd" type="password" class="field-input" placeholder="At least 4 characters" />
@@ -582,12 +530,11 @@ function renderCreate() {
           <div class="field-label">Confirm Password</div>
           <input id="meet-pwd2" type="password" class="field-input" />
         </div>
-
         <div style="margin-top:22px;">
           <div class="field-label">Your Meet Code</div>
           <div class="display" style="font-size:72px;color:var(--accent2);letter-spacing:0.15em;line-height:1;">${code}</div>
           <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-top:12px;">
-            Share <b>both</b> the code <i>and</i> the password with every coach and timing volunteer. Anyone can view; only those with the password can upload rosters or operate timing.
+            Share both the code and the password with every coach and timing volunteer.
           </div>
         </div>
         <div id="create-err" class="err" style="display:none;"></div>
@@ -602,17 +549,14 @@ async function doCreate(code) {
   const errEl = $("create-err");
   errEl.style.display = "none";
   const show = (msg) => { errEl.textContent = "⚠ " + msg; errEl.style.display = "block"; };
-
   const name = ($("meet-name").value || "").trim() || "Untitled Meet";
   const pwd  = $("meet-pwd").value;
   const pwd2 = $("meet-pwd2").value;
   if (!pwd || pwd.length < 4) return show("Password must be at least 4 characters.");
   if (pwd !== pwd2) return show("Passwords don't match.");
-
   const btn = $("create-btn");
   btn.disabled = true;
   btn.textContent = "Creating…";
-
   const { data: token, error } = await sb.rpc("create_meet", { p_code: code, p_name: name, p_password: pwd });
   if (error || !token) {
     show(error?.message || "Could not create meet.");
@@ -624,19 +568,17 @@ async function doCreate(code) {
   go(`m/${code}`);
 }
 
-/* ---- Not Found ---- */
 function renderNotFound(code) {
   $("app").innerHTML = `
     ${header("NOT FOUND", `<button class="btn btn-ghost" onclick="go('')">← Home</button>`)}
     <div style="max-width:600px;margin:80px auto;padding:24px;text-align:center;">
       <div class="display" style="font-size:56px;color:var(--red);">NO MEET</div>
       <div class="ui" style="color:var(--ink-dim);margin-top:12px;">
-        No meet found with code <span class="mono" style="color:var(--ink)">${esc(code)}</span>. Check with the meet director.
+        No meet found with code <span class="mono" style="color:var(--ink)">${esc(code)}</span>.
       </div>
     </div>`;
 }
 
-/* ---- Hub ---- */
 function renderHub() {
   const teamCount = State.teams.length;
   const runnerCount = State.runners.length;
@@ -651,14 +593,10 @@ function renderHub() {
     <div class="wrap">
       <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
         <div>
-          <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:6px;">
-            ${esc(State.meet.name)}
-          </div>
+          <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:6px;">${esc(State.meet.name)}</div>
           <div class="display" style="font-size:56px;line-height:1;letter-spacing:0.04em;">${code}</div>
           <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-top:8px;max-width:520px;">
-            ${authed
-              ? "This device is unlocked — you can upload rosters and operate timing."
-              : `Read-only on this device. Tap any role and enter the director password to enable writes.`}
+            ${authed ? "This device is unlocked — you can upload rosters and operate timing." : "Read-only on this device. Tap any role and enter the director password."}
           </div>
         </div>
         <div>
@@ -673,35 +611,33 @@ function renderHub() {
         <div class="role-card" onclick="goRole('roster')">
           <div class="num">01 · Upload Roster · Assign Bibs</div>
           <div class="title">COACH</div>
-          <div class="desc">CSV upload with first, last, grade, gender. School name becomes the team. Bibs auto-assigned in sequential team blocks (1xxx, 2xxx, …).</div>
+          <div class="desc">CSV upload with first, last, grade, gender. School name becomes the team.</div>
         </div>
         <div class="role-card ${finishCount === 0 ? "disabled" : ""}" ${finishCount === 0 ? "" : `onclick="go('m/${code}/results')"`}>
           <div class="num" style="color:var(--accent2)">02 · Live Standings · Final Scoring</div>
           <div class="title">RESULTS</div>
-          <div class="desc">Official XC scores: top 5 score, 6 &amp; 7 displace, low total wins. Tie-broken by 6th-runner place. Viewable by anyone.</div>
+          <div class="desc">Official XC scores: top 5 score, 6 &amp; 7 displace.</div>
         </div>
         <div class="role-card" onclick="goRole('timer')">
           <div class="num">03 · Tap Finish</div>
           <div class="title">TIMER · START LINE</div>
-          <div class="desc">One big button. Captures finish times in order. Hold the line clock — no bib entry here.</div>
+          <div class="desc">One big button. Captures finish times in order.</div>
         </div>
         <div class="role-card ${tapped === 0 ? "disabled" : ""}" ${tapped === 0 ? "" : `onclick="goRole('recorder')"`}>
           <div class="num">04 · Match Bibs to Times</div>
           <div class="title">RECORDER · CHUTE</div>
-          <div class="desc">As runners flow through the chute in order, type each bib. Each entry pairs with the next unmatched tap.</div>
+          <div class="desc">Type each bib as runners flow through the chute.</div>
           ${tapped > 0 ? `<div class="note">→ ${pending} unmatched tap${pending === 1 ? "" : "s"}</div>` : `<div class="note" style="color:var(--ink-dim)">→ Waiting for timer taps…</div>`}
         </div>
       </div>
     </div>`;
 }
 
-// Auth-gated nav into operator roles
 function goRole(view) {
   const code = State.meet.code;
   ensureAuth(code, () => go(`m/${code}/${view}`));
 }
 
-/* ---- Roster ---- */
 let _rosterFilterTeam = "ALL";
 function renderRoster() {
   const code = State.meet.code;
@@ -723,7 +659,7 @@ function renderRoster() {
           </div>
           <div style="margin-top:16px;">
             <div class="field-label">Or paste CSV</div>
-            <textarea id="r-csv" rows="6" class="mono" placeholder="first,last,grade,gender&#10;Jamal,Reeves,11,M&#10;Lina,Park,10,F" style="width:100%;padding:12px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:12px;outline:none;resize:vertical;"></textarea>
+            <textarea id="r-csv" rows="6" class="mono" placeholder="first,last,grade,gender&#10;Jamal,Reeves,11,M" style="width:100%;padding:12px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:12px;outline:none;resize:vertical;"></textarea>
           </div>
           <div id="r-err" class="err" style="display:none;"></div>
           <div id="r-ok" class="ok" style="display:none;"></div>
@@ -734,7 +670,7 @@ function renderRoster() {
         <div class="panel" style="padding:22px;">
           <div class="mono" style="font-size:10px;color:var(--accent2);letter-spacing:0.2em;margin-bottom:14px;">BIB ASSIGNMENT</div>
           <div class="ui" style="font-size:13px;color:var(--ink-dim);line-height:1.6;">
-            Each team gets a 1000-block: Team 1 = <span class="mono" style="color:var(--ink)">1001–1999</span>, Team 2 = <span class="mono" style="color:var(--ink)">2001–2999</span>, etc. Bibs are 4-digit, zero-padded, assigned in CSV row order.
+            Each team gets a 1000-block: Team 1 = <span class="mono" style="color:var(--ink)">1001–1999</span>, Team 2 = <span class="mono" style="color:var(--ink)">2001–2999</span>.
           </div>
           <div class="hairline"></div>
           <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:10px;">TEAMS REGISTERED</div>
@@ -777,8 +713,7 @@ function renderRoster() {
         </div>
       </div>` : ""}
     </div>
-    <style>@media(max-width:760px){.roster-grid{grid-template-columns:1fr !important;}}</style>
-  `;
+    <style>@media(max-width:760px){.roster-grid{grid-template-columns:1fr !important;}}</style>`;
 
   $("r-file")?.addEventListener("change", (e) => {
     const f = e.target.files[0];
@@ -813,7 +748,6 @@ async function doUploadRoster() {
   btn.textContent = "Uploading…";
 
   try {
-    // Atomic team registration
     const { data: teamIdx, error: teamErr } = await sb.rpc("register_team", {
       p_token: token, p_meet: code, p_team: school
     });
@@ -833,10 +767,20 @@ async function doUploadRoster() {
     });
     if (insErr) throw insErr;
 
-    $("r-school").value = "";
-    $("r-csv").value = "";
-    if ($("r-file")) $("r-file").value = "";
+    if (!State.teams.find(t => t.name === school)) {
+      State.teams.push({ meet_code: code, name: school, team_index: teamIdx, created_at: new Date().toISOString() });
+      State.teams.sort((a,b) => a.team_index - b.team_index);
+    }
+    for (const r of rows) {
+      if (!State.runnersByBib[r.bib]) {
+        State.runners.push({ ...r, meet_code: code, created_at: new Date().toISOString() });
+        State.runnersByBib[r.bib] = { bib: r.bib, first: r.first_name, last: r.last_name, grade: r.grade, gender: r.gender, team: r.team };
+      }
+    }
+    State.runners.sort((a,b) => a.bib.localeCompare(b.bib));
+
     showOk(`Added ${rows.length} runner${rows.length === 1 ? "" : "s"} to ${school}.`);
+    renderRoster();
   } catch (e) {
     if (e?.message?.includes("Not authorized")) {
       Auth.clear(code);
@@ -846,12 +790,11 @@ async function doUploadRoster() {
       showErr(e.message || "Upload failed.");
     }
   } finally {
-    btn.disabled = false;
-    btn.textContent = "Assign Bibs →";
+    const submitBtn = $("r-submit");
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Assign Bibs →"; }
   }
 }
 
-/* ---- Timer ---- */
 function renderTimer() {
   const code = State.meet.code;
   if (!Auth.isAuthed(code)) { ensureAuth(code, () => render()); }
@@ -873,7 +816,7 @@ function renderTimer() {
           ${started
             ? `<button id="tap-btn" class="tap-btn">TAP FINISH</button>
                <div style="text-align:center;margin-top:14px;"><button class="btn btn-danger" onclick="doResetRace()">Reset Race</button></div>`
-            : `<button class="start-btn" onclick="doStartRace()">START RACE ▶</button>`}
+            : `<button id="start-btn" class="start-btn">START RACE ▶</button>`}
         </div>
       </div>
       <div style="background:var(--panel);border-left:1px solid var(--line);padding:22px;">
@@ -903,6 +846,9 @@ function renderTimer() {
     }, 50);
   }
 
+  const startBtn = $("start-btn");
+  if (startBtn) startBtn.addEventListener("click", doStartRace);
+
   const tapBtn = $("tap-btn");
   if (tapBtn) {
     let cooling = false;
@@ -916,9 +862,17 @@ function renderTimer() {
       const token = Auth.get(code);
       if (!token) return ensureAuth(code, () => {});
       const t = Date.now() - State.meet.start_time;
+
+      const nextPlace = State.taps.length + 1;
+      State.taps.push({ meet_code: code, place: nextPlace, time_ms: t, created_at: new Date().toISOString() });
+      State.taps.sort((a,b) => a.place - b.place);
+      render();
+
       const { error } = await sb.rpc("add_tap", { p_token: token, p_meet: code, p_time_ms: t });
       if (error) {
         console.error("tap failed", error);
+        State.taps = State.taps.filter(x => x.place !== nextPlace);
+        render();
         if (error.message?.includes("Not authorized")) {
           Auth.clear(code);
           alert("Session expired. Please unlock again.");
@@ -930,12 +884,21 @@ function renderTimer() {
 }
 
 async function doStartRace() {
+  if (!State.meet) { alert("Meet not loaded yet — please wait a moment."); return; }
   const code = State.meet.code;
   const token = Auth.get(code);
   if (!token) return ensureAuth(code, doStartRace);
   const t = Date.now();
+
+  State.meet = { ...State.meet, start_time: t };
+  render();
+
   const { error } = await sb.rpc("start_race", { p_token: token, p_meet: code, p_start_time: t });
-  if (error) alert("Failed to start: " + error.message);
+  if (error) {
+    alert("Failed to start: " + error.message);
+    State.meet = { ...State.meet, start_time: null };
+    render();
+  }
 }
 
 async function doResetRace() {
@@ -943,11 +906,20 @@ async function doResetRace() {
   const code = State.meet.code;
   const token = Auth.get(code);
   if (!token) return ensureAuth(code, doResetRace);
+
+  State.meet = { ...State.meet, start_time: null };
+  State.taps = [];
+  State.results = [];
+  render();
+
   const { error } = await sb.rpc("reset_race", { p_token: token, p_meet: code });
-  if (error) alert("Reset failed: " + error.message);
+  if (error) {
+    alert("Reset failed: " + error.message);
+    await loadMeet(code);
+    render();
+  }
 }
 
-/* ---- Recorder ---- */
 function renderRecorder() {
   const code = State.meet.code;
   if (!Auth.isAuthed(code)) { ensureAuth(code, () => render()); }
@@ -1040,19 +1012,30 @@ async function doRecordBib() {
   if (!State.runnersByBib[bib]) return showErr(`No runner with bib ${bib}`);
   if (State.results.find(r => r.bib === bib)) return showErr(`Bib ${bib} already recorded`);
 
+  const nextPlace = State.results.length + 1;
+  const nextTap = State.taps.find(t => t.place === nextPlace);
+  if (!nextTap) return showErr("No tap to match yet.");
+
+  const newResult = { meet_code: code, place: nextPlace, bib, time_ms: nextTap.time_ms, recorded_at: new Date().toISOString() };
+  State.results.push(newResult);
+  State.results.sort((a,b) => a.place - b.place);
+  $("bib-input").value = "";
+  updatePreview();
+  render();
+  $("bib-input")?.focus();
+
   const { error } = await sb.rpc("add_result", { p_token: token, p_meet: code, p_bib: bib });
   if (error) {
+    State.results = State.results.filter(r => !(r.place === nextPlace && r.bib === bib));
+    render();
     if (error.message?.includes("Not authorized")) {
       Auth.clear(code);
       showErr("Session expired. Please unlock again.");
       ensureAuth(code, () => {});
       return;
     }
-    return showErr(error.message);
+    showErr(error.message);
   }
-  $("bib-input").value = "";
-  updatePreview();
-  $("bib-input").focus();
 }
 
 async function doUndo() {
@@ -1060,11 +1043,19 @@ async function doUndo() {
   const code = State.meet.code;
   const token = Auth.get(code);
   if (!token) return ensureAuth(code, doUndo);
+
+  const removed = State.results.pop();
+  render();
+
   const { error } = await sb.rpc("undo_result", { p_token: token, p_meet: code });
-  if (error) alert("Undo failed: " + error.message);
+  if (error) {
+    alert("Undo failed: " + error.message);
+    State.results.push(removed);
+    State.results.sort((a,b) => a.place - b.place);
+    render();
+  }
 }
 
-/* ---- Results ---- */
 function renderResults() {
   const code = State.meet.code;
   const teamScores = scoreMeet(State.results, State.runnersByBib);
@@ -1081,7 +1072,7 @@ function renderResults() {
           <div class="display" style="font-size:72px;line-height:0.95;">FINAL <span style="color:var(--accent)">RESULTS</span></div>
         </div>
         <div class="ui" style="font-size:12px;color:var(--ink-dim);text-align:right;max-width:280px;">
-          Top 5 finishers per team score. Teams need 5 to be ranked. 6th &amp; 7th displace. Low total wins; 6th runner breaks ties.
+          Top 5 finishers per team score. Teams need 5 to be ranked. Low total wins; 6th runner breaks ties.
         </div>
       </div>
 
@@ -1128,20 +1119,8 @@ function renderResults() {
     </div>`;
 }
 
-/* =====================================================================
- * BOOT
- * ===================================================================== */
-(async function boot() {
-  if (SUPABASE_URL === "YOUR_SUPABASE_URL") {
-    document.body.innerHTML = `<div style="padding:40px;color:#e8e4d8;font-family:monospace;">
-      <h1 style="color:#ff6b1a;">CONFIG REQUIRED</h1>
-      <p>Set <code>SUPABASE_URL</code> and <code>SUPABASE_ANON</code> as Vercel env vars,
-      <br>or copy <code>env.example.js</code> to <code>env.js</code> for local dev.</p>
-    </div>`;
-    return;
-  }
-  await handleRoute();
-})();
+/* BOOT */
+(async function boot() { await handleRoute(); })();
 </script>
 </body>
 </html>
