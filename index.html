@@ -44,11 +44,12 @@
   a { color: var(--gold-2); text-decoration: none; }
   a:hover { color: var(--gold); }
 
-  .hdr { border-bottom: 1px solid var(--line); padding: 18px 24px;
-    display: flex; align-items: baseline; justify-content: space-between;
-    gap: 16px; flex-wrap: wrap;
+  .hdr { border-bottom: 1px solid var(--line); padding: 0;
     background: linear-gradient(180deg, rgba(212,168,81,0.05) 0%, transparent 100%);
     backdrop-filter: blur(8px); }
+  .hdr-inner { max-width: 1100px; margin: 0 auto; padding: 18px 24px;
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap; }
   .hdr .logo { font-family: 'Bebas Neue', sans-serif; font-size: 34px; line-height: 1;
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-2) 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent; cursor: pointer; }
@@ -213,6 +214,11 @@
     border: 0; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.15s; }
   .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
   .tab-btn:hover { color: var(--ink); }
+
+  .prompt-banner { background: linear-gradient(135deg, rgba(212,168,81,0.12) 0%, rgba(212,168,81,0.04) 100%);
+    border: 1px solid var(--gold); border-radius: 12px; padding: 18px 22px;
+    display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin-bottom: 24px; }
 </style>
 </head>
 <body>
@@ -380,7 +386,7 @@ const State = {
   meet: null,
   teams: [], runners: [], runnersByBib: {},
   races: [], taps: [], results: [],
-  leagueMeets: [], myMeets: [],
+  leagueMeets: [], myMeets: [], profile: null,
   selectedDivision: null,
   channel: null, connected: false, tickTimer: null, loading: false,
 };
@@ -455,9 +461,13 @@ async function loadLeague(slug) {
   State.leagueMeets = data || [];
 }
 async function loadMyMeets() {
-  if (!State.user) { State.myMeets = []; return; }
-  const { data } = await sb.rpc("my_meets");
-  State.myMeets = data || [];
+  if (!State.user) { State.myMeets = []; State.profile = null; return; }
+  const [{ data: meets }, { data: profile }] = await Promise.all([
+    sb.rpc("my_meets"),
+    sb.rpc("my_profile"),
+  ]);
+  State.myMeets = meets || [];
+  State.profile = profile?.[0] || null;
 }
 async function loadAdminData() {
   if (!State.user) { State.admin = null; return; }
@@ -611,6 +621,7 @@ function meetLogout() {
 sb.auth.onAuthStateChange((event, session) => {
   State.user = session?.user || null;
   checkAdminStatus();
+  loadProfileIfSignedIn();
   if (State.route.name === "me") loadMyMeets().then(render);
   else if (State.route.name === "admin") loadAdminData().then(render);
   else render();
@@ -626,6 +637,15 @@ async function initAuth() {
   const { data } = await sb.auth.getSession();
   State.user = data.session?.user || null;
   await checkAdminStatus();
+  await loadProfileIfSignedIn();
+}
+
+async function loadProfileIfSignedIn() {
+  if (!State.user) { State.profile = null; return; }
+  try {
+    const { data } = await sb.rpc("my_profile");
+    State.profile = data?.[0] || null;
+  } catch { State.profile = null; }
 }
 
 async function signInWithPassword(email, password) {
@@ -633,7 +653,7 @@ async function signInWithPassword(email, password) {
   return error;
 }
 
-async function signUpWithInvite(email, password, invite) {
+async function signUpWithInvite(email, password, invite, fullName, school) {
   const { error: checkErr } = await sb.rpc("check_invite", { p_invite: invite.toUpperCase() });
   if (checkErr) return checkErr;
   const { data, error: signUpErr } = await sb.auth.signUp({ email: email.toLowerCase(), password });
@@ -643,6 +663,11 @@ async function signUpWithInvite(email, password, invite) {
   }
   const signInErr = await signInWithPassword(email, password);
   if (signInErr) return signInErr;
+  // Save profile
+  if (fullName || school) {
+    const { error: profErr } = await sb.rpc("set_my_profile", { p_full_name: fullName || "", p_school: school || "" });
+    if (profErr) console.warn("set_my_profile:", profErr.message);
+  }
   const { error: claimErr } = await sb.rpc("claim_invite", { p_invite: invite.toUpperCase() });
   if (claimErr) console.warn("claim_invite:", claimErr.message);
   return null;
@@ -683,6 +708,7 @@ function header(subtitle, rightHTML = "") {
     : `<a class="auth-link" href="#/signin">Sign in</a>`;
   return `
     <div class="hdr">
+      <div class="hdr-inner">
       <div class="left">
         <div class="logo" onclick="go('')">XC<span>·CHRONO</span></div>
         ${subtitle ? `<div class="sub">${esc(subtitle)}</div>` : ""}
@@ -694,14 +720,39 @@ function header(subtitle, rightHTML = "") {
         ${rightHTML}
         ${userBlock}
       </div>
+      </div>
     </div>`;
 }
 
 /* ============================ LANDING ============================ */
+function profilePromptBanner() {
+  if (!State.user) return "";
+  const p = State.profile || {};
+  const incomplete = !p.full_name || !p.school;
+  if (!incomplete) return "";
+  const dismissed = sessionStorage.getItem("xc.profilePromptDismissed") === "1";
+  if (dismissed) return "";
+  return `<div class="prompt-banner">
+    <div>
+      <div class="display" style="font-size:20px;">Complete your profile</div>
+      <div class="ui" style="font-size:12px;color:var(--ink-dim);">Add your name and school so meet results can credit you properly.</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary btn-sm" onclick="go('me')">Complete →</button>
+      <button class="btn btn-ghost btn-sm" onclick="dismissProfilePrompt()">Later</button>
+    </div>
+  </div>`;
+}
+function dismissProfilePrompt() {
+  sessionStorage.setItem("xc.profilePromptDismissed", "1");
+  render();
+}
+
 function renderLanding() {
   $("app").innerHTML = `
     ${header("OFFICIAL TIMING")}
     <div class="wrap-wide">
+      ${profilePromptBanner()}
       <div class="display land-hero">THE CLOCK<br><span class="gold">DOESN'T LIE.</span></div>
       <div class="ui" style="font-size:16px;color:var(--ink-dim);max-width:520px;margin-bottom:48px;">
         Multi-coach roster intake, dual-operator timing, division-aware scoring, public results. Built for the chute.
@@ -783,6 +834,14 @@ function renderSignIn() {
           <input id="auth-invite" class="field-input mono" placeholder="ABCD1234" maxlength="8"
             style="letter-spacing:0.2em;text-transform:uppercase;" autofocus />
           <div style="margin-top:16px;">
+            <div class="field-label">Full Name <span style="text-transform:none;color:var(--ink-dim);">(optional, can fill later)</span></div>
+            <input id="auth-name" class="field-input" placeholder="Coach Sarah Chen" />
+          </div>
+          <div style="margin-top:16px;">
+            <div class="field-label">School / Organization <span style="text-transform:none;color:var(--ink-dim);">(optional)</span></div>
+            <input id="auth-school" class="field-input" placeholder="Riverdale High School" />
+          </div>
+          <div style="margin-top:16px;">
             <div class="field-label">Email</div>
             <input id="auth-email" type="email" class="field-input" placeholder="you@school.edu" />
           </div>
@@ -837,6 +896,8 @@ async function doPasswordSignIn() {
 }
 async function doSignUp() {
   const invite = $("auth-invite").value.trim().toUpperCase();
+  const name = $("auth-name").value.trim();
+  const school = $("auth-school").value.trim();
   const email = $("auth-email").value.trim();
   const pwd  = $("auth-pwd").value;
   const pwd2 = $("auth-pwd2").value;
@@ -849,7 +910,7 @@ async function doSignUp() {
   if (pwd !== pwd2) return showErr("Passwords don't match.");
   const btn = $("auth-btn");
   btn.disabled = true; btn.textContent = "Creating account…";
-  const err = await signUpWithInvite(email, pwd, invite);
+  const err = await signUpWithInvite(email, pwd, invite, name, school);
   if (err) { showErr(err.message || "Sign-up failed"); btn.disabled = false; btn.textContent = "Sign Up →"; return; }
   okEl.textContent = "✓ Account created. Redirecting…"; okEl.style.display = "block";
   setTimeout(() => go(""), 400);
@@ -860,6 +921,7 @@ function renderMe() {
   if (!State.user) { go("signin"); return; }
   const meets = State.myMeets;
   const leagues = [...new Set(meets.map(m => m.league).filter(Boolean))];
+  const p = State.profile || {};
   $("app").innerHTML = `
     ${header("MY DASHBOARD", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Home</button>`)}
     <div class="wrap">
@@ -867,11 +929,34 @@ function renderMe() {
       <div class="ui" style="color:var(--ink-dim);font-size:13px;margin-bottom:28px;">
         Signed in as <span style="color:var(--ink)">${esc(State.user.email)}</span>. ${meets.length} meet${meets.length===1?"":"s"} owned.
       </div>
+
+      <!-- PROFILE -->
+      <div class="display" style="font-size:22px;color:var(--gold-2);margin-bottom:10px;">▰ YOUR PROFILE</div>
+      <div class="panel" style="padding:22px;margin-bottom:32px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;" class="profile-grid">
+          <div>
+            <div class="field-label">Full Name</div>
+            <input id="me-name" class="field-input" value="${esc(p.full_name || "")}" placeholder="Your name" />
+          </div>
+          <div>
+            <div class="field-label">School / Organization</div>
+            <input id="me-school" class="field-input" value="${esc(p.school || "")}" placeholder="Riverdale High" />
+          </div>
+        </div>
+        <div id="me-prof-err" class="err" style="display:none;"></div>
+        <div id="me-prof-ok" class="ok" style="display:none;"></div>
+        <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="doSaveProfile()">Save Profile</button>
+          <button class="btn btn-sm" onclick="showChangePasswordModal()">Change Password</button>
+        </div>
+      </div>
+
       ${leagues.length > 0 ? `
         <div class="display" style="font-size:22px;color:var(--gold-2);margin-bottom:10px;">▰ YOUR LEAGUES</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;">
           ${leagues.map(l => `<a href="#/league/${encodeURIComponent(l)}" style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--panel);color:var(--gold-2);padding:8px 14px;border:1px solid var(--line);text-decoration:none;border-radius:8px;">${esc(l)}</a>`).join("")}
         </div>` : ""}
+
       <div class="display" style="font-size:22px;color:var(--gold-2);margin-bottom:10px;">▰ ALL MEETS</div>
       <div class="panel">
         ${meets.length === 0
@@ -886,7 +971,55 @@ function renderMe() {
               <div class="code-pill">${esc(m.code)}</div>
             </div>`).join("")}
       </div>
+    </div>
+    <style>@media(max-width:760px){.profile-grid{grid-template-columns:1fr !important;}}</style>`;
+}
+
+async function doSaveProfile() {
+  const name = $("me-name").value.trim();
+  const school = $("me-school").value.trim();
+  const errEl = $("me-prof-err"), okEl = $("me-prof-ok");
+  errEl.style.display = "none"; okEl.style.display = "none";
+  const { error } = await sb.rpc("set_my_profile", { p_full_name: name, p_school: school });
+  if (error) { errEl.textContent = "⚠ " + error.message; errEl.style.display = "block"; return; }
+  okEl.textContent = "✓ Profile saved."; okEl.style.display = "block";
+  setTimeout(() => { okEl.style.display = "none"; }, 2500);
+  await loadMyMeets();
+}
+
+function showChangePasswordModal() {
+  $("modal-root").innerHTML = `
+    <div class="modal-back" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="display" style="font-size:32px;margin-bottom:10px;">CHANGE PASSWORD</div>
+        <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-bottom:18px;">Enter your current password and a new one.</div>
+        <div class="field-label">Current Password</div>
+        <input id="cp-old" type="password" class="field-input" autofocus />
+        <div style="margin-top:14px;"><div class="field-label">New Password (6+ chars)</div><input id="cp-new" type="password" class="field-input" /></div>
+        <div style="margin-top:14px;"><div class="field-label">Confirm New Password</div><input id="cp-new2" type="password" class="field-input" /></div>
+        <div id="cp-err" class="err" style="display:none;"></div>
+        <div id="cp-ok" class="ok" style="display:none;"></div>
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button class="btn btn-primary" onclick="doChangePassword()">Update →</button>
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
     </div>`;
+}
+async function doChangePassword() {
+  const oldp = $("cp-old").value;
+  const newp = $("cp-new").value;
+  const newp2 = $("cp-new2").value;
+  const errEl = $("cp-err"), okEl = $("cp-ok");
+  errEl.style.display = "none"; okEl.style.display = "none";
+  const show = (m) => { errEl.textContent = "⚠ " + m; errEl.style.display = "block"; };
+  if (!oldp) return show("Enter your current password.");
+  if (!newp || newp.length < 6) return show("New password must be at least 6 characters.");
+  if (newp !== newp2) return show("New passwords don't match.");
+  const { error } = await sb.rpc("change_my_password", { p_old_password: oldp, p_new_password: newp });
+  if (error) return show(error.message);
+  okEl.textContent = "✓ Password updated."; okEl.style.display = "block";
+  setTimeout(() => closeModal(), 1500);
 }
 
 /* ============================ ADMIN ============================ */
@@ -952,11 +1085,13 @@ function renderAdmin() {
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
-        <div class="display" style="font-size:24px;color:var(--gold-2);">▰ INVITE CODES · ${invites.filter(i=>!i.used_by_email).length} UNUSED</div>
-        <div style="display:flex;gap:8px;align-items:center;">
+        <div class="display" style="font-size:24px;color:var(--gold-2);">▰ INVITE CODES · ${invites.filter(i=>!i.used_by_email).length} UNUSED · ${invites.filter(i=>i.used_by_email).length} USED</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <input id="invite-note" class="field-input" placeholder="Note (e.g. Coach Smith)" style="font-size:12px;padding:8px 12px;width:200px;" />
           <input id="invite-count" type="number" min="1" max="50" value="1" class="field-input" style="font-size:12px;padding:8px 12px;width:60px;" />
           <button class="btn btn-primary btn-sm" onclick="doGenerateInvites()">+ Generate</button>
+          <button class="btn btn-ghost btn-sm" onclick="doCleanupInvites('used')" title="Delete invite records that have been claimed">🧹 Clear Used</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="doCleanupInvites('unused')" title="Revoke all unused invite codes">⚠ Revoke All Unused</button>
         </div>
       </div>
       <div class="panel" style="margin-bottom:36px;max-height:300px;overflow:auto;">
@@ -977,17 +1112,25 @@ function renderAdmin() {
         </table>
       </div>
 
-      <div class="display" style="font-size:24px;color:var(--gold-2);margin-bottom:12px;">▰ USERS · ${users.length}</div>
-      <div class="panel" style="margin-bottom:36px;max-height:400px;overflow:auto;">
+      <div class="display" style="font-size:24px;color:var(--gold-2);margin-bottom:12px;">▰ USERS · ${users.length}${users.filter(u=>u.disabled_at).length ? ` · ${users.filter(u=>u.disabled_at).length} DISABLED` : ""}</div>
+      <div class="panel" style="margin-bottom:36px;max-height:480px;overflow:auto;">
         <table>
-          <thead><tr><th>EMAIL</th><th>SIGNED UP</th><th>LAST SIGN-IN</th><th>MEETS</th></tr></thead>
+          <thead><tr><th>EMAIL</th><th>NAME</th><th>SCHOOL</th><th>JOINED</th><th>LAST SEEN</th><th>MEETS</th><th>ACTIONS</th></tr></thead>
           <tbody>
-            ${users.length === 0 ? `<tr><td colspan="4" style="text-align:center;color:var(--ink-dim);padding:24px;">No users yet.</td></tr>` :
-              users.map(u => `<tr>
-                <td class="ui">${esc(u.email)}</td>
+            ${users.length === 0 ? `<tr><td colspan="7" style="text-align:center;color:var(--ink-dim);padding:24px;">No users yet.</td></tr>` :
+              users.map(u => `<tr ${u.disabled_at ? 'style="opacity:0.5;"' : ''}>
+                <td class="ui">${esc(u.email)} ${u.disabled_at ? '<span class="status-badge" style="color:var(--red);border-color:var(--red);background:rgba(226,107,91,0.08);">⊘ DISABLED</span>' : ""}</td>
+                <td class="ui" style="color:${u.full_name?'var(--ink)':'var(--ink-dim)'};">${esc(u.full_name || "—")}</td>
+                <td class="ui" style="color:${u.school?'var(--ink)':'var(--ink-dim)'};">${esc(u.school || "—")}</td>
                 <td class="mono" style="color:var(--ink-dim);">${new Date(u.created_at).toLocaleDateString()}</td>
                 <td class="mono" style="color:var(--ink-dim);">${u.last_sign_in ? new Date(u.last_sign_in).toLocaleDateString() : "—"}</td>
                 <td class="mono" style="color:var(--gold);">${u.meet_count}</td>
+                <td style="white-space:nowrap;">
+                  <button class="btn btn-ghost btn-sm" onclick="adminResetPwd('${u.user_id}', '${esc(u.email).replace(/'/g,"\\'")}')">🔑 Reset</button>
+                  ${u.disabled_at
+                    ? `<button class="btn btn-ghost btn-sm" style="color:var(--green);" onclick="adminReactivateUser('${u.user_id}', '${esc(u.email).replace(/'/g,"\\'")}')">↻ Reactivate</button>`
+                    : `<button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="adminDisableUser('${u.user_id}', '${esc(u.email).replace(/'/g,"\\'")}')">⊘ Disable</button>`}
+                </td>
               </tr>`).join("")}
           </tbody>
         </table>
@@ -1068,6 +1211,43 @@ async function doRevokeInvite(code) {
   if (!confirm(`Revoke invite ${code}?`)) return;
   const { error } = await sb.rpc("admin_revoke_invite", { p_code: code });
   if (error) return alert("Failed: " + error.message);
+  await loadAdminData(); render();
+}
+
+async function doCleanupInvites(mode) {
+  let msg = "";
+  if (mode === "used") msg = "Delete all USED invite records? This removes history of who claimed which codes, but doesn't affect existing accounts.";
+  else if (mode === "unused") msg = "Revoke ALL unused invite codes? Any pending invites will stop working.";
+  else if (mode === "expired") msg = "Delete all expired unused invite codes?";
+  if (!confirm(msg)) return;
+  const { data, error } = await sb.rpc("admin_cleanup_invites", { p_mode: mode });
+  if (error) return alert("Failed: " + error.message);
+  alert(`Removed ${data || 0} invite${data===1?"":"s"}.`);
+  await loadAdminData(); render();
+}
+
+async function adminResetPwd(userId, email) {
+  const newPwd = prompt(`Reset password for ${email}?\n\nEnter a new password (6+ chars). The user will need to use this to sign in.`);
+  if (!newPwd) return;
+  if (newPwd.length < 6) return alert("Password must be at least 6 characters.");
+  const { error } = await sb.rpc("admin_reset_password", { p_user_id: userId, p_new_password: newPwd });
+  if (error) return alert("Failed: " + error.message);
+  alert(`✓ Password reset for ${email}. New password: ${newPwd}\n\nMake sure to communicate this to the user securely.`);
+}
+
+async function adminDisableUser(userId, email) {
+  if (!confirm(`Disable user ${email}?\n\nThey won't be able to sign in, but their meets and account stay visible. You can reactivate them anytime.`)) return;
+  const { error } = await sb.rpc("admin_delete_user", { p_user_id: userId });
+  if (error) return alert("Failed: " + error.message);
+  alert(`✓ User ${email} disabled.`);
+  await loadAdminData(); render();
+}
+
+async function adminReactivateUser(userId, email) {
+  if (!confirm(`Reactivate user ${email}? They'll be able to sign in again.`)) return;
+  const { error } = await sb.rpc("admin_reactivate_user", { p_user_id: userId });
+  if (error) return alert("Failed: " + error.message);
+  alert(`✓ User ${email} reactivated.`);
   await loadAdminData(); render();
 }
 
