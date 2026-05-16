@@ -440,22 +440,22 @@ async function loadMyMeets() {
 
 async function loadAdminData() {
   if (!State.user) { State.admin = null; return; }
-  // Check admin status
   const { data: isAdminData } = await sb.rpc("is_admin");
   State.isAdmin = !!isAdminData;
   if (!State.isAdmin) { State.admin = { unauthorized: true }; return; }
-  // Load stats, users, meets, activity in parallel
-  const [stats, users, meets, activity] = await Promise.all([
+  const [stats, users, meets, activity, invites] = await Promise.all([
     sb.rpc("admin_stats"),
     sb.rpc("admin_list_users"),
     sb.rpc("admin_list_meets"),
     sb.rpc("admin_daily_activity"),
+    sb.rpc("admin_list_invites"),
   ]);
   State.admin = {
     stats: stats.data?.[0] || null,
     users: users.data || [],
     meets: meets.data || [],
     activity: activity.data || [],
+    invites: invites.data || [],
   };
 }
 
@@ -628,12 +628,18 @@ async function initAuth() {
   await checkAdminStatus();
 }
 
-async function signInWithEmail(email) {
-  const { error } = await sb.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: location.origin + location.pathname }
-  });
+async function signInWithPassword(email, password) {
+  const { error } = await sb.auth.signInWithPassword({ email: email.toLowerCase(), password });
   return error;
+}
+
+async function signUpWithInvite(email, password, invite) {
+  const { error } = await sb.rpc("signup_with_invite", {
+    p_email: email.toLowerCase(), p_password: password, p_invite: invite.toUpperCase()
+  });
+  if (error) return error;
+  // Now sign them in
+  return await signInWithPassword(email, password);
 }
 
 async function signOut() {
@@ -738,45 +744,129 @@ function doJoin() {
   go(`m/${v}`);
 }
 
-/* ============================ SIGN IN ============================ */
+/* ============================ SIGN IN / SIGN UP ============================ */
+let _authMode = "signin"; // or "signup"
 function renderSignIn() {
   $("app").innerHTML = `
-    ${header("SIGN IN", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Cancel</button>`)}
+    ${header("ACCOUNT", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Cancel</button>`)}
     <div class="wrap-narrow">
-      <div class="display" style="font-size:56px;margin-bottom:8px;">DIRECTOR<span style="color:var(--accent)">·</span>SIGN IN</div>
+      <div class="display" style="font-size:56px;margin-bottom:8px;">DIRECTOR<span style="color:var(--accent)">·</span>ACCOUNT</div>
       <div class="ui" style="color:var(--ink-dim);font-size:14px;margin-bottom:28px;">
-        Enter your email. We'll send a one-click sign-in link — no password to remember. Coaches and volunteers don't need accounts.
+        Track all your meets in one dashboard. Coaches and volunteers don't need accounts — they just use meet codes.
       </div>
-      <div class="panel" style="padding:28px;">
-        <div class="field-label">Email</div>
-        <input id="si-email" type="email" class="field-input" placeholder="director@school.edu" autofocus />
-        <div id="si-err" class="err" style="display:none;"></div>
-        <div id="si-ok"  class="ok"  style="display:none;"></div>
-        <div style="margin-top:18px;">
-          <button id="si-btn" class="btn btn-primary" onclick="doSignIn()">Send Magic Link →</button>
-        </div>
+
+      <div style="display:flex;gap:0;margin-bottom:0;">
+        <button onclick="switchAuthMode('signin')" class="btn ${_authMode==='signin'?'btn-primary':''}"
+          style="flex:1;border-radius:0;border-bottom-${_authMode==='signin'?'color:var(--accent)':'width:0'};">SIGN IN</button>
+        <button onclick="switchAuthMode('signup')" class="btn ${_authMode==='signup'?'btn-primary':''}"
+          style="flex:1;border-radius:0;">SIGN UP</button>
+      </div>
+
+      <div class="panel" style="padding:28px;border-top:0;">
+        ${_authMode === 'signin' ? `
+          <div class="field-label">Email</div>
+          <input id="auth-email" type="email" class="field-input" placeholder="you@school.edu" autofocus />
+          <div style="margin-top:16px;">
+            <div class="field-label">Password</div>
+            <input id="auth-pwd" type="password" class="field-input" />
+          </div>
+          <div id="auth-err" class="err" style="display:none;"></div>
+          <div id="auth-ok"  class="ok"  style="display:none;"></div>
+          <div style="margin-top:18px;">
+            <button id="auth-btn" class="btn btn-primary" onclick="doPasswordSignIn()">Sign In →</button>
+          </div>
+        ` : `
+          <div class="ui" style="font-size:12px;color:var(--ink-dim);margin-bottom:16px;">
+            Need an invite code? Contact your league administrator.
+          </div>
+          <div class="field-label">Invite Code</div>
+          <input id="auth-invite" class="field-input mono" placeholder="ABCD1234" maxlength="8"
+            style="letter-spacing:0.2em;text-transform:uppercase;" autofocus />
+          <div style="margin-top:16px;">
+            <div class="field-label">Email</div>
+            <input id="auth-email" type="email" class="field-input" placeholder="you@school.edu" />
+          </div>
+          <div style="margin-top:16px;">
+            <div class="field-label">Password (6+ characters)</div>
+            <input id="auth-pwd" type="password" class="field-input" />
+          </div>
+          <div style="margin-top:12px;">
+            <div class="field-label">Confirm Password</div>
+            <input id="auth-pwd2" type="password" class="field-input" />
+          </div>
+          <div id="auth-err" class="err" style="display:none;"></div>
+          <div id="auth-ok"  class="ok"  style="display:none;"></div>
+          <div style="margin-top:18px;">
+            <button id="auth-btn" class="btn btn-primary" onclick="doSignUp()">Sign Up →</button>
+          </div>
+        `}
       </div>
     </div>`;
-  $("si-email")?.addEventListener("keydown", e => { if (e.key === "Enter") doSignIn(); });
+
+  if (_authMode === 'signin') {
+    $("auth-pwd")?.addEventListener("keydown", e => { if (e.key === "Enter") doPasswordSignIn(); });
+  } else {
+    $("auth-invite")?.addEventListener("input", e => {
+      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    });
+    $("auth-pwd2")?.addEventListener("keydown", e => { if (e.key === "Enter") doSignUp(); });
+  }
 }
-async function doSignIn() {
-  const email = $("si-email").value.trim();
-  const errEl = $("si-err"), okEl = $("si-ok");
+
+function switchAuthMode(mode) {
+  _authMode = mode;
+  renderSignIn();
+}
+
+async function doPasswordSignIn() {
+  const email = $("auth-email").value.trim();
+  const pwd = $("auth-pwd").value;
+  const errEl = $("auth-err"), okEl = $("auth-ok");
   errEl.style.display = "none"; okEl.style.display = "none";
   if (!email || !/^.+@.+\..+$/.test(email)) {
     errEl.textContent = "⚠ Enter a valid email."; errEl.style.display = "block"; return;
   }
-  const btn = $("si-btn");
-  btn.disabled = true; btn.textContent = "Sending…";
-  const err = await signInWithEmail(email);
-  btn.disabled = false; btn.textContent = "Send Magic Link →";
+  if (!pwd) { errEl.textContent = "⚠ Enter your password."; errEl.style.display = "block"; return; }
+
+  const btn = $("auth-btn");
+  btn.disabled = true; btn.textContent = "Signing in…";
+  const err = await signInWithPassword(email, pwd);
   if (err) {
-    errEl.textContent = "⚠ " + err.message;
+    errEl.textContent = "⚠ " + (err.message || "Sign-in failed");
     errEl.style.display = "block";
-  } else {
-    okEl.textContent = `✓ Check ${email} for a sign-in link.`;
-    okEl.style.display = "block";
+    btn.disabled = false; btn.textContent = "Sign In →";
+    return;
   }
+  okEl.textContent = "✓ Signed in. Redirecting…";
+  okEl.style.display = "block";
+  setTimeout(() => go(""), 400);
+}
+
+async function doSignUp() {
+  const invite = $("auth-invite").value.trim().toUpperCase();
+  const email = $("auth-email").value.trim();
+  const pwd  = $("auth-pwd").value;
+  const pwd2 = $("auth-pwd2").value;
+  const errEl = $("auth-err"), okEl = $("auth-ok");
+  errEl.style.display = "none"; okEl.style.display = "none";
+  const showErr = (msg) => { errEl.textContent = "⚠ " + msg; errEl.style.display = "block"; };
+
+  if (!invite || invite.length < 4) return showErr("Enter your invite code.");
+  if (!email || !/^.+@.+\..+$/.test(email)) return showErr("Enter a valid email.");
+  if (!pwd || pwd.length < 6) return showErr("Password must be at least 6 characters.");
+  if (pwd !== pwd2) return showErr("Passwords don't match.");
+
+  const btn = $("auth-btn");
+  btn.disabled = true; btn.textContent = "Creating account…";
+  const err = await signUpWithInvite(email, pwd, invite);
+  if (err) {
+    showErr(err.message || "Sign-up failed");
+    btn.disabled = false; btn.textContent = "Sign Up →";
+    return;
+  }
+  okEl.textContent = "✓ Account created. Redirecting…";
+  okEl.style.display = "block";
+  setTimeout(() => go(""), 400);
 }
 
 /* ============================ /me DASHBOARD ============================ */
@@ -883,6 +973,33 @@ function renderAdmin() {
         </div>
       </div>
 
+      <!-- INVITE CODES -->
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
+        <div class="display" style="font-size:24px;color:var(--accent2);">▰ INVITE CODES · ${(State.admin.invites||[]).filter(i=>!i.used_by_email).length} UNUSED</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input id="invite-note" class="field-input" placeholder="Note (e.g. Coach Smith)" style="font-size:12px;padding:8px 12px;width:200px;" />
+          <input id="invite-count" type="number" min="1" max="50" value="1" class="field-input" style="font-size:12px;padding:8px 12px;width:60px;" />
+          <button class="btn btn-lime btn-sm" onclick="doGenerateInvites()">+ Generate</button>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:36px;max-height:300px;overflow:auto;">
+        <table>
+          <thead><tr><th>CODE</th><th>NOTE</th><th>CREATED</th><th>STATUS</th><th></th></tr></thead>
+          <tbody>
+            ${(State.admin.invites || []).length === 0 ? `<tr><td colspan="5" style="text-align:center;color:var(--ink-dim);padding:24px;">No invite codes yet. Generate some above.</td></tr>` :
+              State.admin.invites.map(inv => `<tr>
+                <td class="mono" style="font-weight:700;color:${inv.used_by_email?'var(--ink-dim)':'var(--accent2)'};letter-spacing:0.15em;">${esc(inv.code)}</td>
+                <td class="ui" style="color:var(--ink-dim);">${esc(inv.note || "—")}</td>
+                <td class="mono" style="color:var(--ink-dim);font-size:11px;">${new Date(inv.created_at).toLocaleDateString()}</td>
+                <td class="mono" style="font-size:11px;color:${inv.used_by_email?'var(--green)':'var(--accent)'};">
+                  ${inv.used_by_email ? `✓ ${esc(inv.used_by_email)}` : "● UNUSED"}
+                </td>
+                <td>${!inv.used_by_email ? `<button class="btn btn-ghost btn-sm" onclick="doRevokeInvite('${esc(inv.code)}')" style="font-size:10px;">Revoke</button>` : ""}</td>
+              </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+
       <!-- USERS -->
       <div class="display" style="font-size:24px;color:var(--accent2);margin-bottom:12px;">▰ USERS · ${users.length}</div>
       <div class="panel" style="margin-bottom:36px;max-height:400px;overflow:auto;">
@@ -944,6 +1061,50 @@ function doExportAdminMeets() {
       m.runner_count, m.result_count]);
   }
   downloadCSV(`xc_chrono_all_meets_${new Date().toISOString().slice(0,10)}.csv`, rows);
+}
+
+async function doGenerateInvites() {
+  const note = $("invite-note").value.trim() || null;
+  const count = parseInt($("invite-count").value || "1", 10);
+  if (count < 1 || count > 50) return alert("Count must be 1-50.");
+
+  const { data, error } = await sb.rpc("admin_create_invite", { p_count: count, p_note: note });
+  if (error) return alert("Failed: " + error.message);
+
+  // Show the codes in a modal
+  const codes = (data || []).map(d => d.code);
+  $("modal-root").innerHTML = `
+    <div class="modal-back" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="display" style="font-size:32px;color:var(--accent2);margin-bottom:10px;">✓ INVITES CREATED</div>
+        <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-bottom:18px;">
+          ${note ? `Note: <span style="color:var(--ink);">${esc(note)}</span><br>` : ""}
+          Copy these codes and share with the people you want to invite.
+        </div>
+        <div style="background:var(--panel2);padding:18px;border:1px dashed var(--line);max-height:240px;overflow:auto;">
+          ${codes.map(c => `<div class="mono" style="font-size:18px;color:var(--accent2);letter-spacing:0.2em;padding:4px 0;">${esc(c)}</div>`).join("")}
+        </div>
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button class="btn btn-primary" onclick="copyInvites('${codes.join(",")}')">📋 Copy All</button>
+          <button class="btn btn-ghost" onclick="closeModal();loadAdminData().then(render);">Close</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function copyInvites(codesStr) {
+  try {
+    await navigator.clipboard.writeText(codesStr.replace(/,/g, "\n"));
+    alert("Copied to clipboard.");
+  } catch { prompt("Copy these:", codesStr.replace(/,/g, "\n")); }
+}
+
+async function doRevokeInvite(code) {
+  if (!confirm(`Revoke invite code ${code}?`)) return;
+  const { error } = await sb.rpc("admin_revoke_invite", { p_code: code });
+  if (error) return alert("Failed: " + error.message);
+  await loadAdminData();
+  render();
 }
 
 /* ============================ /league/SLUG ============================ */
