@@ -165,8 +165,7 @@
 <div id="app"></div>
 <div id="modal-root"></div>
 
-<!-- Env vars (Vercel serves /api/env; local dev falls back to env.js) -->
-<script src="/api/env" onerror="this.onerror=null;this.src='/env.js'"></script>
+
 
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -175,8 +174,8 @@
 /* =====================================================================
  * CONFIG
  * ===================================================================== */
-const SUPABASE_URL  = window.SUPABASE_URL  || "YOUR_SUPABASE_URL";
-const SUPABASE_ANON = window.SUPABASE_ANON || "YOUR_SUPABASE_ANON_KEY";
+const SUPABASE_URL  = "https://twfjsvmwmtnowdehzltz.supabase.co";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Zmpzdm13bXRub3dkZWh6bHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4OTA5MDcsImV4cCI6MjA5NDQ2NjkwN30.a8Xi7jPE9rDgKf7-8CWGoGIGKQ0I3lJkYs2YWz5JrvY";
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
   realtime: { params: { eventsPerSecond: 20 } }
