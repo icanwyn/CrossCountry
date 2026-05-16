@@ -10,15 +10,28 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f1411; --panel: #161c19; --panel2: #1d2521;
-    --ink: #e8e4d8; --ink-dim: #9a9587; --line: #2a3530;
-    --accent: #ff6b1a; --accent2: #d4ff3a;
-    --red: #e23636; --green: #5ab86c; --blue: #5aa8e2;
+    --bg:       #0c1424;          /* deep navy */
+    --bg-2:     #131c30;          /* slightly lighter */
+    --panel:    #1a2540;          /* card surface */
+    --panel-2:  #243152;          /* hover/active */
+    --ink:      #eef0f5;
+    --ink-dim:  #8c97b3;
+    --line:     #2c3a5c;
+    --gold:     #d4a851;          /* primary accent */
+    --gold-2:   #f0c878;          /* gold highlight */
+    --gold-dark:#8a6a2e;
+    --silver:   #c8cdd9;
+    --red:      #e26b5b;
+    --green:    #7fb88c;
+    --blue:     #6f8fc4;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body { min-height: 100vh;
-    background: radial-gradient(circle at 20% 0%, #1a2420 0%, var(--bg) 50%);
+    background:
+      radial-gradient(circle at 80% -10%, rgba(212,168,81,0.06) 0%, transparent 50%),
+      radial-gradient(circle at 0% 80%, rgba(111,143,196,0.04) 0%, transparent 50%),
+      var(--bg);
     color: var(--ink); font-family: 'JetBrains Mono', 'Courier New', monospace;
     -webkit-font-smoothing: antialiased; }
   .ui { font-family: 'Inter', sans-serif; }
@@ -28,34 +41,47 @@
   button { cursor: pointer; }
   button:disabled { cursor: not-allowed; opacity: 0.4; }
   input::placeholder { color: var(--ink-dim); opacity: 0.6; }
-  a { color: var(--accent2); text-decoration: none; }
-  a:hover { text-decoration: underline; }
+  a { color: var(--gold-2); text-decoration: none; }
+  a:hover { color: var(--gold); }
 
   .hdr { border-bottom: 1px solid var(--line); padding: 18px 24px;
     display: flex; align-items: baseline; justify-content: space-between;
-    gap: 16px; background: rgba(0,0,0,0.2); flex-wrap: wrap; }
-  .hdr .logo { font-family: 'Bebas Neue', sans-serif; font-size: 34px; line-height: 1; color: var(--accent); cursor: pointer; }
-  .hdr .logo span { color: var(--ink); }
+    gap: 16px; flex-wrap: wrap;
+    background: linear-gradient(180deg, rgba(212,168,81,0.05) 0%, transparent 100%);
+    backdrop-filter: blur(8px); }
+  .hdr .logo { font-family: 'Bebas Neue', sans-serif; font-size: 34px; line-height: 1;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-2) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent; cursor: pointer; }
+  .hdr .logo span { color: var(--ink); -webkit-text-fill-color: var(--ink); }
   .hdr .sub { font-size: 11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.15em; }
   .hdr .left { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
   .hdr .right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 
   .btn { padding: 12px 22px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.08em; font-size: 12px; transition: transform 0.1s, opacity 0.2s;
-    background: transparent; color: var(--ink); border: 2px solid var(--line); }
+    letter-spacing: 0.08em; font-size: 12px; transition: transform 0.1s, box-shadow 0.2s, opacity 0.2s, background 0.2s;
+    background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; }
+  .btn:hover { background: var(--panel-2); }
   .btn:active { transform: translateY(1px); }
-  .btn-primary { background: var(--accent); color: #000; border-color: var(--accent); }
-  .btn-ghost { color: var(--ink-dim); border-color: transparent; }
-  .btn-danger { color: var(--red); border-color: var(--red); }
-  .btn-lime { background: var(--accent2); color: #000; border-color: var(--accent2); }
-  .btn-sm { padding: 8px 14px; font-size: 10px; }
+  .btn-primary { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: #1a1408;
+    border-color: var(--gold); box-shadow: 0 4px 14px rgba(212,168,81,0.25); }
+  .btn-primary:hover { background: linear-gradient(135deg, var(--gold-2) 0%, var(--gold) 100%); }
+  .btn-ghost { background: transparent; color: var(--ink-dim); border-color: transparent; }
+  .btn-ghost:hover { color: var(--ink); background: transparent; }
+  .btn-danger { color: var(--red); border-color: var(--red); background: transparent; }
+  .btn-danger:hover { background: rgba(226,107,91,0.1); }
+  .btn-silver { background: linear-gradient(135deg, var(--silver) 0%, #9ba3b5 100%); color: #1a2540; border-color: var(--silver); }
+  .btn-sm { padding: 8px 14px; font-size: 10px; border-radius: 8px; }
 
   .field-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-dim); margin-bottom: 6px; font-family: 'Inter', sans-serif; }
-  .field-input { width: 100%; padding: 12px 14px; background: var(--panel2);
-    border: 1px solid var(--line); color: var(--ink); font-size: 16px; outline: none; }
-  .field-input:focus { border-color: var(--accent); }
+  .field-input { width: 100%; padding: 12px 14px; background: var(--bg-2);
+    border: 1px solid var(--line); color: var(--ink); font-size: 16px; outline: none;
+    border-radius: 10px; transition: border-color 0.15s, box-shadow 0.15s; }
+  .field-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,168,81,0.15); }
 
-  .panel { background: var(--panel); border: 1px solid var(--line); }
+  .panel { background: linear-gradient(180deg, var(--panel) 0%, var(--bg-2) 100%);
+    border: 1px solid var(--line); border-radius: 14px; }
+  .panel-gold { border-color: rgba(212,168,81,0.3);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(212,168,81,0.1); }
   .hairline { border-top: 1px solid var(--line); margin: 18px 0; }
 
   .conn { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; }
@@ -64,70 +90,85 @@
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
   .flash { animation: flash 0.4s ease-out; }
   @keyframes flash { 0% { background: #fff !important; } 100% {} }
+  @keyframes countpop { 0% { transform: scale(1); } 30% { transform: scale(1.15); color: var(--gold-2); } 100% { transform: scale(1); } }
+  .pop { animation: countpop 0.3s ease-out; }
 
-  .lock-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; letter-spacing: 0.15em; padding: 4px 8px; border: 1px solid var(--line); }
-  .lock-badge.unlocked { color: var(--green); border-color: var(--green); }
+  .lock-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; letter-spacing: 0.15em; padding: 5px 10px; border: 1px solid var(--line); border-radius: 6px; }
+  .lock-badge.unlocked { color: var(--green); border-color: var(--green); background: rgba(127,184,140,0.08); }
   .lock-badge.locked { color: var(--ink-dim); }
-  .status-badge { display:inline-block; font-size:10px; letter-spacing:0.15em; padding:3px 8px; border:1px solid var(--line); margin-left:8px; vertical-align:middle; }
-  .status-badge.completed { color: var(--green); border-color: var(--green); }
-  .status-badge.active { color: var(--accent); border-color: var(--accent); }
+  .status-badge { display:inline-block; font-size:10px; letter-spacing:0.15em; padding:3px 9px; border:1px solid var(--line); border-radius:6px; margin-left:8px; vertical-align:middle; }
+  .status-badge.completed { color: var(--green); border-color: var(--green); background: rgba(127,184,140,0.08); }
+  .status-badge.active { color: var(--gold); border-color: var(--gold); background: rgba(212,168,81,0.08); }
 
   table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; padding: 10px 14px; font-size: 10px; color: var(--ink-dim);
-       letter-spacing: 0.2em; border-bottom: 1px solid var(--line); background: var(--panel2);
+  th { text-align: left; padding: 12px 16px; font-size: 10px; color: var(--ink-dim);
+       letter-spacing: 0.2em; border-bottom: 1px solid var(--line); background: var(--bg-2);
        font-family: 'JetBrains Mono', monospace; }
-  td { padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 13px; }
+  td { padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 13px; }
+  tr:last-child td { border-bottom: 0; }
 
-  .land-hero { font-size: 88px; line-height: 0.95; margin-bottom: 8px; }
+  .land-hero { font-size: 96px; line-height: 0.92; margin-bottom: 12px; letter-spacing: -0.01em; }
+  .land-hero .gold { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-2) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  @media (max-width: 760px) { .grid-2 { grid-template-columns: 1fr; } .land-hero { font-size: 56px; } }
+  @media (max-width: 760px) { .grid-2 { grid-template-columns: 1fr; } .land-hero { font-size: 60px; } }
 
-  .timer-grid { display: grid; grid-template-columns: 1fr 320px; min-height: calc(100vh - 73px); }
+  .timer-grid { display: grid; grid-template-columns: 1fr 340px; min-height: calc(100vh - 73px); }
   @media (max-width: 900px) { .timer-grid { grid-template-columns: 1fr; } }
-  .clock { font-size: min(220px, 22vw); line-height: 0.85; color: var(--accent);
+  .clock { font-size: min(220px, 22vw); line-height: 0.85;
+    background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
     font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
     font-family: 'Bebas Neue', sans-serif; }
-  .clock.idle { color: var(--ink-dim); }
+  .clock.idle { background: none; -webkit-text-fill-color: var(--ink-dim); color: var(--ink-dim); }
 
-  .tap-counter { font-family: 'Bebas Neue', sans-serif; font-size: 120px;
-    line-height: 0.9; color: var(--accent2); font-variant-numeric: tabular-nums;
-    text-align: center; padding: 18px 0; border-top: 2px solid var(--line);
-    border-bottom: 2px solid var(--line); margin: 16px 0; background: rgba(212,255,58,0.04); }
-  .tap-counter .lbl { font-family: 'JetBrains Mono', monospace; font-size: 12px;
-    color: var(--ink-dim); letter-spacing: 0.3em; display:block; }
+  .tap-counter { font-family: 'Bebas Neue', sans-serif; font-size: 160px;
+    line-height: 0.9; color: var(--gold-2); font-variant-numeric: tabular-nums;
+    text-align: center; padding: 24px 0; border: 1px solid var(--line); border-radius: 14px;
+    margin: 18px 0; background: linear-gradient(180deg, rgba(212,168,81,0.08) 0%, rgba(212,168,81,0.02) 100%);
+    box-shadow: inset 0 1px 0 rgba(212,168,81,0.15); display: block; }
+  .tap-counter .lbl { font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    color: var(--ink-dim); letter-spacing: 0.3em; display:block; margin-bottom: 4px; }
 
-  .tap-btn { width: 100%; padding: 80px 0; font-size: 88px;
-    font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.1em;
-    background: var(--accent); color: #000; border: none; cursor: pointer;
-    transition: background 0.1s; }
-  .tap-btn:active { background: #fff; }
+  .tap-btn { width: 100%; padding: 88px 0; font-size: 96px;
+    font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.12em;
+    background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+    color: #1a1408; border: none; cursor: pointer; border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(212,168,81,0.35), inset 0 2px 0 rgba(255,255,255,0.2);
+    transition: transform 0.1s, box-shadow 0.1s; }
+  .tap-btn:active { transform: translateY(2px); box-shadow: 0 4px 16px rgba(212,168,81,0.2), inset 0 2px 0 rgba(255,255,255,0.2); background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold) 100%); }
   .start-btn { width: 100%; padding: 60px 0; font-size: 56px;
-    font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.1em;
-    background: var(--accent2); color: #000; border: none; cursor: pointer; }
+    font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.12em;
+    background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold) 100%);
+    color: #1a1408; border: none; cursor: pointer; border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(212,168,81,0.25); }
 
   .bib-input { width: 100%; padding: 24px 28px; font-size: 72px;
     letter-spacing: 0.2em; text-align: center;
-    background: var(--panel2); border: 2px solid var(--accent);
+    background: var(--bg-2); border: 2px solid var(--gold);
     color: var(--ink); outline: none; font-variant-numeric: tabular-nums;
-    font-family: 'JetBrains Mono', monospace; }
-  .bib-input:disabled { opacity: 0.5; border-color: var(--line); }
+    font-family: 'JetBrains Mono', monospace; border-radius: 12px;
+    box-shadow: 0 0 0 4px rgba(212,168,81,0.1); }
+  .bib-input:disabled { opacity: 0.5; border-color: var(--line); box-shadow: none; }
 
-  .role-card { background: var(--panel); border: 1px solid var(--line); padding: 28px;
+  .role-card { background: linear-gradient(180deg, var(--panel) 0%, var(--bg-2) 100%);
+    border: 1px solid var(--line); padding: 28px; border-radius: 14px;
     cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
   .role-card.disabled { opacity: 0.5; cursor: not-allowed; }
-  .role-card:not(.disabled):hover { border-color: var(--accent); }
+  .role-card:not(.disabled):hover { border-color: var(--gold); transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(212,168,81,0.2); }
   .role-card .num { font-size: 10px; letter-spacing: 0.25em; margin-bottom: 12px;
-                    color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+                    color: var(--gold); font-family: 'JetBrains Mono', monospace; }
   .role-card .title { font-size: 42px; line-height: 1; margin-bottom: 10px;
                       font-family: 'Bebas Neue', sans-serif; }
   .role-card .desc { font-size: 13px; color: var(--ink-dim); line-height: 1.5;
                      font-family: 'Inter', sans-serif; }
-  .role-card .note { font-size: 11px; color: var(--accent); margin-top: 14px;
+  .role-card .note { font-size: 11px; color: var(--gold-2); margin-top: 14px;
                      letter-spacing: 0.1em; font-family: 'JetBrains Mono', monospace; }
 
   .stat { display: inline-block; margin-left: 28px; text-align: right; }
   .stat .v { font-size: 36px; line-height: 1; font-family: 'Bebas Neue', sans-serif; }
-  .stat .v.alert { color: var(--accent); }
+  .stat .v.alert { color: var(--gold); }
   .stat .l { font-size: 9px; color: var(--ink-dim); letter-spacing: 0.2em;
              text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
 
@@ -138,32 +179,40 @@
   .wrap-narrow { max-width: 640px; margin: 60px auto; padding: 0 24px; }
   .wrap-wide { max-width: 900px; margin: 0 auto; padding: 60px 24px; }
 
-  .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    display: flex; align-items: center; justify-content: center; z-index: 100;
-    padding: 20px; }
-  .modal { background: var(--panel); border: 1px solid var(--accent);
-    padding: 32px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto; }
+  .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+  .modal { background: linear-gradient(180deg, var(--panel) 0%, var(--bg-2) 100%); border: 1px solid var(--gold);
+    padding: 32px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto; border-radius: 16px;
+    box-shadow: 0 20px 64px rgba(0,0,0,0.6); }
 
   .div-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; margin-top: 16px; }
-  .div-tile { background: var(--panel2); border: 2px solid var(--line); padding: 18px 12px;
-    cursor: pointer; transition: all 0.15s; text-align: center; }
-  .div-tile:hover { border-color: var(--accent); }
-  .div-tile.active { border-color: var(--accent); background: rgba(255,107,26,0.15); }
-  .div-tile .code { font-family: 'Bebas Neue', sans-serif; font-size: 40px; line-height: 1; color: var(--accent); }
+  .div-tile { background: var(--bg-2); border: 1px solid var(--line); padding: 18px 12px;
+    cursor: pointer; transition: all 0.15s; text-align: center; border-radius: 12px; }
+  .div-tile:hover { border-color: var(--gold); background: var(--panel-2); }
+  .div-tile.active { border-color: var(--gold); background: rgba(212,168,81,0.1); }
+  .div-tile .code { font-family: 'Bebas Neue', sans-serif; font-size: 40px; line-height: 1; color: var(--gold); }
   .div-tile .lbl  { font-size: 10px; color: var(--ink-dim); letter-spacing: 0.15em; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
   .div-tile .stat-line { font-size: 10px; color: var(--ink-dim); margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
   .div-tile.started .code { color: var(--green); }
 
   .meet-row { display: flex; justify-content: space-between; padding: 14px 18px;
-    border-bottom: 1px solid var(--line); align-items: center; gap: 14px; cursor: pointer; }
-  .meet-row:hover { background: var(--panel2); }
+    border-bottom: 1px solid var(--line); align-items: center; gap: 14px; cursor: pointer; transition: background 0.15s; }
+  .meet-row:hover { background: var(--panel-2); }
+  .meet-row:last-child { border-bottom: 0; }
   .meet-row .name { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600; }
   .meet-row .meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-dim); margin-top: 3px; }
   .meet-row .code-pill { font-family: 'JetBrains Mono', monospace; font-size: 14px;
-    color: var(--accent); background: var(--panel2); padding: 6px 12px; letter-spacing: 0.1em; }
+    color: var(--gold); background: var(--bg-2); padding: 6px 12px; letter-spacing: 0.1em; border-radius: 8px;
+    border: 1px solid var(--line); }
 
   .auth-link { font-family: 'Inter', sans-serif; font-size: 12px; color: var(--ink-dim); }
   .auth-link:hover { color: var(--ink); }
+
+  .tab-btn { padding: 14px 24px; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    letter-spacing: 0.2em; text-transform: uppercase; background: transparent; color: var(--ink-dim);
+    border: 0; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.15s; }
+  .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab-btn:hover { color: var(--ink); }
 </style>
 </head>
 <body>
@@ -184,6 +233,12 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
 
 /* ============================ AUDIO ============================ */
 let _audioCtx = null;
+function unlockAudio() {
+  try {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (_audioCtx.state === "suspended") _audioCtx.resume();
+  } catch (e) {}
+}
 function playBeep() {
   try {
     if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -191,17 +246,17 @@ function playBeep() {
     if (ctx.state === "suspended") ctx.resume();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = "square";
-    osc.frequency.setValueAtTime(880, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.08);
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(1100, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1600, ctx.currentTime + 0.06);
     gain.gain.setValueAtTime(0.001, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.005);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
     osc.connect(gain).connect(ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.13);
-  } catch (e) { /* ignore */ }
-  try { if (navigator.vibrate) navigator.vibrate(40); } catch(e){}
+  } catch (e) {}
+  try { if (navigator.vibrate) navigator.vibrate(45); } catch(e){}
 }
 
 /* ============================ HELPERS ============================ */
@@ -220,7 +275,6 @@ const newMeetCode = () => {
   return out;
 };
 const validCode = (s) => /^[A-Z0-9][A-Z0-9-]{1,18}[A-Z0-9]$/.test(s) && s.length >= 3 && s.length <= 20;
-const normLeague = (s) => (s || "").trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 const parseCSV = (text) => {
   const lines = text.split(/\r?\n/).filter(l => l.trim().length);
   if (!lines.length) return [];
@@ -265,7 +319,7 @@ const fmtDate = (s) => {
   return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 };
 
-/* ============================ AUTH (meet password) ============================ */
+/* ============================ AUTH ============================ */
 const MeetAuth = {
   tokenKey: (code) => `xc.tok.${code}`,
   get(code)  { return localStorage.getItem(this.tokenKey(code)); },
@@ -284,7 +338,6 @@ function scoreRace(divisionResults, runnersByBib) {
     teamFinisherCount[runner.team] = (teamFinisherCount[runner.team] || 0) + 1;
   }
   const scoring = new Set(Object.keys(teamFinisherCount).filter(t => teamFinisherCount[t] >= 5));
-
   let adj = 0;
   const placed = [];
   for (const r of sorted) {
@@ -323,14 +376,11 @@ function scoreRace(divisionResults, runnersByBib) {
 /* ============================ STATE ============================ */
 const State = {
   route: { name: "landing" },
-  user: null,           // supabase auth user, null if not signed in
+  user: null, isAdmin: false, admin: null,
   meet: null,
   teams: [], runners: [], runnersByBib: {},
   races: [], taps: [], results: [],
-  leagueMeets: [],      // for league listing page
-  myMeets: [],          // for /me dashboard
-  isAdmin: false,       // computed once user is loaded
-  admin: null,          // admin dashboard data
+  leagueMeets: [], myMeets: [],
   selectedDivision: null,
   channel: null, connected: false, tickTimer: null, loading: false,
 };
@@ -360,42 +410,20 @@ async function handleRoute() {
   if (next.division) State.selectedDivision = next.division;
 
   if (next.name !== "meet" && wasMeet) await teardownMeet();
-
-  if (next.name === "meet" && !sameMeet) {
-    State.loading = true;
-    render();
-    await loadMeet(next.code);
-    State.loading = false;
-  } else if (next.name === "league") {
-    State.loading = true;
-    render();
-    await loadLeague(next.slug);
-    State.loading = false;
-  } else if (next.name === "me") {
-    State.loading = true;
-    render();
-    await loadMyMeets();
-    State.loading = false;
-  } else if (next.name === "admin") {
-    State.loading = true;
-    render();
-    await loadAdminData();
-    State.loading = false;
-  }
-
+  if (next.name === "meet" && !sameMeet) { State.loading = true; render(); await loadMeet(next.code); State.loading = false; }
+  else if (next.name === "league") { State.loading = true; render(); await loadLeague(next.slug); State.loading = false; }
+  else if (next.name === "me") { State.loading = true; render(); await loadMyMeets(); State.loading = false; }
+  else if (next.name === "admin") { State.loading = true; render(); await loadAdminData(); State.loading = false; }
   render();
 }
 
-/* ============================ DATA LOADING ============================ */
 async function loadMeet(code) {
   await teardownMeet();
   setConnected(false);
-
   const { data: meet, error } = await sb.from("public_meets").select("*").eq("code", code).maybeSingle();
-  if (error) console.error("loadMeet error:", error);
+  if (error) console.error("loadMeet:", error);
   State.meet = meet || null;
   if (!meet) { render(); return; }
-
   const [t, r, rc, tp, rs] = await Promise.all([
     sb.from("teams").select("*").eq("meet_code", code).order("team_index"),
     sb.from("runners").select("*").eq("meet_code", code).order("bib"),
@@ -412,7 +440,6 @@ async function loadMeet(code) {
   State.races = rc.data || [];
   State.taps = tp.data || [];
   State.results = rs.data || [];
-
   State.channel = sb.channel(`meet:${code}`)
     .on("postgres_changes", { event: "*", schema: "public", table: "meets",   filter: `code=eq.${code}` },      handleMeetChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "teams",   filter: `meet_code=eq.${code}` }, handleTeamChange)
@@ -422,22 +449,16 @@ async function loadMeet(code) {
     .on("postgres_changes", { event: "*", schema: "public", table: "results", filter: `meet_code=eq.${code}` }, handleResultChange)
     .subscribe((status) => { setConnected(status === "SUBSCRIBED"); });
 }
-
 async function loadLeague(slug) {
-  const normalized = normLeague(slug);
-  const { data, error } = await sb.from("public_meets").select("*").eq("league", normalized)
-    .order("meet_date", { ascending: false });
-  if (error) console.error("loadLeague:", error);
+  const normalized = slug.toLowerCase();
+  const { data } = await sb.from("public_meets").select("*").eq("league", normalized).order("meet_date", { ascending: false });
   State.leagueMeets = data || [];
 }
-
 async function loadMyMeets() {
   if (!State.user) { State.myMeets = []; return; }
-  const { data, error } = await sb.rpc("my_meets");
-  if (error) console.error("my_meets:", error);
+  const { data } = await sb.rpc("my_meets");
   State.myMeets = data || [];
 }
-
 async function loadAdminData() {
   if (!State.user) { State.admin = null; return; }
   const { data: isAdminData } = await sb.rpc("is_admin");
@@ -452,10 +473,8 @@ async function loadAdminData() {
   ]);
   State.admin = {
     stats: stats.data?.[0] || null,
-    users: users.data || [],
-    meets: meets.data || [],
-    activity: activity.data || [],
-    invites: invites.data || [],
+    users: users.data || [], meets: meets.data || [],
+    activity: activity.data || [], invites: invites.data || [],
   };
 }
 
@@ -474,71 +493,58 @@ function setConnected(b) {
   }
 }
 
-function handleMeetChange(payload) {
-  if (payload.eventType === "DELETE") { State.meet = null; render(); return; }
-  const { password_hash, ...rest } = payload.new || {};
+function handleMeetChange(p) {
+  if (p.eventType === "DELETE") { State.meet = null; render(); return; }
+  const { password_hash, ...rest } = p.new || {};
   State.meet = { ...State.meet, ...rest };
   render();
 }
-function handleTeamChange(payload) {
-  if (payload.eventType === "INSERT") {
-    if (!State.teams.find(t => t.name === payload.new.name)) State.teams.push(payload.new);
-  } else if (payload.eventType === "DELETE") {
-    State.teams = State.teams.filter(t => t.name !== payload.old.name);
-  }
-  State.teams.sort((a, b) => a.team_index - b.team_index);
-  render();
+function handleTeamChange(p) {
+  if (p.eventType === "INSERT") { if (!State.teams.find(t => t.name === p.new.name)) State.teams.push(p.new); }
+  else if (p.eventType === "DELETE") State.teams = State.teams.filter(t => t.name !== p.old.name);
+  State.teams.sort((a, b) => a.team_index - b.team_index); render();
 }
-function handleRunnerChange(payload) {
-  if (payload.eventType === "INSERT") {
-    if (!State.runnersByBib[payload.new.bib]) {
-      State.runners.push(payload.new);
-      State.runnersByBib[payload.new.bib] = {
-        bib: payload.new.bib, first: payload.new.first_name, last: payload.new.last_name,
-        grade: payload.new.grade, gender: payload.new.gender, team: payload.new.team
-      };
+function handleRunnerChange(p) {
+  if (p.eventType === "INSERT") {
+    if (!State.runnersByBib[p.new.bib]) {
+      State.runners.push(p.new);
+      State.runnersByBib[p.new.bib] = { bib: p.new.bib, first: p.new.first_name, last: p.new.last_name, grade: p.new.grade, gender: p.new.gender, team: p.new.team };
     }
-  } else if (payload.eventType === "DELETE") {
-    State.runners = State.runners.filter(r => r.bib !== payload.old.bib);
-    delete State.runnersByBib[payload.old.bib];
+  } else if (p.eventType === "DELETE") {
+    State.runners = State.runners.filter(r => r.bib !== p.old.bib);
+    delete State.runnersByBib[p.old.bib];
   }
-  State.runners.sort((a, b) => a.bib.localeCompare(b.bib));
-  render();
+  State.runners.sort((a, b) => a.bib.localeCompare(b.bib)); render();
 }
-function handleRaceChange(payload) {
-  if (payload.eventType === "INSERT") {
-    if (!State.races.find(r => r.division === payload.new.division)) State.races.push(payload.new);
-  } else if (payload.eventType === "UPDATE") {
-    const i = State.races.findIndex(r => r.division === payload.new.division);
-    if (i >= 0) State.races[i] = payload.new;
-  } else if (payload.eventType === "DELETE") {
-    State.races = State.races.filter(r => r.division !== payload.old.division);
-  }
-  State.races.sort((a,b) => a.division.localeCompare(b.division));
-  render();
+function handleRaceChange(p) {
+  if (p.eventType === "INSERT") { if (!State.races.find(r => r.division === p.new.division)) State.races.push(p.new); }
+  else if (p.eventType === "UPDATE") {
+    const i = State.races.findIndex(r => r.division === p.new.division);
+    if (i >= 0) State.races[i] = p.new;
+  } else if (p.eventType === "DELETE") State.races = State.races.filter(r => r.division !== p.old.division);
+  State.races.sort((a,b) => a.division.localeCompare(b.division)); render();
 }
-function handleTapChange(payload) {
-  if (payload.eventType === "INSERT") {
-    const exists = State.taps.find(t => t.division === payload.new.division && t.place === payload.new.place);
-    if (!exists) State.taps.push(payload.new);
-  } else if (payload.eventType === "DELETE") {
-    State.taps = State.taps.filter(t => !(t.division === payload.old.division && t.place === payload.old.place));
+function handleTapChange(p) {
+  if (p.eventType === "INSERT") {
+    const exists = State.taps.find(t => t.division === p.new.division && t.place === p.new.place);
+    if (!exists) State.taps.push(p.new);
+  } else if (p.eventType === "DELETE") {
+    State.taps = State.taps.filter(t => !(t.division === p.old.division && t.place === p.old.place));
   }
   render();
 }
-function handleResultChange(payload) {
-  if (payload.eventType === "INSERT") {
-    const exists = State.results.find(r => r.division === payload.new.division && r.place === payload.new.place);
-    if (!exists) State.results.push(payload.new);
-  } else if (payload.eventType === "DELETE") {
-    State.results = State.results.filter(r => !(r.division === payload.old.division && r.place === payload.old.place));
+function handleResultChange(p) {
+  if (p.eventType === "INSERT") {
+    const exists = State.results.find(r => r.division === p.new.division && r.place === p.new.place);
+    if (!exists) State.results.push(p.new);
+  } else if (p.eventType === "DELETE") {
+    State.results = State.results.filter(r => !(r.division === p.old.division && r.place === p.old.place));
   }
   render();
 }
-
-function tapsForDiv(div)    { return State.taps.filter(t => t.division === div).sort((a,b)=>a.place-b.place); }
+function tapsForDiv(div) { return State.taps.filter(t => t.division === div).sort((a,b)=>a.place-b.place); }
 function resultsForDiv(div) { return State.results.filter(r => r.division === div).sort((a,b)=>a.place-b.place); }
-function raceFor(div)       { return State.races.find(r => r.division === div); }
+function raceFor(div) { return State.races.find(r => r.division === div); }
 function computeDivisions() {
   const set = new Map();
   for (const r of State.runners) {
@@ -546,12 +552,11 @@ function computeDivisions() {
     if (!d) continue;
     set.set(d, (set.get(d) || 0) + 1);
   }
-  return [...set.entries()]
-    .map(([division, count]) => ({ division, label: divLabel(division), count }))
+  return [...set.entries()].map(([division, count]) => ({ division, label: divLabel(division), count }))
     .sort((a,b) => a.division.localeCompare(b.division));
 }
 
-/* ============================ AUTH MODAL (meet password) ============================ */
+/* ============================ MEET PASSWORD MODAL ============================ */
 function ensureAuth(code, onAuthed) {
   if (MeetAuth.isAuthed(code)) { onAuthed(); return; }
   showMeetLoginModal(code, onAuthed);
@@ -561,7 +566,7 @@ function showMeetLoginModal(code, onAuthed) {
   root.innerHTML = `
     <div class="modal-back" onclick="if(event.target===this)closeModal()">
       <div class="modal">
-        <div class="mono" style="font-size:10px;color:var(--accent);letter-spacing:0.25em;margin-bottom:8px;">DIRECTOR ACCESS</div>
+        <div class="mono" style="font-size:10px;color:var(--gold);letter-spacing:0.25em;margin-bottom:8px;">DIRECTOR ACCESS</div>
         <div class="display" style="font-size:36px;margin-bottom:6px;">UNLOCK</div>
         <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-bottom:22px;">
           Enter the director password to enable writes on this device.
@@ -578,16 +583,13 @@ function showMeetLoginModal(code, onAuthed) {
   const submit = async () => {
     const pwd = $("auth-pwd").value;
     if (!pwd) return;
-    const errEl = $("auth-err");
-    errEl.style.display = "none";
-    $("auth-submit").disabled = true;
-    $("auth-submit").textContent = "Verifying…";
+    const errEl = $("auth-err"); errEl.style.display = "none";
+    $("auth-submit").disabled = true; $("auth-submit").textContent = "Verifying…";
     const { data: token, error } = await sb.rpc("login_meet", { p_code: code, p_password: pwd });
     if (error || !token) {
       errEl.textContent = "⚠ " + (error?.message || "Login failed");
       errEl.style.display = "block";
-      $("auth-submit").disabled = false;
-      $("auth-submit").textContent = "Unlock →";
+      $("auth-submit").disabled = false; $("auth-submit").textContent = "Unlock →";
       return;
     }
     MeetAuth.set(code, token);
@@ -613,7 +615,6 @@ sb.auth.onAuthStateChange((event, session) => {
   else if (State.route.name === "admin") loadAdminData().then(render);
   else render();
 });
-
 async function checkAdminStatus() {
   if (!State.user) { State.isAdmin = false; return; }
   try {
@@ -621,7 +622,6 @@ async function checkAdminStatus() {
     State.isAdmin = !!data;
   } catch { State.isAdmin = false; }
 }
-
 async function initAuth() {
   const { data } = await sb.auth.getSession();
   State.user = data.session?.user || null;
@@ -634,18 +634,21 @@ async function signInWithPassword(email, password) {
 }
 
 async function signUpWithInvite(email, password, invite) {
-  const { error } = await sb.rpc("signup_with_invite", {
-    p_email: email.toLowerCase(), p_password: password, p_invite: invite.toUpperCase()
-  });
-  if (error) return error;
-  // Now sign them in
-  return await signInWithPassword(email, password);
+  const { error: checkErr } = await sb.rpc("check_invite", { p_invite: invite.toUpperCase() });
+  if (checkErr) return checkErr;
+  const { data, error: signUpErr } = await sb.auth.signUp({ email: email.toLowerCase(), password });
+  if (signUpErr) { console.error("signUp:", signUpErr); return signUpErr; }
+  if (data?.user && !data?.session) {
+    return new Error("Account created but no session. Disable 'Confirm email' in Supabase Auth → Sign In / Providers → Email.");
+  }
+  const signInErr = await signInWithPassword(email, password);
+  if (signInErr) return signInErr;
+  const { error: claimErr } = await sb.rpc("claim_invite", { p_invite: invite.toUpperCase() });
+  if (claimErr) console.warn("claim_invite:", claimErr.message);
+  return null;
 }
 
-async function signOut() {
-  await sb.auth.signOut();
-  go("");
-}
+async function signOut() { await sb.auth.signOut(); go(""); }
 
 /* ============================ RENDER ROUTER ============================ */
 function render() {
@@ -676,7 +679,7 @@ function header(subtitle, rightHTML = "") {
   const showLock = State.route.name === "meet" && State.meet;
   const isAuthed = showLock && MeetAuth.isAuthed(State.meet.code);
   const userBlock = State.user
-    ? `<a class="auth-link" href="#/me">${esc(State.user.email)}</a>${State.isAdmin ? ` · <a class="auth-link" href="#/admin" style="color:var(--accent2);">admin</a>` : ""} · <a class="auth-link" href="javascript:signOut()">Sign out</a>`
+    ? `<a class="auth-link" href="#/me">${esc(State.user.email)}</a>${State.isAdmin ? ` · <a class="auth-link" href="#/admin" style="color:var(--gold-2);">admin</a>` : ""} · <a class="auth-link" href="javascript:signOut()">Sign out</a>`
     : `<a class="auth-link" href="#/signin">Sign in</a>`;
   return `
     <div class="hdr">
@@ -699,23 +702,23 @@ function renderLanding() {
   $("app").innerHTML = `
     ${header("OFFICIAL TIMING")}
     <div class="wrap-wide">
-      <div class="display land-hero">THE CLOCK<br><span style="color:var(--accent)">DOESN'T LIE.</span></div>
+      <div class="display land-hero">THE CLOCK<br><span class="gold">DOESN'T LIE.</span></div>
       <div class="ui" style="font-size:16px;color:var(--ink-dim);max-width:520px;margin-bottom:48px;">
         Multi-coach roster intake, dual-operator timing, division-aware scoring, public results. Built for the chute.
       </div>
       <div class="grid-2">
-        <div class="panel" style="padding:28px;">
-          <div class="mono" style="font-size:11px;color:var(--accent);letter-spacing:0.15em;margin-bottom:14px;">01 / MEET DIRECTOR</div>
-          <div class="display" style="font-size:32px;margin-bottom:14px;">NEW MEET</div>
-          <div class="ui" style="font-size:14px;color:var(--ink-dim);margin-bottom:22px;">Create a meet, set a password, optionally tag a league.</div>
+        <div class="panel panel-gold" style="padding:32px;">
+          <div class="mono" style="font-size:11px;color:var(--gold);letter-spacing:0.15em;margin-bottom:14px;">01 / MEET DIRECTOR</div>
+          <div class="display" style="font-size:36px;margin-bottom:14px;">NEW MEET</div>
+          <div class="ui" style="font-size:14px;color:var(--ink-dim);margin-bottom:24px;">Create a meet, set a password, optionally tag a league.</div>
           <button class="btn btn-primary" onclick="go('create')">Create Meet →</button>
         </div>
-        <div class="panel" style="padding:28px;">
-          <div class="mono" style="font-size:11px;color:var(--accent2);letter-spacing:0.15em;margin-bottom:14px;">02 / JOIN</div>
-          <div class="display" style="font-size:32px;margin-bottom:14px;">ENTER CODE</div>
+        <div class="panel" style="padding:32px;">
+          <div class="mono" style="font-size:11px;color:var(--gold-2);letter-spacing:0.15em;margin-bottom:14px;">02 / JOIN</div>
+          <div class="display" style="font-size:36px;margin-bottom:14px;">ENTER CODE</div>
           <input id="join-code" maxlength="20" placeholder="MEET-CODE" class="mono"
-                 style="width:100%;padding:14px 16px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:24px;letter-spacing:0.15em;text-align:center;outline:none;margin-bottom:16px;text-transform:uppercase;" />
-          <button class="btn btn-lime" onclick="doJoin()">Join Meet →</button>
+                 style="width:100%;padding:14px 16px;background:var(--bg-2);border:1px solid var(--line);color:var(--ink);font-size:24px;letter-spacing:0.15em;text-align:center;outline:none;margin-bottom:16px;text-transform:uppercase;border-radius:10px;" />
+          <button class="btn btn-silver" onclick="doJoin()">Join Meet →</button>
         </div>
       </div>
 
@@ -723,16 +726,16 @@ function renderLanding() {
         <div class="panel" style="margin-top:24px;padding:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div>
             <div class="display" style="font-size:24px;">DIRECTOR ACCOUNT?</div>
-            <div class="ui" style="font-size:13px;color:var(--ink-dim);">Sign in to track all your meets and leagues in one place. Optional — anonymous meets still work.</div>
+            <div class="ui" style="font-size:13px;color:var(--ink-dim);">Track all your meets and leagues in one place. Optional — anonymous meets still work.</div>
           </div>
           <button class="btn" onclick="go('signin')">Sign In / Sign Up →</button>
         </div>` : `
         <div class="panel" style="margin-top:24px;padding:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div>
-            <div class="display" style="font-size:24px;">YOUR MEETS</div>
+            <div class="display" style="font-size:24px;">YOUR DASHBOARD</div>
             <div class="ui" style="font-size:13px;color:var(--ink-dim);">View all meets you've created.</div>
           </div>
-          <button class="btn btn-lime" onclick="go('me')">My Dashboard →</button>
+          <button class="btn btn-primary" onclick="go('me')">My Meets →</button>
         </div>`}
     </div>`;
   $("join-code")?.addEventListener("keydown", e => { if (e.key === "Enter") doJoin(); });
@@ -745,24 +748,21 @@ function doJoin() {
 }
 
 /* ============================ SIGN IN / SIGN UP ============================ */
-let _authMode = "signin"; // or "signup"
+let _authMode = "signin";
 function renderSignIn() {
   $("app").innerHTML = `
     ${header("ACCOUNT", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Cancel</button>`)}
     <div class="wrap-narrow">
-      <div class="display" style="font-size:56px;margin-bottom:8px;">DIRECTOR<span style="color:var(--accent)">·</span>ACCOUNT</div>
+      <div class="display" style="font-size:56px;margin-bottom:8px;">DIRECTOR<span style="color:var(--gold)">·</span>ACCOUNT</div>
       <div class="ui" style="color:var(--ink-dim);font-size:14px;margin-bottom:28px;">
         Track all your meets in one dashboard. Coaches and volunteers don't need accounts — they just use meet codes.
       </div>
-
-      <div style="display:flex;gap:0;margin-bottom:0;">
-        <button onclick="switchAuthMode('signin')" class="btn ${_authMode==='signin'?'btn-primary':''}"
-          style="flex:1;border-radius:0;border-bottom-${_authMode==='signin'?'color:var(--accent)':'width:0'};">SIGN IN</button>
-        <button onclick="switchAuthMode('signup')" class="btn ${_authMode==='signup'?'btn-primary':''}"
-          style="flex:1;border-radius:0;">SIGN UP</button>
-      </div>
-
-      <div class="panel" style="padding:28px;border-top:0;">
+      <div class="panel panel-gold">
+        <div style="display:flex;border-bottom:1px solid var(--line);">
+          <button class="tab-btn ${_authMode==='signin'?'active':''}" onclick="switchAuthMode('signin')" style="flex:1;">SIGN IN</button>
+          <button class="tab-btn ${_authMode==='signup'?'active':''}" onclick="switchAuthMode('signup')" style="flex:1;">SIGN UP</button>
+        </div>
+        <div style="padding:28px;">
         ${_authMode === 'signin' ? `
           <div class="field-label">Email</div>
           <input id="auth-email" type="email" class="field-input" placeholder="you@school.edu" autofocus />
@@ -800,9 +800,9 @@ function renderSignIn() {
             <button id="auth-btn" class="btn btn-primary" onclick="doSignUp()">Sign Up →</button>
           </div>
         `}
+        </div>
       </div>
     </div>`;
-
   if (_authMode === 'signin') {
     $("auth-pwd")?.addEventListener("keydown", e => { if (e.key === "Enter") doPasswordSignIn(); });
   } else {
@@ -812,11 +812,7 @@ function renderSignIn() {
     $("auth-pwd2")?.addEventListener("keydown", e => { if (e.key === "Enter") doSignUp(); });
   }
 }
-
-function switchAuthMode(mode) {
-  _authMode = mode;
-  renderSignIn();
-}
+function switchAuthMode(mode) { _authMode = mode; renderSignIn(); }
 
 async function doPasswordSignIn() {
   const email = $("auth-email").value.trim();
@@ -827,7 +823,6 @@ async function doPasswordSignIn() {
     errEl.textContent = "⚠ Enter a valid email."; errEl.style.display = "block"; return;
   }
   if (!pwd) { errEl.textContent = "⚠ Enter your password."; errEl.style.display = "block"; return; }
-
   const btn = $("auth-btn");
   btn.disabled = true; btn.textContent = "Signing in…";
   const err = await signInWithPassword(email, pwd);
@@ -837,11 +832,9 @@ async function doPasswordSignIn() {
     btn.disabled = false; btn.textContent = "Sign In →";
     return;
   }
-  okEl.textContent = "✓ Signed in. Redirecting…";
-  okEl.style.display = "block";
+  okEl.textContent = "✓ Signed in. Redirecting…"; okEl.style.display = "block";
   setTimeout(() => go(""), 400);
 }
-
 async function doSignUp() {
   const invite = $("auth-invite").value.trim().toUpperCase();
   const email = $("auth-email").value.trim();
@@ -850,22 +843,15 @@ async function doSignUp() {
   const errEl = $("auth-err"), okEl = $("auth-ok");
   errEl.style.display = "none"; okEl.style.display = "none";
   const showErr = (msg) => { errEl.textContent = "⚠ " + msg; errEl.style.display = "block"; };
-
   if (!invite || invite.length < 4) return showErr("Enter your invite code.");
   if (!email || !/^.+@.+\..+$/.test(email)) return showErr("Enter a valid email.");
   if (!pwd || pwd.length < 6) return showErr("Password must be at least 6 characters.");
   if (pwd !== pwd2) return showErr("Passwords don't match.");
-
   const btn = $("auth-btn");
   btn.disabled = true; btn.textContent = "Creating account…";
   const err = await signUpWithInvite(email, pwd, invite);
-  if (err) {
-    showErr(err.message || "Sign-up failed");
-    btn.disabled = false; btn.textContent = "Sign Up →";
-    return;
-  }
-  okEl.textContent = "✓ Account created. Redirecting…";
-  okEl.style.display = "block";
+  if (err) { showErr(err.message || "Sign-up failed"); btn.disabled = false; btn.textContent = "Sign Up →"; return; }
+  okEl.textContent = "✓ Account created. Redirecting…"; okEl.style.display = "block";
   setTimeout(() => go(""), 400);
 }
 
@@ -874,22 +860,19 @@ function renderMe() {
   if (!State.user) { go("signin"); return; }
   const meets = State.myMeets;
   const leagues = [...new Set(meets.map(m => m.league).filter(Boolean))];
-
   $("app").innerHTML = `
     ${header("MY DASHBOARD", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Home</button>`)}
     <div class="wrap">
-      <div class="display" style="font-size:56px;margin-bottom:6px;">YOUR<span style="color:var(--accent)">·</span>MEETS</div>
+      <div class="display" style="font-size:56px;margin-bottom:6px;">YOUR<span style="color:var(--gold)">·</span>MEETS</div>
       <div class="ui" style="color:var(--ink-dim);font-size:13px;margin-bottom:28px;">
         Signed in as <span style="color:var(--ink)">${esc(State.user.email)}</span>. ${meets.length} meet${meets.length===1?"":"s"} owned.
       </div>
-
       ${leagues.length > 0 ? `
-        <div class="display" style="font-size:22px;color:var(--accent2);margin-bottom:10px;">▰ YOUR LEAGUES</div>
+        <div class="display" style="font-size:22px;color:var(--gold-2);margin-bottom:10px;">▰ YOUR LEAGUES</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;">
-          ${leagues.map(l => `<a href="#/league/${encodeURIComponent(l)}" style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--panel);color:var(--accent2);padding:8px 14px;border:1px solid var(--line);text-decoration:none;">${esc(l)}</a>`).join("")}
+          ${leagues.map(l => `<a href="#/league/${encodeURIComponent(l)}" style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--panel);color:var(--gold-2);padding:8px 14px;border:1px solid var(--line);text-decoration:none;border-radius:8px;">${esc(l)}</a>`).join("")}
         </div>` : ""}
-
-      <div class="display" style="font-size:22px;color:var(--accent2);margin-bottom:10px;">▰ ALL MEETS</div>
+      <div class="display" style="font-size:22px;color:var(--gold-2);margin-bottom:10px;">▰ ALL MEETS</div>
       <div class="panel">
         ${meets.length === 0
           ? `<div class="ui" style="padding:32px;text-align:center;color:var(--ink-dim);">No meets yet. <a href="#/create">Create your first one →</a></div>`
@@ -898,7 +881,7 @@ function renderMe() {
               <div style="flex:1;min-width:0;">
                 <div class="name">${esc(m.name)} ${m.status === "completed" ? '<span class="status-badge completed">✓ COMPLETED</span>' : '<span class="status-badge active">● ACTIVE</span>'}</div>
                 <div class="meta">${[m.course_name, m.location, m.distance, fmtDate(m.meet_date)].filter(Boolean).map(esc).join(" · ") || "No details set"}</div>
-                ${m.league ? `<div class="meta" style="color:var(--accent2);margin-top:2px;">League: ${esc(m.league)}</div>` : ""}
+                ${m.league ? `<div class="meta" style="color:var(--gold-2);margin-top:2px;">League: ${esc(m.league)}</div>` : ""}
               </div>
               <div class="code-pill">${esc(m.code)}</div>
             </div>`).join("")}
@@ -906,7 +889,7 @@ function renderMe() {
     </div>`;
 }
 
-/* ============================ /admin DASHBOARD ============================ */
+/* ============================ ADMIN ============================ */
 function renderAdmin() {
   if (!State.user) { go("signin"); return; }
   if (State.admin?.unauthorized) {
@@ -915,35 +898,31 @@ function renderAdmin() {
       <div style="max-width:600px;margin:80px auto;padding:24px;text-align:center;">
         <div class="display" style="font-size:56px;color:var(--red);">NOT AN ADMIN</div>
         <div class="ui" style="color:var(--ink-dim);margin-top:12px;">
-          ${esc(State.user.email)} doesn't have admin access. Contact the site owner.
+          ${esc(State.user.email)} doesn't have admin access.
         </div>
       </div>`;
     return;
   }
-  if (!State.admin) {
-    $("app").innerHTML = `${header("ADMIN")}<div style="padding:60px;text-align:center;color:var(--ink-dim);">Loading admin data…</div>`;
-    return;
-  }
-
+  if (!State.admin) { $("app").innerHTML = `${header("ADMIN")}<div style="padding:60px;text-align:center;color:var(--ink-dim);">Loading admin data…</div>`; return; }
   const s = State.admin.stats || {};
   const users = State.admin.users || [];
   const meets = State.admin.meets || [];
   const activity = State.admin.activity || [];
+  const invites = State.admin.invites || [];
   const maxAct = Math.max(1, ...activity.map(a => Math.max(a.meets_created || 0, a.results_logged || 0)));
 
   $("app").innerHTML = `
     ${header("ADMIN DASHBOARD", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Home</button>`)}
     <div class="wrap">
       <div style="margin-bottom:32px;">
-        <div class="mono" style="font-size:11px;color:var(--accent2);letter-spacing:0.2em;">ADMIN · ${esc(State.user.email)}</div>
-        <div class="display" style="font-size:64px;line-height:1;">XC<span style="color:var(--accent)">·</span>CHRONO <span style="color:var(--accent2);">/ ADMIN</span></div>
+        <div class="mono" style="font-size:11px;color:var(--gold-2);letter-spacing:0.2em;">ADMIN · ${esc(State.user.email)}</div>
+        <div class="display" style="font-size:64px;line-height:1;">XC<span style="color:var(--gold)">·</span>CHRONO <span style="color:var(--gold-2);">/ ADMIN</span></div>
       </div>
 
-      <!-- STATS GRID -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:36px;">
-        ${statCard("Users", s.total_users, "var(--accent2)")}
-        ${statCard("Meets", s.total_meets, "var(--accent)")}
-        ${statCard("Active", s.active_meets, "var(--accent)")}
+        ${statCard("Users", s.total_users, "var(--gold-2)")}
+        ${statCard("Meets", s.total_meets, "var(--gold)")}
+        ${statCard("Active", s.active_meets, "var(--gold)")}
         ${statCard("Completed", s.completed_meets, "var(--green)")}
         ${statCard("Runners", s.total_runners, "var(--ink)")}
         ${statCard("Finishers", s.total_results, "var(--ink)")}
@@ -951,8 +930,7 @@ function renderAdmin() {
         ${statCard("Meets (30d)", s.meets_last_30_days, "var(--blue)")}
       </div>
 
-      <!-- ACTIVITY CHART -->
-      <div class="display" style="font-size:24px;color:var(--accent2);margin-bottom:12px;">▰ ACTIVITY · LAST 30 DAYS</div>
+      <div class="display" style="font-size:24px;color:var(--gold-2);margin-bottom:12px;">▰ ACTIVITY · LAST 30 DAYS</div>
       <div class="panel" style="padding:22px;margin-bottom:36px;">
         <div style="display:flex;align-items:flex-end;gap:4px;height:120px;">
           ${activity.map(a => {
@@ -961,37 +939,36 @@ function renderAdmin() {
             const day = new Date(a.day).toLocaleDateString(undefined, {month:"numeric", day:"numeric"});
             return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;">
               <div style="flex:1;display:flex;align-items:flex-end;gap:2px;width:100%;">
-                <div title="${day}: ${a.meets_created} meets created" style="flex:1;background:var(--accent);height:${mHeight}%;min-height:${a.meets_created?2:0}px;"></div>
-                <div title="${day}: ${a.results_logged} results logged" style="flex:1;background:var(--accent2);height:${rHeight}%;min-height:${a.results_logged?2:0}px;"></div>
+                <div title="${day}: ${a.meets_created} meets" style="flex:1;background:var(--gold);height:${mHeight}%;min-height:${a.meets_created?2:0}px;border-radius:2px 2px 0 0;"></div>
+                <div title="${day}: ${a.results_logged} finishers" style="flex:1;background:var(--gold-2);height:${rHeight}%;min-height:${a.results_logged?2:0}px;border-radius:2px 2px 0 0;"></div>
               </div>
             </div>`;
           }).join("")}
         </div>
         <div style="display:flex;gap:18px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-dim);margin-top:10px;letter-spacing:0.15em;">
-          <span><span style="display:inline-block;width:10px;height:10px;background:var(--accent);vertical-align:middle;"></span> MEETS CREATED</span>
-          <span><span style="display:inline-block;width:10px;height:10px;background:var(--accent2);vertical-align:middle;"></span> FINISHERS LOGGED</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:var(--gold);vertical-align:middle;border-radius:2px;"></span> MEETS CREATED</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:var(--gold-2);vertical-align:middle;border-radius:2px;"></span> FINISHERS LOGGED</span>
         </div>
       </div>
 
-      <!-- INVITE CODES -->
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
-        <div class="display" style="font-size:24px;color:var(--accent2);">▰ INVITE CODES · ${(State.admin.invites||[]).filter(i=>!i.used_by_email).length} UNUSED</div>
+        <div class="display" style="font-size:24px;color:var(--gold-2);">▰ INVITE CODES · ${invites.filter(i=>!i.used_by_email).length} UNUSED</div>
         <div style="display:flex;gap:8px;align-items:center;">
           <input id="invite-note" class="field-input" placeholder="Note (e.g. Coach Smith)" style="font-size:12px;padding:8px 12px;width:200px;" />
           <input id="invite-count" type="number" min="1" max="50" value="1" class="field-input" style="font-size:12px;padding:8px 12px;width:60px;" />
-          <button class="btn btn-lime btn-sm" onclick="doGenerateInvites()">+ Generate</button>
+          <button class="btn btn-primary btn-sm" onclick="doGenerateInvites()">+ Generate</button>
         </div>
       </div>
       <div class="panel" style="margin-bottom:36px;max-height:300px;overflow:auto;">
         <table>
           <thead><tr><th>CODE</th><th>NOTE</th><th>CREATED</th><th>STATUS</th><th></th></tr></thead>
           <tbody>
-            ${(State.admin.invites || []).length === 0 ? `<tr><td colspan="5" style="text-align:center;color:var(--ink-dim);padding:24px;">No invite codes yet. Generate some above.</td></tr>` :
-              State.admin.invites.map(inv => `<tr>
-                <td class="mono" style="font-weight:700;color:${inv.used_by_email?'var(--ink-dim)':'var(--accent2)'};letter-spacing:0.15em;">${esc(inv.code)}</td>
+            ${invites.length === 0 ? `<tr><td colspan="5" style="text-align:center;color:var(--ink-dim);padding:24px;">No invite codes yet.</td></tr>` :
+              invites.map(inv => `<tr>
+                <td class="mono" style="font-weight:700;color:${inv.used_by_email?'var(--ink-dim)':'var(--gold-2)'};letter-spacing:0.15em;">${esc(inv.code)}</td>
                 <td class="ui" style="color:var(--ink-dim);">${esc(inv.note || "—")}</td>
                 <td class="mono" style="color:var(--ink-dim);font-size:11px;">${new Date(inv.created_at).toLocaleDateString()}</td>
-                <td class="mono" style="font-size:11px;color:${inv.used_by_email?'var(--green)':'var(--accent)'};">
+                <td class="mono" style="font-size:11px;color:${inv.used_by_email?'var(--green)':'var(--gold)'};">
                   ${inv.used_by_email ? `✓ ${esc(inv.used_by_email)}` : "● UNUSED"}
                 </td>
                 <td>${!inv.used_by_email ? `<button class="btn btn-ghost btn-sm" onclick="doRevokeInvite('${esc(inv.code)}')" style="font-size:10px;">Revoke</button>` : ""}</td>
@@ -1000,8 +977,7 @@ function renderAdmin() {
         </table>
       </div>
 
-      <!-- USERS -->
-      <div class="display" style="font-size:24px;color:var(--accent2);margin-bottom:12px;">▰ USERS · ${users.length}</div>
+      <div class="display" style="font-size:24px;color:var(--gold-2);margin-bottom:12px;">▰ USERS · ${users.length}</div>
       <div class="panel" style="margin-bottom:36px;max-height:400px;overflow:auto;">
         <table>
           <thead><tr><th>EMAIL</th><th>SIGNED UP</th><th>LAST SIGN-IN</th><th>MEETS</th></tr></thead>
@@ -1011,15 +987,14 @@ function renderAdmin() {
                 <td class="ui">${esc(u.email)}</td>
                 <td class="mono" style="color:var(--ink-dim);">${new Date(u.created_at).toLocaleDateString()}</td>
                 <td class="mono" style="color:var(--ink-dim);">${u.last_sign_in ? new Date(u.last_sign_in).toLocaleDateString() : "—"}</td>
-                <td class="mono" style="color:var(--accent);">${u.meet_count}</td>
+                <td class="mono" style="color:var(--gold);">${u.meet_count}</td>
               </tr>`).join("")}
           </tbody>
         </table>
       </div>
 
-      <!-- MEETS -->
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">
-        <div class="display" style="font-size:24px;color:var(--accent2);">▰ ALL MEETS · ${meets.length}</div>
+        <div class="display" style="font-size:24px;color:var(--gold-2);">▰ ALL MEETS · ${meets.length}</div>
         <button class="btn btn-ghost btn-sm" onclick="doExportAdminMeets()">⬇ CSV</button>
       </div>
       <div class="panel" style="max-height:600px;overflow:auto;">
@@ -1028,9 +1003,9 @@ function renderAdmin() {
           <tbody>
             ${meets.length === 0 ? `<tr><td colspan="8" style="text-align:center;color:var(--ink-dim);padding:24px;">No meets yet.</td></tr>` :
               meets.map(m => `<tr style="cursor:pointer;" onclick="go('m/${m.code}')">
-                <td class="mono" style="color:var(--accent);font-weight:700;">${esc(m.code)}</td>
+                <td class="mono" style="color:var(--gold);font-weight:700;">${esc(m.code)}</td>
                 <td class="ui">${esc(m.name)}</td>
-                <td class="mono" style="color:var(--accent2);">${esc(m.league || "—")}</td>
+                <td class="mono" style="color:var(--gold-2);">${esc(m.league || "—")}</td>
                 <td class="ui" style="color:var(--ink-dim);font-size:12px;">${esc(m.owner_email || "anon")}</td>
                 <td class="mono" style="color:var(--ink-dim);">${m.meet_date ? esc(fmtDate(m.meet_date)) : "—"}</td>
                 <td>${m.status === "completed" ? '<span class="status-badge completed">✓</span>' : '<span class="status-badge active">●</span>'}</td>
@@ -1042,14 +1017,12 @@ function renderAdmin() {
       </div>
     </div>`;
 }
-
 function statCard(label, val, color) {
-  return `<div class="panel" style="padding:16px;text-align:center;">
+  return `<div class="panel" style="padding:18px;text-align:center;">
     <div class="display" style="font-size:42px;line-height:1;color:${color};">${val ?? 0}</div>
     <div class="mono" style="font-size:9px;color:var(--ink-dim);letter-spacing:0.2em;margin-top:6px;">${esc(label.toUpperCase())}</div>
   </div>`;
 }
-
 function doExportAdminMeets() {
   const meets = State.admin?.meets || [];
   if (meets.length === 0) return alert("No meets to export.");
@@ -1062,27 +1035,23 @@ function doExportAdminMeets() {
   }
   downloadCSV(`xc_chrono_all_meets_${new Date().toISOString().slice(0,10)}.csv`, rows);
 }
-
 async function doGenerateInvites() {
   const note = $("invite-note").value.trim() || null;
   const count = parseInt($("invite-count").value || "1", 10);
   if (count < 1 || count > 50) return alert("Count must be 1-50.");
-
   const { data, error } = await sb.rpc("admin_create_invite", { p_count: count, p_note: note });
   if (error) return alert("Failed: " + error.message);
-
-  // Show the codes in a modal
   const codes = (data || []).map(d => d.code);
   $("modal-root").innerHTML = `
     <div class="modal-back" onclick="if(event.target===this)closeModal()">
       <div class="modal">
-        <div class="display" style="font-size:32px;color:var(--accent2);margin-bottom:10px;">✓ INVITES CREATED</div>
+        <div class="display" style="font-size:32px;color:var(--gold-2);margin-bottom:10px;">✓ INVITES CREATED</div>
         <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-bottom:18px;">
           ${note ? `Note: <span style="color:var(--ink);">${esc(note)}</span><br>` : ""}
-          Copy these codes and share with the people you want to invite.
+          Share these codes with the people you want to invite.
         </div>
-        <div style="background:var(--panel2);padding:18px;border:1px dashed var(--line);max-height:240px;overflow:auto;">
-          ${codes.map(c => `<div class="mono" style="font-size:18px;color:var(--accent2);letter-spacing:0.2em;padding:4px 0;">${esc(c)}</div>`).join("")}
+        <div style="background:var(--bg-2);padding:18px;border:1px dashed var(--line);max-height:240px;overflow:auto;border-radius:10px;">
+          ${codes.map(c => `<div class="mono" style="font-size:18px;color:var(--gold-2);letter-spacing:0.2em;padding:4px 0;">${esc(c)}</div>`).join("")}
         </div>
         <div style="display:flex;gap:10px;margin-top:18px;">
           <button class="btn btn-primary" onclick="copyInvites('${codes.join(",")}')">📋 Copy All</button>
@@ -1091,36 +1060,29 @@ async function doGenerateInvites() {
       </div>
     </div>`;
 }
-
-async function copyInvites(codesStr) {
-  try {
-    await navigator.clipboard.writeText(codesStr.replace(/,/g, "\n"));
-    alert("Copied to clipboard.");
-  } catch { prompt("Copy these:", codesStr.replace(/,/g, "\n")); }
+async function copyInvites(s) {
+  try { await navigator.clipboard.writeText(s.replace(/,/g, "\n")); alert("Copied."); }
+  catch { prompt("Copy:", s.replace(/,/g, "\n")); }
 }
-
 async function doRevokeInvite(code) {
-  if (!confirm(`Revoke invite code ${code}?`)) return;
+  if (!confirm(`Revoke invite ${code}?`)) return;
   const { error } = await sb.rpc("admin_revoke_invite", { p_code: code });
   if (error) return alert("Failed: " + error.message);
-  await loadAdminData();
-  render();
+  await loadAdminData(); render();
 }
 
-/* ============================ /league/SLUG ============================ */
+/* ============================ /league ============================ */
 function renderLeague() {
   const slug = State.route.slug;
   const meets = State.leagueMeets;
-
   $("app").innerHTML = `
     ${header("LEAGUE", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Home</button>`)}
     <div class="wrap">
       <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:4px;">LEAGUE</div>
-      <div class="display" style="font-size:64px;line-height:1;color:var(--accent2);margin-bottom:8px;">${esc(slug.toUpperCase())}</div>
+      <div class="display" style="font-size:64px;line-height:1;color:var(--gold);margin-bottom:8px;">${esc(slug.toUpperCase())}</div>
       <div class="ui" style="color:var(--ink-dim);font-size:14px;margin-bottom:28px;">
-        ${meets.length} meet${meets.length===1?"":"s"} in this league. Anyone can view; password required to score new meets.
+        ${meets.length} meet${meets.length===1?"":"s"} in this league.
       </div>
-
       <div class="panel">
         ${meets.length === 0
           ? `<div class="ui" style="padding:32px;text-align:center;color:var(--ink-dim);">No meets tagged with this league yet.</div>`
@@ -1142,28 +1104,21 @@ function renderCreate() {
   $("app").innerHTML = `
     ${header("NEW MEET", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Cancel</button>`)}
     <div class="wrap-narrow">
-      <div class="display" style="font-size:56px;margin-bottom:24px;">MEET<span style="color:var(--accent)">·</span>SETUP</div>
-      <div class="panel" style="padding:28px;">
+      <div class="display" style="font-size:56px;margin-bottom:24px;">MEET<span style="color:var(--gold)">·</span>SETUP</div>
+      <div class="panel panel-gold" style="padding:32px;">
         <div class="field-label">Meet Name</div>
         <input id="meet-name" class="field-input" placeholder="Tri-County Invitational" />
-
         <div style="margin-top:18px;">
           <div class="field-label">Meet Code (3–20 chars · letters, numbers, dashes)</div>
-          <input id="meet-code" class="field-input mono" value="${auto}" maxlength="20"
-            style="letter-spacing:0.15em;text-transform:uppercase;" />
+          <input id="meet-code" class="field-input mono" value="${auto}" maxlength="20" style="letter-spacing:0.15em;text-transform:uppercase;" />
           <div class="ui" style="font-size:11px;color:var(--ink-dim);margin-top:6px;">
-            Customize this — e.g. <span class="mono">SJUSD-WK3</span>. Auto-generated as <span class="mono">${auto}</span>.
+            Customize this — e.g. <span class="mono">SJUSD-WK3</span>.
           </div>
         </div>
-
         <div style="margin-top:18px;">
           <div class="field-label">League (optional)</div>
           <input id="meet-league" class="field-input" placeholder="sjusd, central-cal-xc, etc." />
-          <div class="ui" style="font-size:11px;color:var(--ink-dim);margin-top:6px;">
-            Meets with the same league name auto-group at <span class="mono">/league/NAME</span>.
-          </div>
         </div>
-
         <div style="margin-top:18px;">
           <div class="field-label">Director Password (share with operators)</div>
           <input id="meet-pwd" type="password" class="field-input" placeholder="At least 4 characters" />
@@ -1172,47 +1127,32 @@ function renderCreate() {
           <div class="field-label">Confirm Password</div>
           <input id="meet-pwd2" type="password" class="field-input" />
         </div>
-
         ${State.user
           ? `<div class="ui" style="font-size:12px;color:var(--green);margin-top:18px;">✓ Signed in — this meet will be saved to your dashboard.</div>`
-          : `<div class="ui" style="font-size:12px;color:var(--ink-dim);margin-top:18px;">Not signed in — meet will be anonymous. <a href="#/signin">Sign in</a> to track your meets in one place.</div>`}
-
+          : `<div class="ui" style="font-size:12px;color:var(--ink-dim);margin-top:18px;">Not signed in — meet will be anonymous.</div>`}
         <div id="create-err" class="err" style="display:none;"></div>
         <div style="margin-top:28px;">
           <button id="create-btn" class="btn btn-primary" onclick="doCreate()">Create →</button>
         </div>
       </div>
     </div>`;
-  $("meet-code")?.addEventListener("input", e => {
-    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
-  });
+  $("meet-code")?.addEventListener("input", e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, ""); });
 }
 async function doCreate() {
-  const errEl = $("create-err");
-  errEl.style.display = "none";
+  const errEl = $("create-err"); errEl.style.display = "none";
   const show = (msg) => { errEl.textContent = "⚠ " + msg; errEl.style.display = "block"; };
-
   let code = ($("meet-code").value || "").trim().toUpperCase();
   const name = ($("meet-name").value || "").trim() || "Untitled Meet";
   const league = ($("meet-league").value || "").trim();
   const pwd  = $("meet-pwd").value;
   const pwd2 = $("meet-pwd2").value;
-
-  if (!validCode(code)) return show("Code must be 3–20 chars: letters, numbers, dashes; cannot start or end with a dash.");
+  if (!validCode(code)) return show("Code must be 3–20 chars: letters, numbers, dashes.");
   if (!pwd || pwd.length < 4) return show("Password must be at least 4 characters.");
   if (pwd !== pwd2) return show("Passwords don't match.");
-
   const btn = $("create-btn");
   btn.disabled = true; btn.textContent = "Creating…";
-
-  const { data: token, error } = await sb.rpc("create_meet", {
-    p_code: code, p_name: name, p_password: pwd, p_league: league
-  });
-  if (error || !token) {
-    show(error?.message || "Could not create meet.");
-    btn.disabled = false; btn.textContent = "Create →";
-    return;
-  }
+  const { data: token, error } = await sb.rpc("create_meet", { p_code: code, p_name: name, p_password: pwd, p_league: league });
+  if (error || !token) { show(error?.message || "Could not create meet."); btn.disabled = false; btn.textContent = "Create →"; return; }
   MeetAuth.set(code, token);
   go(`m/${code}`);
 }
@@ -1238,14 +1178,13 @@ function renderHub() {
   const racesStarted = State.races.filter(r => r.start_time).length;
   const m = State.meet;
   const isCompleted = m.status === "completed";
-
   $("app").innerHTML = `
     ${header(`MEET CODE · ${code}`, `<button class="btn btn-ghost btn-sm" onclick="go('')">← Switch Meet</button>`)}
     <div class="wrap">
       <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
         <div>
           <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:6px;">${esc(m.name)} ${isCompleted ? '<span class="status-badge completed">✓ COMPLETED</span>' : '<span class="status-badge active">● ACTIVE</span>'}</div>
-          <div class="display" style="font-size:56px;line-height:1;letter-spacing:0.04em;">${code}</div>
+          <div class="display" style="font-size:56px;line-height:1;letter-spacing:0.04em;background:linear-gradient(135deg,var(--gold),var(--gold-2));-webkit-background-clip:text;background-clip:text;color:transparent;">${code}</div>
           <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-top:8px;max-width:520px;">
             ${m.course_name || m.location || m.distance
               ? `<span style="color:var(--ink);">${esc(m.course_name || "")}${m.location ? ` · ${esc(m.location)}` : ""}${m.distance ? ` · ${esc(m.distance)}` : ""}${m.meet_date ? ` · ${esc(fmtDate(m.meet_date))}` : ""}</span>`
@@ -1262,7 +1201,7 @@ function renderHub() {
       </div>
 
       ${isCompleted ? `
-        <div class="panel" style="padding:18px 22px;margin-bottom:24px;border-color:var(--green);">
+        <div class="panel" style="padding:22px;margin-bottom:24px;border-color:var(--green);background:linear-gradient(180deg,rgba(127,184,140,0.08) 0%,var(--bg-2) 100%);">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
             <div>
               <div class="display" style="font-size:24px;color:var(--green);">✓ MEET COMPLETED</div>
@@ -1279,43 +1218,43 @@ function renderHub() {
         <div class="role-card ${isCompleted?"disabled":""}" ${isCompleted?"":`onclick="goRole('details')"`}>
           <div class="num" style="color:var(--blue);">00 · Course · Location · Distance · Date · League</div>
           <div class="title">MEET DETAILS</div>
-          <div class="desc">Set the course details and league tag. Visible on the public results page.</div>
+          <div class="desc">Set course details. Visible on the public results page.</div>
         </div>
         <div class="role-card ${isCompleted?"disabled":""}" ${isCompleted?"":`onclick="goRole('roster')"`}>
           <div class="num">01 · Upload Roster · Auto-Divisions</div>
           <div class="title">COACH</div>
-          <div class="desc">CSV with first, last, grade, gender. Auto-grouped into divisions by grade+gender.</div>
+          <div class="desc">CSV with first, last, grade, gender. Auto-grouped into divisions.</div>
         </div>
         <div class="role-card ${(divs.length === 0 || isCompleted) ? "disabled" : ""}" ${(divs.length === 0 || isCompleted) ? "" : `onclick="goRole('timer')"`}>
           <div class="num">02 · Tap Finish · Pick Race</div>
           <div class="title">TIMER · START LINE</div>
-          <div class="desc">Pick a race and tap finishes. Each race has its own clock and tap log.</div>
+          <div class="desc">Pick a race and tap finishes. Each race has its own clock.</div>
         </div>
         <div class="role-card ${(totalTaps === 0 || isCompleted) ? "disabled" : ""}" ${(totalTaps === 0 || isCompleted) ? "" : `onclick="goRole('recorder')"`}>
           <div class="num">03 · Match Bibs to Times</div>
           <div class="title">RECORDER · CHUTE</div>
-          <div class="desc">Pick a race and type bibs as runners flow through the chute.</div>
+          <div class="desc">Type bibs as runners flow through the chute.</div>
           ${totalTaps === 0 ? `<div class="note" style="color:var(--ink-dim);">→ Waiting for taps</div>` : `<div class="note">→ ${totalTaps - totalFinish} unmatched tap${(totalTaps-totalFinish)===1?"":"s"}</div>`}
         </div>
         <div class="role-card ${totalFinish === 0 ? "disabled" : ""}" ${totalFinish === 0 ? "" : `onclick="go('m/${code}/results')"`} style="grid-column:1/-1;">
-          <div class="num" style="color:var(--accent2)">04 · Live Standings · Export · Public Link</div>
+          <div class="num" style="color:var(--gold-2)">04 · Live Standings · Export · Public Link</div>
           <div class="title">RESULTS</div>
-          <div class="desc">Per-race team scores and individual finishers. Shareable public link, CSV export.</div>
+          <div class="desc">Per-race team scores. Shareable public link, CSV export.</div>
         </div>
       </div>
 
       ${!isCompleted && totalFinish > 0 && authed ? `
-        <div class="panel" style="margin-top:24px;padding:22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="panel panel-gold" style="margin-top:24px;padding:22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div>
             <div class="display" style="font-size:22px;">FINISH THE MEET</div>
-            <div class="ui" style="font-size:12px;color:var(--ink-dim);">Lock all timing and mark this meet complete. You can reopen it later if needed.</div>
+            <div class="ui" style="font-size:12px;color:var(--ink-dim);">Lock all timing. You can reopen it later.</div>
           </div>
-          <button class="btn btn-lime" onclick="doEndMeet()">✓ Complete Meet</button>
+          <button class="btn btn-primary" onclick="doEndMeet()">✓ Complete Meet</button>
         </div>` : ""}
 
       ${divs.length > 0 ? `
         <div class="hairline" style="margin-top:36px;"></div>
-        <div class="display" style="font-size:22px;margin-top:24px;margin-bottom:12px;color:var(--accent2);">▰ DIVISIONS DETECTED</div>
+        <div class="display" style="font-size:22px;margin-top:24px;margin-bottom:12px;color:var(--gold-2);">▰ DIVISIONS DETECTED</div>
         <div class="div-grid">
           ${divs.map(d => {
             const race = raceFor(d.division);
@@ -1332,94 +1271,55 @@ function renderHub() {
         </div>` : ""}
     </div>`;
 }
-
-function goRole(view) {
-  const code = State.meet.code;
-  ensureAuth(code, () => go(`m/${code}/${view}`));
-}
+function goRole(view) { const code = State.meet.code; ensureAuth(code, () => go(`m/${code}/${view}`)); }
 
 async function doEndMeet() {
-  const code = State.meet.code;
-  const token = MeetAuth.get(code);
+  const code = State.meet.code; const token = MeetAuth.get(code);
   if (!token) return ensureAuth(code, doEndMeet);
-  if (!confirm("Complete this meet? Timing will be locked. You can reopen it later if needed.")) return;
-
+  if (!confirm("Complete this meet? Timing will be locked.")) return;
   State.meet = { ...State.meet, status: "completed", completed_at: new Date().toISOString() };
   render();
-
   const { error } = await sb.rpc("end_meet", { p_token: token, p_meet: code });
-  if (error) {
-    alert("Failed: " + error.message);
-    State.meet = { ...State.meet, status: "active", completed_at: null };
-    render();
-  }
+  if (error) { alert("Failed: " + error.message); State.meet = { ...State.meet, status: "active", completed_at: null }; render(); }
 }
-
 async function doReopenMeet() {
-  const code = State.meet.code;
-  const token = MeetAuth.get(code);
+  const code = State.meet.code; const token = MeetAuth.get(code);
   if (!token) return ensureAuth(code, doReopenMeet);
-  if (!confirm("Reopen this meet for further timing changes?")) return;
-
+  if (!confirm("Reopen this meet for changes?")) return;
   State.meet = { ...State.meet, status: "active", completed_at: null };
   render();
-
   const { error } = await sb.rpc("reopen_meet", { p_token: token, p_meet: code });
-  if (error) {
-    alert("Failed: " + error.message);
-    await loadMeet(code);
-    render();
-  }
+  if (error) { alert("Failed: " + error.message); await loadMeet(code); render(); }
 }
 
-/* ============================ MEET DETAILS ============================ */
+/* ============================ DETAILS ============================ */
 function renderDetails() {
   const code = State.meet.code;
   if (!MeetAuth.isAuthed(code)) { ensureAuth(code, () => render()); }
   const m = State.meet;
-
   $("app").innerHTML = `
     ${header("MEET DETAILS", `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
     <div class="wrap-narrow">
-      <div class="display" style="font-size:48px;margin-bottom:24px;">COURSE<span style="color:var(--accent)">·</span>INFO</div>
-      <div class="panel" style="padding:28px;">
+      <div class="display" style="font-size:48px;margin-bottom:24px;">COURSE<span style="color:var(--gold)">·</span>INFO</div>
+      <div class="panel panel-gold" style="padding:32px;">
         <div class="field-label">Course Name</div>
         <input id="d-course" class="field-input" value="${esc(m.course_name || "")}" placeholder="Greenfield Park Loop" />
-        <div style="margin-top:16px;">
-          <div class="field-label">Location</div>
-          <input id="d-loc" class="field-input" value="${esc(m.location || "")}" placeholder="Greenfield, CA" />
-        </div>
-        <div style="margin-top:16px;">
-          <div class="field-label">Distance</div>
-          <input id="d-dist" class="field-input" value="${esc(m.distance || "")}" placeholder="3 miles, 5K, etc." />
-        </div>
-        <div style="margin-top:16px;">
-          <div class="field-label">Meet Date</div>
-          <input id="d-date" type="date" class="field-input" value="${esc(m.meet_date || "")}" />
-        </div>
-        <div style="margin-top:16px;">
-          <div class="field-label">League (optional)</div>
-          <input id="d-league" class="field-input" value="${esc(m.league || "")}" placeholder="sjusd, central-cal-xc, etc." />
-        </div>
-        <div style="margin-top:16px;">
-          <div class="field-label">Notes (optional)</div>
-          <textarea id="d-notes" class="field-input" rows="3" placeholder="Bag drop at the pavilion, awards at 12:30">${esc(m.notes || "")}</textarea>
-        </div>
+        <div style="margin-top:16px;"><div class="field-label">Location</div><input id="d-loc" class="field-input" value="${esc(m.location || "")}" placeholder="Greenfield, CA" /></div>
+        <div style="margin-top:16px;"><div class="field-label">Distance</div><input id="d-dist" class="field-input" value="${esc(m.distance || "")}" placeholder="3 miles, 5K" /></div>
+        <div style="margin-top:16px;"><div class="field-label">Meet Date</div><input id="d-date" type="date" class="field-input" value="${esc(m.meet_date || "")}" /></div>
+        <div style="margin-top:16px;"><div class="field-label">League (optional)</div><input id="d-league" class="field-input" value="${esc(m.league || "")}" placeholder="sjusd, central-cal-xc" /></div>
+        <div style="margin-top:16px;"><div class="field-label">Notes (optional)</div><textarea id="d-notes" class="field-input" rows="3" placeholder="Awards at 12:30">${esc(m.notes || "")}</textarea></div>
         <div id="d-err" class="err" style="display:none;"></div>
         <div id="d-ok" class="ok" style="display:none;"></div>
-        <div style="margin-top:22px;">
-          <button id="d-save" class="btn btn-primary" onclick="doSaveDetails()">Save Details →</button>
-        </div>
+        <div style="margin-top:22px;"><button id="d-save" class="btn btn-primary" onclick="doSaveDetails()">Save Details →</button></div>
       </div>
     </div>`;
 }
 async function doSaveDetails() {
-  const code = State.meet.code;
-  const token = MeetAuth.get(code);
+  const code = State.meet.code; const token = MeetAuth.get(code);
   if (!token) return ensureAuth(code, doSaveDetails);
   const errEl = $("d-err"), okEl = $("d-ok");
   errEl.style.display = "none"; okEl.style.display = "none";
-
   const updates = {
     course_name: $("d-course").value.trim() || null,
     location:    $("d-loc").value.trim() || null,
@@ -1428,27 +1328,18 @@ async function doSaveDetails() {
     notes:       $("d-notes").value.trim() || null,
     league:      $("d-league").value.trim() || null,
   };
-
   State.meet = { ...State.meet, ...updates };
   render();
-
   const btn = $("d-save");
   if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
-
   const { error } = await sb.rpc("set_meet_details", {
-    p_token: token, p_meet: code,
-    p_course: updates.course_name, p_location: updates.location,
-    p_distance: updates.distance, p_meet_date: updates.meet_date,
-    p_notes: updates.notes, p_league: updates.league
+    p_token: token, p_meet: code, p_course: updates.course_name, p_location: updates.location,
+    p_distance: updates.distance, p_meet_date: updates.meet_date, p_notes: updates.notes, p_league: updates.league
   });
-
-  const okEl2 = $("d-ok"), errEl2 = $("d-err"), btn2 = $("d-save");
-  if (btn2) { btn2.disabled = false; btn2.textContent = "Save Details →"; }
-  if (error) {
-    if (errEl2) { errEl2.textContent = "⚠ " + error.message; errEl2.style.display = "block"; }
-  } else {
-    if (okEl2) { okEl2.textContent = "✓ Saved."; okEl2.style.display = "block"; }
-  }
+  const ok2 = $("d-ok"), err2 = $("d-err"), b2 = $("d-save");
+  if (b2) { b2.disabled = false; b2.textContent = "Save Details →"; }
+  if (error) { if (err2) { err2.textContent = "⚠ " + error.message; err2.style.display = "block"; } }
+  else { if (ok2) { ok2.textContent = "✓ Saved."; ok2.style.display = "block"; } }
 }
 
 /* ============================ ROSTER ============================ */
@@ -1459,33 +1350,24 @@ function renderRoster() {
   const filterOptions = ["ALL", ...State.teams.map(t => t.name)];
   const visible = _rosterFilterTeam === "ALL" ? State.runners : State.runners.filter(r => r.team === _rosterFilterTeam);
   const divs = computeDivisions();
-
   $("app").innerHTML = `
     ${header("ROSTER INTAKE", `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
     <div class="wrap">
-      <div class="display" style="font-size:48px;margin-bottom:24px;">UPLOAD<span style="color:var(--accent)">·</span>ROSTER</div>
+      <div class="display" style="font-size:48px;margin-bottom:24px;">UPLOAD<span style="color:var(--gold)">·</span>ROSTER</div>
       <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:24px;margin-bottom:32px;" class="roster-grid">
-        <div class="panel" style="padding:22px;">
+        <div class="panel panel-gold" style="padding:24px;">
           <div class="field-label">School / Team Name</div>
           <input id="r-school" class="field-input" placeholder="Riverdale High" />
-          <div style="margin-top:16px;">
-            <div class="field-label">CSV File</div>
-            <input id="r-file" type="file" accept=".csv,text/csv" style="color:var(--ink-dim);font-size:13px;" />
-          </div>
-          <div style="margin-top:16px;">
-            <div class="field-label">Or paste CSV</div>
-            <textarea id="r-csv" rows="6" class="mono" placeholder="first,last,grade,gender&#10;Jamal,Reeves,7,M&#10;Lina,Park,6,F" style="width:100%;padding:12px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:12px;outline:none;resize:vertical;"></textarea>
-          </div>
+          <div style="margin-top:16px;"><div class="field-label">CSV File</div><input id="r-file" type="file" accept=".csv,text/csv" style="color:var(--ink-dim);font-size:13px;" /></div>
+          <div style="margin-top:16px;"><div class="field-label">Or paste CSV</div><textarea id="r-csv" rows="6" class="mono field-input" placeholder="first,last,grade,gender&#10;Jamal,Reeves,7,M&#10;Lina,Park,6,F" style="font-size:12px;resize:vertical;"></textarea></div>
           <div id="r-err" class="err" style="display:none;"></div>
           <div id="r-ok" class="ok" style="display:none;"></div>
-          <div style="margin-top:18px;">
-            <button id="r-submit" class="btn btn-primary" onclick="doUploadRoster()">Assign Bibs →</button>
-          </div>
+          <div style="margin-top:18px;"><button id="r-submit" class="btn btn-primary" onclick="doUploadRoster()">Assign Bibs →</button></div>
         </div>
-        <div class="panel" style="padding:22px;">
-          <div class="mono" style="font-size:10px;color:var(--accent2);letter-spacing:0.2em;margin-bottom:14px;">BIB + DIVISION ASSIGNMENT</div>
+        <div class="panel" style="padding:24px;">
+          <div class="mono" style="font-size:10px;color:var(--gold-2);letter-spacing:0.2em;margin-bottom:14px;">BIB + DIVISION ASSIGNMENT</div>
           <div class="ui" style="font-size:13px;color:var(--ink-dim);line-height:1.6;">
-            Each team gets a 1000-block. Runners auto-assigned to divisions by grade+gender (6M, 7F, etc.).
+            Each team gets a 1000-block. Runners auto-assigned by grade+gender (6M, 7F, etc.).
           </div>
           <div class="hairline"></div>
           <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:10px;">TEAMS REGISTERED</div>
@@ -1497,24 +1379,23 @@ function renderRoster() {
               const lo = bibs.length ? Math.min(...bibs) : t.team_index*1000+1;
               const hi = bibs.length ? Math.max(...bibs) : t.team_index*1000+1;
               return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);">
-                <div><span class="mono" style="color:var(--accent);margin-right:10px;">#${t.team_index}</span><span class="ui" style="font-size:14px;">${esc(t.name)}</span></div>
+                <div><span class="mono" style="color:var(--gold);margin-right:10px;">#${t.team_index}</span><span class="ui" style="font-size:14px;">${esc(t.name)}</span></div>
                 <div class="mono" style="font-size:12px;color:var(--ink-dim);">${count} runners · ${pad(lo,4)}–${pad(hi,4)}</div>
               </div>`;
             }).join("")}
           ${divs.length > 0 ? `
             <div class="hairline"></div>
-            <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:10px;">RACES (auto-detected)</div>
+            <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:10px;">RACES</div>
             <div style="display:flex;flex-wrap:wrap;gap:6px;">
-              ${divs.map(d => `<span style="font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--panel2);color:var(--accent);padding:4px 10px;border:1px solid var(--line);">${d.division} · ${d.count}</span>`).join("")}
+              ${divs.map(d => `<span style="font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--bg-2);color:var(--gold);padding:4px 10px;border:1px solid var(--line);border-radius:6px;">${d.division} · ${d.count}</span>`).join("")}
             </div>` : ""}
         </div>
       </div>
-
       ${State.runners.length > 0 ? `
       <div class="panel">
         <div style="padding:14px 22px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);">
           <div class="display" style="font-size:22px;letter-spacing:0.05em;">ENTERED RUNNERS · ${State.runners.length}</div>
-          <select id="r-filter" class="mono" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line);padding:6px 10px;font-size:12px;" onchange="changeFilter(this.value)">
+          <select id="r-filter" class="mono" style="background:var(--bg-2);color:var(--ink);border:1px solid var(--line);padding:6px 10px;font-size:12px;border-radius:6px;" onchange="changeFilter(this.value)">
             ${filterOptions.map(t => `<option value="${esc(t)}" ${t === _rosterFilterTeam ? "selected" : ""}>${esc(t)}</option>`).join("")}
           </select>
         </div>
@@ -1525,11 +1406,11 @@ function renderRoster() {
               ${visible.map(r => {
                 const div = divFromRunner(r);
                 return `<tr>
-                  <td class="mono" style="color:var(--accent);font-weight:700;">${esc(r.bib)}</td>
+                  <td class="mono" style="color:var(--gold);font-weight:700;">${esc(r.bib)}</td>
                   <td class="ui">${esc(r.first_name)} ${esc(r.last_name)}</td>
                   <td class="mono" style="color:var(--ink-dim);">${esc(r.grade || "")}</td>
                   <td class="mono" style="color:var(--ink-dim);">${esc(r.gender || "")}</td>
-                  <td class="mono" style="color:${div?"var(--accent2)":"var(--red)"};font-weight:700;">${div || "—"}</td>
+                  <td class="mono" style="color:${div?"var(--gold-2)":"var(--red)"};font-weight:700;">${div || "—"}</td>
                   <td class="ui" style="color:var(--ink-dim);">${esc(r.team)}</td>
                 </tr>`;
               }).join("")}
@@ -1539,7 +1420,6 @@ function renderRoster() {
       </div>` : ""}
     </div>
     <style>@media(max-width:760px){.roster-grid{grid-template-columns:1fr !important;}}</style>`;
-
   $("r-file")?.addEventListener("change", (e) => {
     const f = e.target.files[0]; if (!f) return;
     const fr = new FileReader();
@@ -1548,55 +1428,38 @@ function renderRoster() {
   });
 }
 function changeFilter(v) { _rosterFilterTeam = v; renderRoster(); }
-
 async function doUploadRoster() {
-  const code = State.meet.code;
-  const token = MeetAuth.get(code);
+  const code = State.meet.code; const token = MeetAuth.get(code);
   if (!token) return ensureAuth(code, doUploadRoster);
   const errEl = $("r-err"), okEl = $("r-ok");
   errEl.style.display = "none"; okEl.style.display = "none";
   const showErr = (msg) => { errEl.textContent = "⚠ " + msg; errEl.style.display = "block"; };
   const showOk  = (msg) => { okEl.textContent  = "✓ " + msg; okEl.style.display  = "block"; };
-
   const school = ($("r-school").value || "").trim();
   if (!school) return showErr("Enter a school name first.");
   const csv = $("r-csv").value;
   const parsed = parseCSV(csv);
   if (parsed === null) return showErr("CSV must have headers: first, last, grade, gender");
   if (!parsed || parsed.length === 0) return showErr("No rows found.");
-
   const btn = $("r-submit");
   btn.disabled = true; btn.textContent = "Uploading…";
-
   try {
-    const { data: teamIdx, error: teamErr } = await sb.rpc("register_team", {
-      p_token: token, p_meet: code, p_team: school
-    });
+    const { data: teamIdx, error: teamErr } = await sb.rpc("register_team", { p_token: token, p_meet: code, p_team: school });
     if (teamErr) throw teamErr;
-
     const existingForTeam = State.runners.filter(r => r.team === school).map(r => parseInt(r.bib, 10));
     let nextBib = existingForTeam.length ? Math.max(...existingForTeam) + 1 : teamIdx * 1000 + 1;
-
     const rows = parsed.map(p => ({
       bib: pad(nextBib++, 4),
       first_name: p.first, last_name: p.last,
       grade: p.grade, gender: p.gender, team: school
     }));
-
-    const { error: insErr } = await sb.rpc("add_runners", {
-      p_token: token, p_meet: code, p_runners: rows
-    });
+    const { error: insErr } = await sb.rpc("add_runners", { p_token: token, p_meet: code, p_runners: rows });
     if (insErr) throw insErr;
-
     const newDivs = new Set();
-    for (const r of rows) {
-      const d = divFromRunner(r);
-      if (d && !State.races.find(x => x.division === d)) newDivs.add(d);
-    }
+    for (const r of rows) { const d = divFromRunner(r); if (d && !State.races.find(x => x.division === d)) newDivs.add(d); }
     for (const d of newDivs) {
       await sb.rpc("register_race", { p_token: token, p_meet: code, p_division: d, p_label: divLabel(d) });
     }
-
     if (!State.teams.find(t => t.name === school)) {
       State.teams.push({ meet_code: code, name: school, team_index: teamIdx });
       State.teams.sort((a,b) => a.team_index - b.team_index);
@@ -1613,17 +1476,13 @@ async function doUploadRoster() {
         State.races.push({ meet_code: code, division: d, label: divLabel(d), start_time: null });
       }
     }
-
     showOk(`Added ${rows.length} runner${rows.length === 1 ? "" : "s"} to ${school}.`);
     renderRoster();
   } catch (e) {
     if (e?.message?.includes("Not authorized")) {
-      MeetAuth.clear(code);
-      showErr("Session expired. Please unlock again.");
+      MeetAuth.clear(code); showErr("Session expired. Please unlock again.");
       ensureAuth(code, () => {});
-    } else {
-      showErr(e.message || "Upload failed.");
-    }
+    } else { showErr(e.message || "Upload failed."); }
   } finally {
     const submitBtn = $("r-submit");
     if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Assign Bibs →"; }
@@ -1666,7 +1525,6 @@ function renderTimer() {
   if (State.meet.status === "completed") return renderCompletedNotice();
   const div = State.route.division;
   if (!div) return renderDivPicker("timer");
-
   const race = raceFor(div) || { start_time: null };
   const started = race.start_time != null;
   const taps = tapsForDiv(div);
@@ -1694,24 +1552,21 @@ function renderTimer() {
             : `<button id="start-btn" class="start-btn">START RACE ▶</button>`}
         </div>
       </div>
-      <div style="background:var(--panel);border-left:1px solid var(--line);padding:22px;">
+      <div style="background:var(--bg-2);border-left:1px solid var(--line);padding:22px;">
         <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:14px;">RECENT TAPS · ${div}</div>
-        <div id="recent-taps">
         ${lastTaps.length === 0 ? `<div class="ui" style="font-size:13px;color:var(--ink-dim);font-style:italic;">None yet.</div>` :
           lastTaps.map(t => {
             const matched = results.find(r => r.place === t.place);
             return `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--line);">
               <div>
-                <span class="display" style="font-size:22px;color:var(--accent);margin-right:10px;">${pad(t.place, 3)}</span>
+                <span class="display" style="font-size:22px;color:var(--gold);margin-right:10px;">${pad(t.place, 3)}</span>
                 <span class="mono" style="font-size:16px;font-variant-numeric:tabular-nums;">${fmtTime(t.time_ms)}</span>
               </div>
               <div class="mono" style="font-size:11px;color:${matched ? "var(--green)" : "var(--ink-dim)"};align-self:center;">
                 ${matched ? "#" + matched.bib : "..."}
               </div>
             </div>`;
-          }).join("")
-        }
-        </div>
+          }).join("")}
       </div>
     </div>`;
 
@@ -1746,7 +1601,12 @@ function renderTimer() {
       const nextPlace = tapsForDiv(div).length + 1;
       State.taps.push({ meet_code: code, division: div, place: nextPlace, time_ms: t });
       const counter = $("tap-count");
-      if (counter) counter.textContent = nextPlace;
+      if (counter) {
+        counter.textContent = nextPlace;
+        counter.classList.remove("pop");
+        void counter.offsetWidth; // restart animation
+        counter.classList.add("pop");
+      }
       render();
 
       const { error } = await sb.rpc("add_tap", { p_token: token, p_meet: code, p_division: div, p_time_ms: t });
@@ -1756,7 +1616,7 @@ function renderTimer() {
         render();
         if (error.message?.includes("Not authorized")) {
           MeetAuth.clear(code);
-          alert("Session expired. Please unlock again.");
+          alert("Session expired.");
           ensureAuth(code, () => render());
         }
       }
@@ -1770,47 +1630,33 @@ function renderCompletedNotice() {
     ${header("MEET COMPLETED", `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
     <div class="wrap-narrow" style="text-align:center;">
       <div class="display" style="font-size:64px;color:var(--green);">✓ COMPLETED</div>
-      <div class="ui" style="color:var(--ink-dim);margin-top:12px;">
-        This meet is marked complete. Reopen from the Hub if you need to make timing changes.
-      </div>
-      <div style="margin-top:24px;">
-        <button class="btn btn-primary" onclick="go('m/${code}/results')">View Results →</button>
-      </div>
+      <div class="ui" style="color:var(--ink-dim);margin-top:12px;">This meet is marked complete.</div>
+      <div style="margin-top:24px;"><button class="btn btn-primary" onclick="go('m/${code}/results')">View Results →</button></div>
     </div>`;
 }
 
 async function doStartRace(div) {
-  const code = State.meet.code;
-  const token = MeetAuth.get(code);
+  const code = State.meet.code; const token = MeetAuth.get(code);
   if (!token) return ensureAuth(code, () => doStartRace(div));
-  // Tap audio context for iOS unlock
-  try { if (!_audioCtx) { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } if (_audioCtx.state === "suspended") _audioCtx.resume(); } catch(e){}
-
+  unlockAudio();
   const t = Date.now();
   const existing = raceFor(div);
   if (existing) existing.start_time = t;
   else State.races.push({ meet_code: code, division: div, label: divLabel(div), start_time: t });
   render();
-
   const { error } = await sb.rpc("start_race", { p_token: token, p_meet: code, p_division: div, p_start_time: t });
-  if (error) {
-    alert("Failed to start: " + error.message);
-    const e2 = raceFor(div); if (e2) e2.start_time = null;
-    render();
-  }
+  if (error) { alert("Failed: " + error.message); const e2 = raceFor(div); if (e2) e2.start_time = null; render(); }
 }
-
 async function doResetRace(div) {
-  if (!confirm(`Reset ${divLabel(div)} race? Clears all taps and finishes for this race only.`)) return;
-  const code = State.meet.code;
-  const token = MeetAuth.get(code);
+  if (!confirm(`Reset ${divLabel(div)} race? Clears taps and finishes.`)) return;
+  const code = State.meet.code; const token = MeetAuth.get(code);
   if (!token) return ensureAuth(code, () => doResetRace(div));
   const r = raceFor(div); if (r) r.start_time = null;
   State.taps = State.taps.filter(t => t.division !== div);
   State.results = State.results.filter(x => x.division !== div);
   render();
   const { error } = await sb.rpc("reset_race", { p_token: token, p_meet: code, p_division: div });
-  if (error) { alert("Reset failed: " + error.message); await loadMeet(code); render(); }
+  if (error) { alert("Failed: " + error.message); await loadMeet(code); render(); }
 }
 
 /* ============================ RECORDER ============================ */
@@ -1820,13 +1666,11 @@ function renderRecorder() {
   if (State.meet.status === "completed") return renderCompletedNotice();
   const div = State.route.division;
   if (!div) return renderDivPicker("recorder");
-
   const taps = tapsForDiv(div);
   const results = resultsForDiv(div);
   const nextPlace = results.length + 1;
   const nextTap = taps.find(t => t.place === nextPlace);
   const recent = [...results].slice(-10).reverse();
-
   $("app").innerHTML = `
     ${header(`RECORDER · ${div} · ${esc(divLabel(div))}`,
       `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}/recorder')">↺ Switch Race</button>
@@ -1834,7 +1678,7 @@ function renderRecorder() {
     <div class="timer-grid">
       <div style="padding:32px;">
         <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:8px;">NEXT FINISHER · ${div}</div>
-        <div class="display" style="font-size:96px;line-height:1;margin-bottom:4px;">PLACE <span style="color:var(--accent)">${pad(nextPlace, 3)}</span></div>
+        <div class="display" style="font-size:96px;line-height:1;margin-bottom:4px;">PLACE <span style="color:var(--gold);">${pad(nextPlace, 3)}</span></div>
         <div class="mono" style="font-size:22px;color:var(--ink-dim);font-variant-numeric:tabular-nums;margin-bottom:30px;">
           ${nextTap ? `TIME · ${fmtTime(nextTap.time_ms)}` : "WAITING FOR TAP…"}
         </div>
@@ -1850,24 +1694,22 @@ function renderRecorder() {
           ${taps.length} TAPS · ${results.length} MATCHED · ${taps.length - results.length} PENDING
         </div>
       </div>
-      <div style="background:var(--panel);border-left:1px solid var(--line);padding:22px;">
+      <div style="background:var(--bg-2);border-left:1px solid var(--line);padding:22px;">
         <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:14px;">LIVE FINISHERS · ${div}</div>
-        ${recent.length === 0 ? `<div class="ui" style="font-size:13px;color:var(--ink-dim);font-style:italic;">No finishers recorded yet.</div>` :
+        ${recent.length === 0 ? `<div class="ui" style="font-size:13px;color:var(--ink-dim);font-style:italic;">No finishers yet.</div>` :
           recent.map(r => {
             const runner = State.runnersByBib[r.bib];
             return `<div style="padding:10px 0;border-bottom:1px dashed var(--line);">
               <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                <span class="display" style="font-size:24px;color:var(--accent);">${pad(r.place, 3)}</span>
+                <span class="display" style="font-size:24px;color:var(--gold);">${pad(r.place, 3)}</span>
                 <span class="mono" style="font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink-dim);">${fmtTime(r.time_ms)}</span>
               </div>
               <div class="ui" style="font-size:13px;margin-top:2px;">#${esc(r.bib)} · ${esc(runner?.first || "")} ${esc(runner?.last || "")}</div>
               <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.1em;">${esc((runner?.team || "").toUpperCase())}</div>
             </div>`;
-          }).join("")
-        }
+          }).join("")}
       </div>
     </div>`;
-
   const input = $("bib-input");
   if (input) {
     input.focus();
@@ -1889,16 +1731,15 @@ function updatePreview(div) {
     const runnerDiv = divFromRunner(runner);
     const mismatched = runnerDiv && runnerDiv !== div;
     preview.style.display = "block";
-    preview.innerHTML = `<div style="padding:12px 18px;background:var(--panel);border-left:3px solid ${mismatched?"var(--red)":"var(--green)"};">
+    preview.innerHTML = `<div style="padding:14px 18px;background:var(--bg-2);border-left:3px solid ${mismatched?"var(--red)":"var(--green)"};border-radius:8px;">
       <div class="ui" style="font-size:17px;font-weight:600;">${esc(runner.first)} ${esc(runner.last)}</div>
       <div class="mono" style="font-size:12px;color:var(--ink-dim);margin-top:2px;">${esc(runner.team)} · GR ${esc(runner.grade || "—")} · ${esc(runner.gender || "—")} · DIV ${runnerDiv || "—"}</div>
-      ${mismatched ? `<div class="mono" style="font-size:11px;color:var(--red);margin-top:6px;">⚠ This runner belongs to ${runnerDiv}, not ${div}.</div>` : ""}
+      ${mismatched ? `<div class="mono" style="font-size:11px;color:var(--red);margin-top:6px;">⚠ Runner belongs to ${runnerDiv}, not ${div}.</div>` : ""}
     </div>`;
   } else { preview.style.display = "none"; }
 }
 async function doRecordBib(div) {
-  const code = State.meet.code;
-  const token = MeetAuth.get(code);
+  const code = State.meet.code; const token = MeetAuth.get(code);
   if (!token) return ensureAuth(code, () => doRecordBib(div));
   const errEl = $("rec-err"); errEl.style.display = "none";
   const showErr = (msg) => { errEl.textContent = "⚠ " + msg; errEl.style.display = "block"; };
@@ -1907,7 +1748,7 @@ async function doRecordBib(div) {
   const bib = raw.padStart(4, "0");
   const runner = State.runnersByBib[bib];
   if (!runner) return showErr(`No runner with bib ${bib}`);
-  if (State.results.find(r => r.division === div && r.bib === bib)) return showErr(`Bib ${bib} already recorded in this race`);
+  if (State.results.find(r => r.division === div && r.bib === bib)) return showErr(`Bib ${bib} already recorded`);
   const runnerDiv = divFromRunner(runner);
   if (runnerDiv && runnerDiv !== div) {
     if (!confirm(`Bib ${bib} (${runner.first} ${runner.last}) belongs to ${runnerDiv}, not ${div}. Record anyway?`)) return;
@@ -1925,24 +1766,20 @@ async function doRecordBib(div) {
   if (error) {
     State.results = State.results.filter(r => !(r.division === div && r.place === nextPlace && r.bib === bib));
     render();
-    if (error.message?.includes("Not authorized")) {
-      MeetAuth.clear(code); showErr("Session expired. Please unlock again.");
-      ensureAuth(code, () => {}); return;
-    }
+    if (error.message?.includes("Not authorized")) { MeetAuth.clear(code); showErr("Session expired."); ensureAuth(code, () => {}); return; }
     showErr(error.message);
   }
 }
 async function doUndo(div) {
   const divResults = resultsForDiv(div);
   if (!divResults.length) return;
-  const code = State.meet.code;
-  const token = MeetAuth.get(code);
+  const code = State.meet.code; const token = MeetAuth.get(code);
   if (!token) return ensureAuth(code, () => doUndo(div));
   const removed = divResults[divResults.length - 1];
   State.results = State.results.filter(r => !(r.division === div && r.place === removed.place));
   render();
   const { error } = await sb.rpc("undo_result", { p_token: token, p_meet: code, p_division: div });
-  if (error) { alert("Undo failed: " + error.message); State.results.push(removed); render(); }
+  if (error) { alert("Failed: " + error.message); State.results.push(removed); render(); }
 }
 
 /* ============================ RESULTS ============================ */
@@ -1952,14 +1789,13 @@ function renderResults() {
   const m = State.meet;
   const publicLink = `${location.origin}${location.pathname}#/m/${code}/results`;
   const isCompleted = m.status === "completed";
-
   $("app").innerHTML = `
     ${header(`RESULTS · ${code}`, `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
     <div class="wrap">
       <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:16px;">
         <div>
           <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.2em;">${isCompleted?"OFFICIAL FINAL RESULTS":"LIVE RESULTS"}</div>
-          <div class="display" style="font-size:72px;line-height:0.95;">${isCompleted?"FINAL":"LIVE"} <span style="color:var(--accent)">RESULTS</span></div>
+          <div class="display" style="font-size:72px;line-height:0.95;">${isCompleted?"FINAL":"LIVE"} <span style="background:linear-gradient(135deg,var(--gold),var(--gold-2));-webkit-background-clip:text;background-clip:text;color:transparent;">RESULTS</span></div>
           <div class="ui" style="font-size:13px;color:var(--ink);margin-top:8px;">${esc(m.name)} ${isCompleted?'<span class="status-badge completed">✓ COMPLETED</span>':'<span class="status-badge active">● ACTIVE</span>'}</div>
           ${(m.course_name || m.location || m.distance || m.meet_date) ? `<div class="mono" style="font-size:12px;color:var(--ink-dim);margin-top:4px;">
             ${[m.course_name, m.location, m.distance, fmtDate(m.meet_date)].filter(Boolean).map(esc).join(" · ")}
@@ -1972,7 +1808,6 @@ function renderResults() {
         </div>
       </div>
       <div id="link-copied" class="ok" style="display:none;text-align:right;">✓ Link copied.</div>
-
       ${divs.length === 0 ? `<div class="panel" style="padding:48px;text-align:center;color:var(--ink-dim);">No results recorded yet.</div>` :
         divs.map(d => renderResultBlock(d.division)).join("")}
     </div>`;
@@ -1986,20 +1821,20 @@ function renderResultBlock(div) {
   return `
     <div style="margin-bottom:48px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
-        <div class="display" style="font-size:30px;letter-spacing:0.05em;color:var(--accent2);">▰ ${esc(divLabel(div))} <span style="color:var(--ink-dim);font-size:18px;">[${div}]</span></div>
+        <div class="display" style="font-size:30px;letter-spacing:0.05em;color:var(--gold-2);">▰ ${esc(divLabel(div))} <span style="color:var(--ink-dim);font-size:18px;">[${div}]</span></div>
         <button class="btn btn-ghost btn-sm" onclick="doExportDivCSV('${div}')">⬇ CSV · ${div}</button>
       </div>
       <div class="panel" style="margin-bottom:16px;">
-        ${teamScores.length === 0 ? `<div class="ui" style="padding:24px;text-align:center;color:var(--ink-dim);">No finishers in this race yet.</div>` : `
+        ${teamScores.length === 0 ? `<div class="ui" style="padding:24px;text-align:center;color:var(--ink-dim);">No finishers yet.</div>` : `
         <table>
-          <thead><tr><th>RANK</th><th>TEAM</th><th>SCORE</th><th>FINISHERS</th><th>TOP 5 PLACES</th><th>6TH</th><th>7TH</th></tr></thead>
+          <thead><tr><th>RANK</th><th>TEAM</th><th>SCORE</th><th>FINISHERS</th><th>TOP 5</th><th>6TH</th><th>7TH</th></tr></thead>
           <tbody>
             ${teamScores.map(t => `<tr>
-              <td>${t.rank ? `<span class="display" style="font-size:32px;color:${t.rank===1?"var(--accent)":"var(--ink)"};">${t.rank===1?"🏆 ":""}${t.rank}</span>` : `<span class="mono" style="font-size:11px;color:var(--ink-dim);">—</span>`}</td>
+              <td>${t.rank ? `<span class="display" style="font-size:32px;color:${t.rank===1?"var(--gold)":"var(--ink)"};">${t.rank===1?"🏆 ":""}${t.rank}</span>` : `<span class="mono" style="font-size:11px;color:var(--ink-dim);">—</span>`}</td>
               <td class="ui" style="font-size:16px;font-weight:600;">${esc(t.team)}</td>
-              <td class="display" style="font-size:28px;color:${t.rank===1?"var(--accent)":"var(--ink)"};">${t.isScoring ? t.total : "INC"}</td>
+              <td class="display" style="font-size:28px;color:${t.rank===1?"var(--gold)":"var(--ink)"};">${t.isScoring ? t.total : "INC"}</td>
               <td class="mono" style="color:var(--ink-dim);">${t.finishers}</td>
-              <td class="mono">${t.isScoring ? t.runners.slice(0,5).map(r=>r.scorePlace).join(" + ") : `<span style="color:var(--ink-dim);">needs 5 finishers</span>`}</td>
+              <td class="mono">${t.isScoring ? t.runners.slice(0,5).map(r=>r.scorePlace).join(" + ") : `<span style="color:var(--ink-dim);">needs 5</span>`}</td>
               <td class="mono" style="color:var(--ink-dim);">${t.sixth || "—"}</td>
               <td class="mono" style="color:var(--ink-dim);">${t.seventh || "—"}</td>
             </tr>`).join("")}
@@ -2015,9 +1850,9 @@ function renderResultBlock(div) {
               const runner = State.runnersByBib[r.bib];
               const sp = scorePlaceLookup[r.bib];
               return `<tr>
-                <td class="display" style="font-size:22px;color:${r.place<=3?"var(--accent)":"var(--ink)"};">${r.place}</td>
-                <td class="mono" style="color:${sp?"var(--accent2)":"var(--ink-dim)"};">${sp || "—"}</td>
-                <td class="mono" style="color:var(--accent);">${esc(r.bib)}</td>
+                <td class="display" style="font-size:22px;color:${r.place<=3?"var(--gold)":"var(--ink)"};">${r.place}</td>
+                <td class="mono" style="color:${sp?"var(--gold-2)":"var(--ink-dim)"};">${sp || "—"}</td>
+                <td class="mono" style="color:var(--gold);">${esc(r.bib)}</td>
                 <td class="ui">${esc(runner?.first || "")} ${esc(runner?.last || "")}</td>
                 <td class="ui" style="color:var(--ink-dim);">${esc(runner?.team || "")}</td>
                 <td class="mono" style="color:var(--ink-dim);">${esc(runner?.grade || "")}</td>
@@ -2030,8 +1865,7 @@ function renderResultBlock(div) {
     </div>`;
 }
 async function doCopyLink(link) {
-  try {
-    await navigator.clipboard.writeText(link);
+  try { await navigator.clipboard.writeText(link);
     const el = $("link-copied");
     if (el) { el.style.display = "block"; setTimeout(() => { el.style.display = "none"; }, 2500); }
   } catch (e) { prompt("Copy this link:", link); }
@@ -2059,14 +1893,14 @@ function buildCsvForDiv(div) {
   const rows = [];
   rows.push(["Meet", m.name]);
   if (m.course_name) rows.push(["Course", m.course_name]);
-  if (m.location)    rows.push(["Location", m.location]);
-  if (m.distance)    rows.push(["Distance", m.distance]);
-  if (m.meet_date)   rows.push(["Date", m.meet_date]);
-  if (m.league)      rows.push(["League", m.league]);
+  if (m.location) rows.push(["Location", m.location]);
+  if (m.distance) rows.push(["Distance", m.distance]);
+  if (m.meet_date) rows.push(["Date", m.meet_date]);
+  if (m.league) rows.push(["League", m.league]);
   rows.push(["Race", `${divLabel(div)} [${div}]`]);
   rows.push([]);
   rows.push(["TEAM STANDINGS"]);
-  rows.push(["Rank", "Team", "Score", "Finishers", "Top 5 Places", "6th", "7th"]);
+  rows.push(["Rank", "Team", "Score", "Finishers", "Top 5", "6th", "7th"]);
   for (const t of teamScores) {
     rows.push([t.rank || "", t.team, t.isScoring ? t.total : "INC", t.finishers,
       t.isScoring ? t.runners.slice(0,5).map(r=>r.scorePlace).join("+") : "",
