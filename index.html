@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,166 +10,160 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #111113;
-    --panel: #1c1c1f;
-    --panel2: #2a2a2e;
-    --ink: #f5f5f7;
-    --ink-dim: #a1a1a6;
-    --line: #38383d;
-    --accent: #ffd60a;
-    --accent2: #ff9f0a;
-    --red: #ff453a;
-    --green: #30d158;
-    --blue: #0a84ff;
-    --header-gold: linear-gradient(90deg, #ffd60a, #ff9f0a, #ffd60a);
+    --bg: #0f1411; --panel: #161c19; --panel2: #1d2521;
+    --ink: #e8e4d8; --ink-dim: #9a9587; --line: #2a3530;
+    --accent: #ff6b1a; --accent2: #d4ff3a;
+    --red: #e23636; --green: #5ab86c; --blue: #5aa8e2;
   }
-
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
-  body { 
-    min-height: 100vh;
-    background: radial-gradient(circle at 30% 10%, #2a2a2e 0%, var(--bg) 60%);
-    color: var(--ink); 
-    font-family: 'JetBrains Mono', 'Courier New', monospace;
-    -webkit-font-smoothing: antialiased; 
-  }
-
+  body { min-height: 100vh;
+    background: radial-gradient(circle at 20% 0%, #1a2420 0%, var(--bg) 50%);
+    color: var(--ink); font-family: 'JetBrains Mono', 'Courier New', monospace;
+    -webkit-font-smoothing: antialiased; }
   .ui { font-family: 'Inter', sans-serif; }
   .display { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.02em; }
   .mono { font-family: 'JetBrains Mono', monospace; }
+  input, select, button, textarea { font-family: inherit; }
+  button { cursor: pointer; }
+  button:disabled { cursor: not-allowed; opacity: 0.4; }
+  input::placeholder { color: var(--ink-dim); opacity: 0.6; }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
 
-  /* APPLE-STYLE HEADER */
-  .hdr { 
-    border-bottom: 1px solid var(--line); 
-    padding: 12px 24px;
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between;
-    background: #1c1c1f;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.6);
-    position: relative;
-  }
-  .hdr::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 3px;
-    background: var(--header-gold);
-  }
-
-  .hdr .logo { 
-    font-family: 'Bebas Neue', sans-serif; 
-    font-size: 32px; 
-    letter-spacing: -0.02em;
-    background: linear-gradient(90deg, #ffd60a, #ff9f0a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+  .hdr { border-bottom: 1px solid var(--line); padding: 18px 24px;
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px; background: rgba(0,0,0,0.2); flex-wrap: wrap; }
+  .hdr .logo { font-family: 'Bebas Neue', sans-serif; font-size: 34px; line-height: 1; color: var(--accent); cursor: pointer; }
+  .hdr .logo span { color: var(--ink); }
   .hdr .sub { font-size: 11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.15em; }
+  .hdr .left { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .hdr .right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 
-  /* PANELS */
-  .panel { 
-    background: var(--panel); 
-    border: 1px solid var(--line); 
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  }
+  .btn { padding: 12px 22px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; font-size: 12px; transition: transform 0.1s, opacity 0.2s;
+    background: transparent; color: var(--ink); border: 2px solid var(--line); }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--accent); color: #000; border-color: var(--accent); }
+  .btn-ghost { color: var(--ink-dim); border-color: transparent; }
+  .btn-danger { color: var(--red); border-color: var(--red); }
+  .btn-lime { background: var(--accent2); color: #000; border-color: var(--accent2); }
+  .btn-sm { padding: 8px 14px; font-size: 10px; }
 
-  .role-card, .div-tile { 
-    background: var(--panel2); 
-    border: 1px solid var(--line); 
-    border-radius: 14px;
-    transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
-  }
-  .role-card:not(.disabled):hover, .div-tile:hover { 
-    border-color: var(--accent); 
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(255, 214, 10, 0.15);
-  }
+  .field-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-dim); margin-bottom: 6px; font-family: 'Inter', sans-serif; }
+  .field-input { width: 100%; padding: 12px 14px; background: var(--panel2);
+    border: 1px solid var(--line); color: var(--ink); font-size: 16px; outline: none; }
+  .field-input:focus { border-color: var(--accent); }
 
-  /* BUTTONS */
-  .btn { 
-    padding: 12px 22px; 
-    font-weight: 700; 
-    text-transform: uppercase;
-    letter-spacing: 0.08em; 
-    font-size: 12px; 
-    border-radius: 10px;
-    transition: all 0.15s;
-  }
-  .btn-primary { 
-    background: var(--accent); 
-    color: #000; 
-    border: none;
-  }
-  .btn-primary:hover { background: #ffed4a; }
-  .btn-lime { background: var(--accent2); color: #000; border: none; }
-  .btn-danger { background: transparent; color: var(--red); border: 2px solid var(--red); }
+  .panel { background: var(--panel); border: 1px solid var(--line); }
+  .hairline { border-top: 1px solid var(--line); margin: 18px 0; }
 
-  /* INPUTS */
-  .field-input, .bib-input { 
-    background: var(--panel2);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    color: var(--ink);
-  }
-  .field-input:focus, .bib-input:focus { 
-    border-color: var(--accent); 
-    box-shadow: 0 0 0 3px rgba(255, 214, 10, 0.2);
-  }
-
-  /* TIMER */
-  .clock { 
-    font-size: min(220px, 22vw); 
-    color: var(--accent);
-    text-shadow: 0 4px 20px rgba(255, 214, 10, 0.3);
-  }
-  .tap-btn { 
-    background: var(--accent); 
-    color: #000; 
-    border-radius: 18px;
-    box-shadow: 0 8px 30px rgba(255, 214, 10, 0.4);
-  }
-  .tap-btn:active { background: #fff; transform: scale(0.97); }
-
-  .start-btn { 
-    background: var(--accent2); 
-    color: #000; 
-    border-radius: 16px;
-  }
-
-  /* OTHER */
-  .conn.live .conn-dot { 
-    background: var(--green); 
-    box-shadow: 0 0 12px var(--green); 
-    animation: pulse 2s ease-in-out infinite; 
-  }
+  .conn { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; }
+  .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-dim); }
+  .conn.live .conn-dot { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s ease-in-out infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .flash { animation: flash 0.4s ease-out; }
+  @keyframes flash { 0% { background: #fff !important; } 100% {} }
 
+  .lock-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; letter-spacing: 0.15em; padding: 4px 8px; border: 1px solid var(--line); }
   .lock-badge.unlocked { color: var(--green); border-color: var(--green); }
   .lock-badge.locked { color: var(--ink-dim); }
+  .status-badge { display:inline-block; font-size:10px; letter-spacing:0.15em; padding:3px 8px; border:1px solid var(--line); margin-left:8px; vertical-align:middle; }
+  .status-badge.completed { color: var(--green); border-color: var(--green); }
+  .status-badge.active { color: var(--accent); border-color: var(--accent); }
 
-  table th { background: var(--panel2); }
-  .land-hero { 
-    font-size: 88px; 
-    line-height: 0.95; 
-    background: linear-gradient(90deg, #ffd60a, #ff9f0a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 10px 14px; font-size: 10px; color: var(--ink-dim);
+       letter-spacing: 0.2em; border-bottom: 1px solid var(--line); background: var(--panel2);
+       font-family: 'JetBrains Mono', monospace; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 13px; }
 
-  .div-tile .code { color: var(--accent); }
-  .div-tile.started .code { color: var(--green); }
-
-  /* Keep original layout */
+  .land-hero { font-size: 88px; line-height: 0.95; margin-bottom: 8px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  @media (max-width: 760px) { .grid-2 { grid-template-columns: 1fr; } }
+  @media (max-width: 760px) { .grid-2 { grid-template-columns: 1fr; } .land-hero { font-size: 56px; } }
+
   .timer-grid { display: grid; grid-template-columns: 1fr 320px; min-height: calc(100vh - 73px); }
   @media (max-width: 900px) { .timer-grid { grid-template-columns: 1fr; } }
+  .clock { font-size: min(220px, 22vw); line-height: 0.85; color: var(--accent);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+    font-family: 'Bebas Neue', sans-serif; }
+  .clock.idle { color: var(--ink-dim); }
+
+  .tap-counter { font-family: 'Bebas Neue', sans-serif; font-size: 120px;
+    line-height: 0.9; color: var(--accent2); font-variant-numeric: tabular-nums;
+    text-align: center; padding: 18px 0; border-top: 2px solid var(--line);
+    border-bottom: 2px solid var(--line); margin: 16px 0; background: rgba(212,255,58,0.04); }
+  .tap-counter .lbl { font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--ink-dim); letter-spacing: 0.3em; display:block; }
+
+  .tap-btn { width: 100%; padding: 80px 0; font-size: 88px;
+    font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.1em;
+    background: var(--accent); color: #000; border: none; cursor: pointer;
+    transition: background 0.1s; }
+  .tap-btn:active { background: #fff; }
+  .start-btn { width: 100%; padding: 60px 0; font-size: 56px;
+    font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.1em;
+    background: var(--accent2); color: #000; border: none; cursor: pointer; }
+
+  .bib-input { width: 100%; padding: 24px 28px; font-size: 72px;
+    letter-spacing: 0.2em; text-align: center;
+    background: var(--panel2); border: 2px solid var(--accent);
+    color: var(--ink); outline: none; font-variant-numeric: tabular-nums;
+    font-family: 'JetBrains Mono', monospace; }
+  .bib-input:disabled { opacity: 0.5; border-color: var(--line); }
+
+  .role-card { background: var(--panel); border: 1px solid var(--line); padding: 28px;
+    cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+  .role-card.disabled { opacity: 0.5; cursor: not-allowed; }
+  .role-card:not(.disabled):hover { border-color: var(--accent); }
+  .role-card .num { font-size: 10px; letter-spacing: 0.25em; margin-bottom: 12px;
+                    color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+  .role-card .title { font-size: 42px; line-height: 1; margin-bottom: 10px;
+                      font-family: 'Bebas Neue', sans-serif; }
+  .role-card .desc { font-size: 13px; color: var(--ink-dim); line-height: 1.5;
+                     font-family: 'Inter', sans-serif; }
+  .role-card .note { font-size: 11px; color: var(--accent); margin-top: 14px;
+                     letter-spacing: 0.1em; font-family: 'JetBrains Mono', monospace; }
+
+  .stat { display: inline-block; margin-left: 28px; text-align: right; }
+  .stat .v { font-size: 36px; line-height: 1; font-family: 'Bebas Neue', sans-serif; }
+  .stat .v.alert { color: var(--accent); }
+  .stat .l { font-size: 9px; color: var(--ink-dim); letter-spacing: 0.2em;
+             text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+
+  .err { color: var(--red); font-size: 12px; margin-top: 12px; font-family: 'JetBrains Mono', monospace; }
+  .ok  { color: var(--green); font-size: 12px; margin-top: 12px; font-family: 'JetBrains Mono', monospace; }
+
   .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
   .wrap-narrow { max-width: 640px; margin: 60px auto; padding: 0 24px; }
   .wrap-wide { max-width: 900px; margin: 0 auto; padding: 60px 24px; }
-  .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 100; }
-  .modal { background: var(--panel); border: 1px solid var(--accent); padding: 32px; max-width: 540px; width: 100%; border-radius: 14px; }
+
+  .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+    padding: 20px; }
+  .modal { background: var(--panel); border: 1px solid var(--accent);
+    padding: 32px; max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto; }
+
+  .div-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; margin-top: 16px; }
+  .div-tile { background: var(--panel2); border: 2px solid var(--line); padding: 18px 12px;
+    cursor: pointer; transition: all 0.15s; text-align: center; }
+  .div-tile:hover { border-color: var(--accent); }
+  .div-tile.active { border-color: var(--accent); background: rgba(255,107,26,0.15); }
+  .div-tile .code { font-family: 'Bebas Neue', sans-serif; font-size: 40px; line-height: 1; color: var(--accent); }
+  .div-tile .lbl  { font-size: 10px; color: var(--ink-dim); letter-spacing: 0.15em; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+  .div-tile .stat-line { font-size: 10px; color: var(--ink-dim); margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
+  .div-tile.started .code { color: var(--green); }
+
+  .meet-row { display: flex; justify-content: space-between; padding: 14px 18px;
+    border-bottom: 1px solid var(--line); align-items: center; gap: 14px; cursor: pointer; }
+  .meet-row:hover { background: var(--panel2); }
+  .meet-row .name { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 600; }
+  .meet-row .meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-dim); margin-top: 3px; }
+  .meet-row .code-pill { font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    color: var(--accent); background: var(--panel2); padding: 6px 12px; letter-spacing: 0.1em; }
+
+  .auth-link { font-family: 'Inter', sans-serif; font-size: 12px; color: var(--ink-dim); }
+  .auth-link:hover { color: var(--ink); }
 </style>
 </head>
 <body>
@@ -183,8 +178,31 @@ const SUPABASE_URL  = "https://twfjsvmwmtnowdehzltz.supabase.co";
 const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR3Zmpzdm13bXRub3dkZWh6bHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4OTA5MDcsImV4cCI6MjA5NDQ2NjkwN30.a8Xi7jPE9rDgKf7-8CWGoGIGKQ0I3lJkYs2YWz5JrvY";
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
-  realtime: { params: { eventsPerSecond: 20 } }
+  realtime: { params: { eventsPerSecond: 20 } },
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
+
+/* ============================ AUDIO ============================ */
+let _audioCtx = null;
+function playBeep() {
+  try {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = _audioCtx;
+    if (ctx.state === "suspended") ctx.resume();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.13);
+  } catch (e) { /* ignore */ }
+  try { if (navigator.vibrate) navigator.vibrate(40); } catch(e){}
+}
 
 /* ============================ HELPERS ============================ */
 const pad = (n, w = 2) => String(n).padStart(w, "0");
@@ -201,6 +219,8 @@ const newMeetCode = () => {
   for (let i = 0; i < 6; i++) out += chars[Math.floor(Math.random() * chars.length)];
   return out;
 };
+const validCode = (s) => /^[A-Z0-9][A-Z0-9-]{1,18}[A-Z0-9]$/.test(s) && s.length >= 3 && s.length <= 20;
+const normLeague = (s) => (s || "").trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 const parseCSV = (text) => {
   const lines = text.split(/\r?\n/).filter(l => l.trim().length);
   if (!lines.length) return [];
@@ -216,7 +236,6 @@ const parseCSV = (text) => {
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const $ = (id) => document.getElementById(id);
 
-/* Division logic */
 const normGender = (g) => {
   if (!g) return null;
   const v = g.trim().toUpperCase();
@@ -246,8 +265,8 @@ const fmtDate = (s) => {
   return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 };
 
-/* ============================ AUTH ============================ */
-const Auth = {
+/* ============================ AUTH (meet password) ============================ */
+const MeetAuth = {
   tokenKey: (code) => `xc.tok.${code}`,
   get(code)  { return localStorage.getItem(this.tokenKey(code)); },
   set(code, t) { localStorage.setItem(this.tokenKey(code), t); },
@@ -274,13 +293,11 @@ function scoreRace(divisionResults, runnersByBib) {
     if (scoring.has(runner.team)) { adj++; placed.push({ ...r, runner, scorePlace: adj }); }
     else { placed.push({ ...r, runner, scorePlace: null }); }
   }
-
   const byTeam = {};
   for (const p of placed) {
     if (!byTeam[p.runner.team]) byTeam[p.runner.team] = [];
     byTeam[p.runner.team].push(p);
   }
-
   const teams = Object.keys(byTeam).map(team => {
     const rs = byTeam[team];
     const isScoring = scoring.has(team);
@@ -291,7 +308,6 @@ function scoreRace(divisionResults, runnersByBib) {
       seventh: isScoring && rs[6] ? rs[6].scorePlace : null,
       runners: rs };
   });
-
   teams.sort((a, b) => {
     if (a.isScoring !== b.isScoring) return a.isScoring ? -1 : 1;
     if (!a.isScoring) return a.team.localeCompare(b.team);
@@ -300,7 +316,6 @@ function scoreRace(divisionResults, runnersByBib) {
     if (a.seventh && b.seventh) return a.seventh - b.seventh;
     return 0;
   });
-
   let rank = 0;
   return teams.map(t => ({ ...t, rank: t.isScoring ? ++rank : null }));
 }
@@ -308,11 +323,12 @@ function scoreRace(divisionResults, runnersByBib) {
 /* ============================ STATE ============================ */
 const State = {
   route: { name: "landing" },
+  user: null,           // supabase auth user, null if not signed in
   meet: null,
   teams: [], runners: [], runnersByBib: {},
-  races: [],            // [{ division, label, start_time }]
-  taps: [],             // [{ division, place, time_ms }]
-  results: [],          // [{ division, place, bib, time_ms }]
+  races: [], taps: [], results: [],
+  leagueMeets: [],      // for league listing page
+  myMeets: [],          // for /me dashboard
   selectedDivision: null,
   channel: null, connected: false, tickTimer: null, loading: false,
 };
@@ -322,8 +338,12 @@ function parseHash() {
   const h = location.hash.replace(/^#\/?/, "");
   if (!h) return { name: "landing" };
   if (h === "create") return { name: "create" };
-  const m = h.match(/^m\/([A-Z0-9]{6})(\/(details|roster|timer|recorder|results))?(\/([0-9A-Z]+))?$/);
-  if (m) return { name: "meet", code: m[1], view: m[3] || "hub", division: m[5] || null };
+  if (h === "signin") return { name: "signin" };
+  if (h === "me") return { name: "me" };
+  const lm = h.match(/^league\/(.+)$/);
+  if (lm) return { name: "league", slug: decodeURIComponent(lm[1]) };
+  const m = h.match(/^m\/([A-Z0-9-]{3,20})(\/(details|roster|timer|recorder|results))?(\/([0-9A-Z]+))?$/i);
+  if (m) return { name: "meet", code: m[1].toUpperCase(), view: m[3] || "hub", division: m[5] || null };
   return { name: "landing" };
 }
 function go(path) { location.hash = "#/" + path; }
@@ -337,15 +357,28 @@ async function handleRoute() {
   if (next.division) State.selectedDivision = next.division;
 
   if (next.name !== "meet" && wasMeet) await teardownMeet();
+
   if (next.name === "meet" && !sameMeet) {
     State.loading = true;
     render();
     await loadMeet(next.code);
     State.loading = false;
+  } else if (next.name === "league") {
+    State.loading = true;
+    render();
+    await loadLeague(next.slug);
+    State.loading = false;
+  } else if (next.name === "me") {
+    State.loading = true;
+    render();
+    await loadMyMeets();
+    State.loading = false;
   }
+
   render();
 }
 
+/* ============================ DATA LOADING ============================ */
 async function loadMeet(code) {
   await teardownMeet();
   setConnected(false);
@@ -373,16 +406,28 @@ async function loadMeet(code) {
   State.results = rs.data || [];
 
   State.channel = sb.channel(`meet:${code}`)
-    .on("postgres_changes", { event: "*", schema: "public", table: "meets",   filter: `code=eq.${code}` }, handleMeetChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "meets",   filter: `code=eq.${code}` },      handleMeetChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "teams",   filter: `meet_code=eq.${code}` }, handleTeamChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "runners", filter: `meet_code=eq.${code}` }, handleRunnerChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "races",   filter: `meet_code=eq.${code}` }, handleRaceChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "taps",    filter: `meet_code=eq.${code}` }, handleTapChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "results", filter: `meet_code=eq.${code}` }, handleResultChange)
-    .subscribe((status) => {
-      console.log("realtime status:", status);
-      setConnected(status === "SUBSCRIBED");
-    });
+    .subscribe((status) => { setConnected(status === "SUBSCRIBED"); });
+}
+
+async function loadLeague(slug) {
+  const normalized = normLeague(slug);
+  const { data, error } = await sb.from("public_meets").select("*").eq("league", normalized)
+    .order("meet_date", { ascending: false });
+  if (error) console.error("loadLeague:", error);
+  State.leagueMeets = data || [];
+}
+
+async function loadMyMeets() {
+  if (!State.user) { State.myMeets = []; return; }
+  const { data, error } = await sb.rpc("my_meets");
+  if (error) console.error("my_meets:", error);
+  State.myMeets = data || [];
 }
 
 async function teardownMeet() {
@@ -390,7 +435,6 @@ async function teardownMeet() {
   if (State.tickTimer) { clearInterval(State.tickTimer); State.tickTimer = null; }
   setConnected(false);
 }
-
 function setConnected(b) {
   State.connected = b;
   const el = document.querySelector(".conn");
@@ -407,24 +451,65 @@ function handleMeetChange(payload) {
   State.meet = { ...State.meet, ...rest };
   render();
 }
-function handleTeamChange(payload) { render(); }
-function handleRunnerChange(payload) { render(); }
-function handleRaceChange(payload) { render(); }
-function handleTapChange(payload) { render(); }
-function handleResultChange(payload) { render(); }
+function handleTeamChange(payload) {
+  if (payload.eventType === "INSERT") {
+    if (!State.teams.find(t => t.name === payload.new.name)) State.teams.push(payload.new);
+  } else if (payload.eventType === "DELETE") {
+    State.teams = State.teams.filter(t => t.name !== payload.old.name);
+  }
+  State.teams.sort((a, b) => a.team_index - b.team_index);
+  render();
+}
+function handleRunnerChange(payload) {
+  if (payload.eventType === "INSERT") {
+    if (!State.runnersByBib[payload.new.bib]) {
+      State.runners.push(payload.new);
+      State.runnersByBib[payload.new.bib] = {
+        bib: payload.new.bib, first: payload.new.first_name, last: payload.new.last_name,
+        grade: payload.new.grade, gender: payload.new.gender, team: payload.new.team
+      };
+    }
+  } else if (payload.eventType === "DELETE") {
+    State.runners = State.runners.filter(r => r.bib !== payload.old.bib);
+    delete State.runnersByBib[payload.old.bib];
+  }
+  State.runners.sort((a, b) => a.bib.localeCompare(b.bib));
+  render();
+}
+function handleRaceChange(payload) {
+  if (payload.eventType === "INSERT") {
+    if (!State.races.find(r => r.division === payload.new.division)) State.races.push(payload.new);
+  } else if (payload.eventType === "UPDATE") {
+    const i = State.races.findIndex(r => r.division === payload.new.division);
+    if (i >= 0) State.races[i] = payload.new;
+  } else if (payload.eventType === "DELETE") {
+    State.races = State.races.filter(r => r.division !== payload.old.division);
+  }
+  State.races.sort((a,b) => a.division.localeCompare(b.division));
+  render();
+}
+function handleTapChange(payload) {
+  if (payload.eventType === "INSERT") {
+    const exists = State.taps.find(t => t.division === payload.new.division && t.place === payload.new.place);
+    if (!exists) State.taps.push(payload.new);
+  } else if (payload.eventType === "DELETE") {
+    State.taps = State.taps.filter(t => !(t.division === payload.old.division && t.place === payload.old.place));
+  }
+  render();
+}
+function handleResultChange(payload) {
+  if (payload.eventType === "INSERT") {
+    const exists = State.results.find(r => r.division === payload.new.division && r.place === payload.new.place);
+    if (!exists) State.results.push(payload.new);
+  } else if (payload.eventType === "DELETE") {
+    State.results = State.results.filter(r => !(r.division === payload.old.division && r.place === payload.old.place));
+  }
+  render();
+}
 
-/* Helpers */
-function tapsForDiv(div) {
-  return State.taps.filter(t => t.division === div).sort((a,b)=>a.place-b.place);
-}
-function resultsForDiv(div) {
-  return State.results.filter(r => r.division === div).sort((a,b)=>a.place-b.place);
-}
-function runnersForDiv(div) {
-  return State.runners.filter(r => divFromRunner(r) === div);
-}
-function raceFor(div) { return State.races.find(r => r.division === div); }
-
+function tapsForDiv(div)    { return State.taps.filter(t => t.division === div).sort((a,b)=>a.place-b.place); }
+function resultsForDiv(div) { return State.results.filter(r => r.division === div).sort((a,b)=>a.place-b.place); }
+function raceFor(div)       { return State.races.find(r => r.division === div); }
 function computeDivisions() {
   const set = new Map();
   for (const r of State.runners) {
@@ -437,12 +522,12 @@ function computeDivisions() {
     .sort((a,b) => a.division.localeCompare(b.division));
 }
 
-/* ============================ AUTH MODAL ============================ */
+/* ============================ AUTH MODAL (meet password) ============================ */
 function ensureAuth(code, onAuthed) {
-  if (Auth.isAuthed(code)) { onAuthed(); return; }
-  showLoginModal(code, onAuthed);
+  if (MeetAuth.isAuthed(code)) { onAuthed(); return; }
+  showMeetLoginModal(code, onAuthed);
 }
-function showLoginModal(code, onAuthed) {
+function showMeetLoginModal(code, onAuthed) {
   const root = $("modal-root");
   root.innerHTML = `
     <div class="modal-back" onclick="if(event.target===this)closeModal()">
@@ -461,7 +546,6 @@ function showLoginModal(code, onAuthed) {
         </div>
       </div>
     </div>`;
-
   const submit = async () => {
     const pwd = $("auth-pwd").value;
     if (!pwd) return;
@@ -477,7 +561,7 @@ function showLoginModal(code, onAuthed) {
       $("auth-submit").textContent = "Unlock →";
       return;
     }
-    Auth.set(code, token);
+    MeetAuth.set(code, token);
     closeModal();
     render();
     onAuthed();
@@ -486,17 +570,45 @@ function showLoginModal(code, onAuthed) {
   $("auth-pwd").addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
 }
 function closeModal() { $("modal-root").innerHTML = ""; }
-function logout() {
+function meetLogout() {
   if (!confirm("Lock this device?")) return;
-  Auth.clear(State.meet.code);
+  MeetAuth.clear(State.meet.code);
   render();
 }
 
-/* ============================ RENDER ============================ */
+/* ============================ SUPABASE AUTH ============================ */
+sb.auth.onAuthStateChange((event, session) => {
+  State.user = session?.user || null;
+  if (State.route.name === "me") loadMyMeets().then(render);
+  else render();
+});
+
+async function initAuth() {
+  const { data } = await sb.auth.getSession();
+  State.user = data.session?.user || null;
+}
+
+async function signInWithEmail(email) {
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: location.origin + location.pathname }
+  });
+  return error;
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+  go("");
+}
+
+/* ============================ RENDER ROUTER ============================ */
 function render() {
   const r = State.route;
   if (r.name === "landing") return renderLanding();
   if (r.name === "create")  return renderCreate();
+  if (r.name === "signin")  return renderSignIn();
+  if (r.name === "me")      return renderMe();
+  if (r.name === "league")  return renderLeague();
   if (r.name === "meet") {
     if (State.loading) return renderLoading();
     if (!State.meet) return renderNotFound(r.code);
@@ -510,28 +622,32 @@ function render() {
 }
 
 function renderLoading() {
-  $("app").innerHTML = `${header("LOADING…")}<div style="max-width:600px;margin:80px auto;padding:24px;text-align:center;"><div class="display" style="font-size:48px;color:var(--ink-dim);">LOADING MEET…</div></div>`;
+  $("app").innerHTML = `${header("LOADING…")}<div style="max-width:600px;margin:80px auto;padding:24px;text-align:center;"><div class="display" style="font-size:48px;color:var(--ink-dim);">LOADING…</div></div>`;
 }
 
 function header(subtitle, rightHTML = "") {
   const showLock = State.route.name === "meet" && State.meet;
-  const isAuthed = showLock && Auth.isAuthed(State.meet.code);
+  const isAuthed = showLock && MeetAuth.isAuthed(State.meet.code);
+  const userBlock = State.user
+    ? `<a class="auth-link" href="#/me">${esc(State.user.email)}</a> · <a class="auth-link" href="javascript:signOut()">Sign out</a>`
+    : `<a class="auth-link" href="#/signin">Sign in</a>`;
   return `
     <div class="hdr">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="logo">XC<span style="color:var(--accent)">CHRONO</span></div>
+      <div class="left">
+        <div class="logo" onclick="go('')">XC<span>·CHRONO</span></div>
         ${subtitle ? `<div class="sub">${esc(subtitle)}</div>` : ""}
       </div>
-      <div style="display:flex;align-items:center;gap:16px">
+      <div class="right">
         ${State.route.name === "meet" ? `<div class="conn"><div class="conn-dot"></div><span class="conn-text">${State.connected ? "LIVE" : "OFFLINE"}</span></div>` : ""}
         ${showLock ? `<span class="lock-badge ${isAuthed ? "unlocked" : "locked"}">${isAuthed ? "🔓 UNLOCKED" : "🔒 READ-ONLY"}</span>` : ""}
-        ${showLock && isAuthed ? `<button class="btn btn-ghost btn-sm" onclick="logout()">Lock</button>` : ""}
+        ${showLock && isAuthed ? `<button class="btn btn-ghost btn-sm" onclick="meetLogout()">Lock</button>` : ""}
         ${rightHTML}
+        ${userBlock}
       </div>
     </div>`;
 }
 
-/* LANDING */
+/* ============================ LANDING ============================ */
 function renderLanding() {
   $("app").innerHTML = `
     ${header("OFFICIAL TIMING")}
@@ -544,37 +660,178 @@ function renderLanding() {
         <div class="panel" style="padding:28px;">
           <div class="mono" style="font-size:11px;color:var(--accent);letter-spacing:0.15em;margin-bottom:14px;">01 / MEET DIRECTOR</div>
           <div class="display" style="font-size:32px;margin-bottom:14px;">NEW MEET</div>
-          <div class="ui" style="font-size:14px;color:var(--ink-dim);margin-bottom:22px;">Create a meet and share the code + password.</div>
+          <div class="ui" style="font-size:14px;color:var(--ink-dim);margin-bottom:22px;">Create a meet, set a password, optionally tag a league.</div>
           <button class="btn btn-primary" onclick="go('create')">Create Meet →</button>
         </div>
         <div class="panel" style="padding:28px;">
           <div class="mono" style="font-size:11px;color:var(--accent2);letter-spacing:0.15em;margin-bottom:14px;">02 / JOIN</div>
           <div class="display" style="font-size:32px;margin-bottom:14px;">ENTER CODE</div>
-          <input id="join-code" maxlength="6" placeholder="ABC123" class="mono"
-                 style="width:100%;padding:14px 16px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:28px;letter-spacing:0.3em;text-align:center;outline:none;margin-bottom:16px;text-transform:uppercase;" />
+          <input id="join-code" maxlength="20" placeholder="MEET-CODE" class="mono"
+                 style="width:100%;padding:14px 16px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:24px;letter-spacing:0.15em;text-align:center;outline:none;margin-bottom:16px;text-transform:uppercase;" />
           <button class="btn btn-lime" onclick="doJoin()">Join Meet →</button>
         </div>
       </div>
+
+      ${!State.user ? `
+        <div class="panel" style="margin-top:24px;padding:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="display" style="font-size:24px;">DIRECTOR ACCOUNT?</div>
+            <div class="ui" style="font-size:13px;color:var(--ink-dim);">Sign in to track all your meets and leagues in one place. Optional — anonymous meets still work.</div>
+          </div>
+          <button class="btn" onclick="go('signin')">Sign In / Sign Up →</button>
+        </div>` : `
+        <div class="panel" style="margin-top:24px;padding:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="display" style="font-size:24px;">YOUR MEETS</div>
+            <div class="ui" style="font-size:13px;color:var(--ink-dim);">View all meets you've created.</div>
+          </div>
+          <button class="btn btn-lime" onclick="go('me')">My Dashboard →</button>
+        </div>`}
     </div>`;
   $("join-code")?.addEventListener("keydown", e => { if (e.key === "Enter") doJoin(); });
-  $("join-code")?.addEventListener("input", e => { e.target.value = e.target.value.toUpperCase(); });
+  $("join-code")?.addEventListener("input", e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, ""); });
 }
 function doJoin() {
   const v = ($("join-code").value || "").toUpperCase().trim();
-  if (v.length !== 6) return;
+  if (v.length < 3) return;
   go(`m/${v}`);
 }
 
-/* CREATE */
-function renderCreate() {
-  const code = newMeetCode();
+/* ============================ SIGN IN ============================ */
+function renderSignIn() {
   $("app").innerHTML = `
-    ${header("NEW MEET", `<button class="btn btn-ghost" onclick="go('')">← Cancel</button>`)}
+    ${header("SIGN IN", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Cancel</button>`)}
+    <div class="wrap-narrow">
+      <div class="display" style="font-size:56px;margin-bottom:8px;">DIRECTOR<span style="color:var(--accent)">·</span>SIGN IN</div>
+      <div class="ui" style="color:var(--ink-dim);font-size:14px;margin-bottom:28px;">
+        Enter your email. We'll send a one-click sign-in link — no password to remember. Coaches and volunteers don't need accounts.
+      </div>
+      <div class="panel" style="padding:28px;">
+        <div class="field-label">Email</div>
+        <input id="si-email" type="email" class="field-input" placeholder="director@school.edu" autofocus />
+        <div id="si-err" class="err" style="display:none;"></div>
+        <div id="si-ok"  class="ok"  style="display:none;"></div>
+        <div style="margin-top:18px;">
+          <button id="si-btn" class="btn btn-primary" onclick="doSignIn()">Send Magic Link →</button>
+        </div>
+      </div>
+    </div>`;
+  $("si-email")?.addEventListener("keydown", e => { if (e.key === "Enter") doSignIn(); });
+}
+async function doSignIn() {
+  const email = $("si-email").value.trim();
+  const errEl = $("si-err"), okEl = $("si-ok");
+  errEl.style.display = "none"; okEl.style.display = "none";
+  if (!email || !/^.+@.+\..+$/.test(email)) {
+    errEl.textContent = "⚠ Enter a valid email."; errEl.style.display = "block"; return;
+  }
+  const btn = $("si-btn");
+  btn.disabled = true; btn.textContent = "Sending…";
+  const err = await signInWithEmail(email);
+  btn.disabled = false; btn.textContent = "Send Magic Link →";
+  if (err) {
+    errEl.textContent = "⚠ " + err.message;
+    errEl.style.display = "block";
+  } else {
+    okEl.textContent = `✓ Check ${email} for a sign-in link.`;
+    okEl.style.display = "block";
+  }
+}
+
+/* ============================ /me DASHBOARD ============================ */
+function renderMe() {
+  if (!State.user) { go("signin"); return; }
+  const meets = State.myMeets;
+  const leagues = [...new Set(meets.map(m => m.league).filter(Boolean))];
+
+  $("app").innerHTML = `
+    ${header("MY DASHBOARD", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Home</button>`)}
+    <div class="wrap">
+      <div class="display" style="font-size:56px;margin-bottom:6px;">YOUR<span style="color:var(--accent)">·</span>MEETS</div>
+      <div class="ui" style="color:var(--ink-dim);font-size:13px;margin-bottom:28px;">
+        Signed in as <span style="color:var(--ink)">${esc(State.user.email)}</span>. ${meets.length} meet${meets.length===1?"":"s"} owned.
+      </div>
+
+      ${leagues.length > 0 ? `
+        <div class="display" style="font-size:22px;color:var(--accent2);margin-bottom:10px;">▰ YOUR LEAGUES</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;">
+          ${leagues.map(l => `<a href="#/league/${encodeURIComponent(l)}" style="font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--panel);color:var(--accent2);padding:8px 14px;border:1px solid var(--line);text-decoration:none;">${esc(l)}</a>`).join("")}
+        </div>` : ""}
+
+      <div class="display" style="font-size:22px;color:var(--accent2);margin-bottom:10px;">▰ ALL MEETS</div>
+      <div class="panel">
+        ${meets.length === 0
+          ? `<div class="ui" style="padding:32px;text-align:center;color:var(--ink-dim);">No meets yet. <a href="#/create">Create your first one →</a></div>`
+          : meets.map(m => `
+            <div class="meet-row" onclick="go('m/${m.code}')">
+              <div style="flex:1;min-width:0;">
+                <div class="name">${esc(m.name)} ${m.status === "completed" ? '<span class="status-badge completed">✓ COMPLETED</span>' : '<span class="status-badge active">● ACTIVE</span>'}</div>
+                <div class="meta">${[m.course_name, m.location, m.distance, fmtDate(m.meet_date)].filter(Boolean).map(esc).join(" · ") || "No details set"}</div>
+                ${m.league ? `<div class="meta" style="color:var(--accent2);margin-top:2px;">League: ${esc(m.league)}</div>` : ""}
+              </div>
+              <div class="code-pill">${esc(m.code)}</div>
+            </div>`).join("")}
+      </div>
+    </div>`;
+}
+
+/* ============================ /league/SLUG ============================ */
+function renderLeague() {
+  const slug = State.route.slug;
+  const meets = State.leagueMeets;
+
+  $("app").innerHTML = `
+    ${header("LEAGUE", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Home</button>`)}
+    <div class="wrap">
+      <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:4px;">LEAGUE</div>
+      <div class="display" style="font-size:64px;line-height:1;color:var(--accent2);margin-bottom:8px;">${esc(slug.toUpperCase())}</div>
+      <div class="ui" style="color:var(--ink-dim);font-size:14px;margin-bottom:28px;">
+        ${meets.length} meet${meets.length===1?"":"s"} in this league. Anyone can view; password required to score new meets.
+      </div>
+
+      <div class="panel">
+        ${meets.length === 0
+          ? `<div class="ui" style="padding:32px;text-align:center;color:var(--ink-dim);">No meets tagged with this league yet.</div>`
+          : meets.map(m => `
+            <div class="meet-row" onclick="go('m/${m.code}${(m.status==='completed')?'/results':''}')">
+              <div style="flex:1;min-width:0;">
+                <div class="name">${esc(m.name)} ${m.status === "completed" ? '<span class="status-badge completed">✓ COMPLETED</span>' : '<span class="status-badge active">● ACTIVE</span>'}</div>
+                <div class="meta">${[m.course_name, m.location, m.distance, fmtDate(m.meet_date)].filter(Boolean).map(esc).join(" · ") || "No details set"}</div>
+              </div>
+              <div class="code-pill">${esc(m.code)}</div>
+            </div>`).join("")}
+      </div>
+    </div>`;
+}
+
+/* ============================ CREATE ============================ */
+function renderCreate() {
+  const auto = newMeetCode();
+  $("app").innerHTML = `
+    ${header("NEW MEET", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Cancel</button>`)}
     <div class="wrap-narrow">
       <div class="display" style="font-size:56px;margin-bottom:24px;">MEET<span style="color:var(--accent)">·</span>SETUP</div>
       <div class="panel" style="padding:28px;">
         <div class="field-label">Meet Name</div>
         <input id="meet-name" class="field-input" placeholder="Tri-County Invitational" />
+
+        <div style="margin-top:18px;">
+          <div class="field-label">Meet Code (3–20 chars · letters, numbers, dashes)</div>
+          <input id="meet-code" class="field-input mono" value="${auto}" maxlength="20"
+            style="letter-spacing:0.15em;text-transform:uppercase;" />
+          <div class="ui" style="font-size:11px;color:var(--ink-dim);margin-top:6px;">
+            Customize this — e.g. <span class="mono">SJUSD-WK3</span>. Auto-generated as <span class="mono">${auto}</span>.
+          </div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <div class="field-label">League (optional)</div>
+          <input id="meet-league" class="field-input" placeholder="sjusd, central-cal-xc, etc." />
+          <div class="ui" style="font-size:11px;color:var(--ink-dim);margin-top:6px;">
+            Meets with the same league name auto-group at <span class="mono">/league/NAME</span>.
+          </div>
+        </div>
+
         <div style="margin-top:18px;">
           <div class="field-label">Director Password (share with operators)</div>
           <input id="meet-pwd" type="password" class="field-input" placeholder="At least 4 characters" />
@@ -583,47 +840,54 @@ function renderCreate() {
           <div class="field-label">Confirm Password</div>
           <input id="meet-pwd2" type="password" class="field-input" />
         </div>
-        <div style="margin-top:22px;">
-          <div class="field-label">Your Meet Code</div>
-          <div class="display" style="font-size:72px;color:var(--accent2);letter-spacing:0.15em;line-height:1;">${code}</div>
-          <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-top:12px;">
-            Share both the code and the password with every coach and timing volunteer.
-          </div>
-        </div>
+
+        ${State.user
+          ? `<div class="ui" style="font-size:12px;color:var(--green);margin-top:18px;">✓ Signed in — this meet will be saved to your dashboard.</div>`
+          : `<div class="ui" style="font-size:12px;color:var(--ink-dim);margin-top:18px;">Not signed in — meet will be anonymous. <a href="#/signin">Sign in</a> to track your meets in one place.</div>`}
+
         <div id="create-err" class="err" style="display:none;"></div>
         <div style="margin-top:28px;">
-          <button id="create-btn" class="btn btn-primary" onclick="doCreate('${code}')">Create →</button>
+          <button id="create-btn" class="btn btn-primary" onclick="doCreate()">Create →</button>
         </div>
       </div>
     </div>`;
+  $("meet-code")?.addEventListener("input", e => {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
+  });
 }
-async function doCreate(code) {
+async function doCreate() {
   const errEl = $("create-err");
   errEl.style.display = "none";
   const show = (msg) => { errEl.textContent = "⚠ " + msg; errEl.style.display = "block"; };
+
+  let code = ($("meet-code").value || "").trim().toUpperCase();
   const name = ($("meet-name").value || "").trim() || "Untitled Meet";
+  const league = ($("meet-league").value || "").trim();
   const pwd  = $("meet-pwd").value;
   const pwd2 = $("meet-pwd2").value;
+
+  if (!validCode(code)) return show("Code must be 3–20 chars: letters, numbers, dashes; cannot start or end with a dash.");
   if (!pwd || pwd.length < 4) return show("Password must be at least 4 characters.");
   if (pwd !== pwd2) return show("Passwords don't match.");
+
   const btn = $("create-btn");
-  btn.disabled = true;
-  btn.textContent = "Creating…";
-  const { data: token, error } = await sb.rpc("create_meet", { p_code: code, p_name: name, p_password: pwd });
+  btn.disabled = true; btn.textContent = "Creating…";
+
+  const { data: token, error } = await sb.rpc("create_meet", {
+    p_code: code, p_name: name, p_password: pwd, p_league: league
+  });
   if (error || !token) {
     show(error?.message || "Could not create meet.");
-    btn.disabled = false;
-    btn.textContent = "Create →";
+    btn.disabled = false; btn.textContent = "Create →";
     return;
   }
-  Auth.set(code, token);
+  MeetAuth.set(code, token);
   go(`m/${code}`);
 }
 
-/* NOT FOUND */
 function renderNotFound(code) {
   $("app").innerHTML = `
-    ${header("NOT FOUND", `<button class="btn btn-ghost" onclick="go('')">← Home</button>`)}
+    ${header("NOT FOUND", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Home</button>`)}
     <div style="max-width:600px;margin:80px auto;padding:24px;text-align:center;">
       <div class="display" style="font-size:56px;color:var(--red);">NO MEET</div>
       <div class="ui" style="color:var(--ink-dim);margin-top:12px;">
@@ -632,15 +896,883 @@ function renderNotFound(code) {
     </div>`;
 }
 
-/* HUB, DETAILS, ROSTER, TIMER, RECORDER, RESULTS - all original logic preserved */
-function renderHub() { /* ... full original renderHub ... */ 
-  // For brevity in this response I've condensed, but in a real file all functions are here.
-  // Since the full file is very long, I recommend copying the rest from your original pasted file.
-  // The CSS change is the only modification.
-  alert("Full file is very long. Please use your original JS + the new <style> above.");
+/* ============================ HUB ============================ */
+function renderHub() {
+  const code = State.meet.code;
+  const authed = MeetAuth.isAuthed(code);
+  const divs = computeDivisions();
+  const totalTaps = State.taps.length;
+  const totalFinish = State.results.length;
+  const racesStarted = State.races.filter(r => r.start_time).length;
+  const m = State.meet;
+  const isCompleted = m.status === "completed";
+
+  $("app").innerHTML = `
+    ${header(`MEET CODE · ${code}`, `<button class="btn btn-ghost btn-sm" onclick="go('')">← Switch Meet</button>`)}
+    <div class="wrap">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
+        <div>
+          <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:6px;">${esc(m.name)} ${isCompleted ? '<span class="status-badge completed">✓ COMPLETED</span>' : '<span class="status-badge active">● ACTIVE</span>'}</div>
+          <div class="display" style="font-size:56px;line-height:1;letter-spacing:0.04em;">${code}</div>
+          <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-top:8px;max-width:520px;">
+            ${m.course_name || m.location || m.distance
+              ? `<span style="color:var(--ink);">${esc(m.course_name || "")}${m.location ? ` · ${esc(m.location)}` : ""}${m.distance ? ` · ${esc(m.distance)}` : ""}${m.meet_date ? ` · ${esc(fmtDate(m.meet_date))}` : ""}</span>`
+              : `<span style="color:var(--ink-dim);font-style:italic;">No course details set.</span>`}
+          </div>
+          ${m.league ? `<div class="ui" style="margin-top:6px;font-size:13px;"><a href="#/league/${encodeURIComponent(m.league)}">League: ${esc(m.league)} →</a></div>` : ""}
+        </div>
+        <div>
+          <div class="stat"><div class="v">${State.teams.length}</div><div class="l">Teams</div></div>
+          <div class="stat"><div class="v">${State.runners.length}</div><div class="l">Runners</div></div>
+          <div class="stat"><div class="v">${divs.length}</div><div class="l">Divisions</div></div>
+          <div class="stat"><div class="v ${racesStarted ? "alert" : ""}">${racesStarted}/${divs.length}</div><div class="l">Started</div></div>
+        </div>
+      </div>
+
+      ${isCompleted ? `
+        <div class="panel" style="padding:18px 22px;margin-bottom:24px;border-color:var(--green);">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+              <div class="display" style="font-size:24px;color:var(--green);">✓ MEET COMPLETED</div>
+              <div class="ui" style="font-size:13px;color:var(--ink-dim);">All timing locked. View results below.</div>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button class="btn" onclick="go('m/${code}/results')">View Results →</button>
+              ${authed ? `<button class="btn btn-ghost btn-sm" onclick="doReopenMeet()">Reopen Meet</button>` : ""}
+            </div>
+          </div>
+        </div>` : ""}
+
+      <div class="grid-2">
+        <div class="role-card ${isCompleted?"disabled":""}" ${isCompleted?"":`onclick="goRole('details')"`}>
+          <div class="num" style="color:var(--blue);">00 · Course · Location · Distance · Date · League</div>
+          <div class="title">MEET DETAILS</div>
+          <div class="desc">Set the course details and league tag. Visible on the public results page.</div>
+        </div>
+        <div class="role-card ${isCompleted?"disabled":""}" ${isCompleted?"":`onclick="goRole('roster')"`}>
+          <div class="num">01 · Upload Roster · Auto-Divisions</div>
+          <div class="title">COACH</div>
+          <div class="desc">CSV with first, last, grade, gender. Auto-grouped into divisions by grade+gender.</div>
+        </div>
+        <div class="role-card ${(divs.length === 0 || isCompleted) ? "disabled" : ""}" ${(divs.length === 0 || isCompleted) ? "" : `onclick="goRole('timer')"`}>
+          <div class="num">02 · Tap Finish · Pick Race</div>
+          <div class="title">TIMER · START LINE</div>
+          <div class="desc">Pick a race and tap finishes. Each race has its own clock and tap log.</div>
+        </div>
+        <div class="role-card ${(totalTaps === 0 || isCompleted) ? "disabled" : ""}" ${(totalTaps === 0 || isCompleted) ? "" : `onclick="goRole('recorder')"`}>
+          <div class="num">03 · Match Bibs to Times</div>
+          <div class="title">RECORDER · CHUTE</div>
+          <div class="desc">Pick a race and type bibs as runners flow through the chute.</div>
+          ${totalTaps === 0 ? `<div class="note" style="color:var(--ink-dim);">→ Waiting for taps</div>` : `<div class="note">→ ${totalTaps - totalFinish} unmatched tap${(totalTaps-totalFinish)===1?"":"s"}</div>`}
+        </div>
+        <div class="role-card ${totalFinish === 0 ? "disabled" : ""}" ${totalFinish === 0 ? "" : `onclick="go('m/${code}/results')"`} style="grid-column:1/-1;">
+          <div class="num" style="color:var(--accent2)">04 · Live Standings · Export · Public Link</div>
+          <div class="title">RESULTS</div>
+          <div class="desc">Per-race team scores and individual finishers. Shareable public link, CSV export.</div>
+        </div>
+      </div>
+
+      ${!isCompleted && totalFinish > 0 && authed ? `
+        <div class="panel" style="margin-top:24px;padding:22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div class="display" style="font-size:22px;">FINISH THE MEET</div>
+            <div class="ui" style="font-size:12px;color:var(--ink-dim);">Lock all timing and mark this meet complete. You can reopen it later if needed.</div>
+          </div>
+          <button class="btn btn-lime" onclick="doEndMeet()">✓ Complete Meet</button>
+        </div>` : ""}
+
+      ${divs.length > 0 ? `
+        <div class="hairline" style="margin-top:36px;"></div>
+        <div class="display" style="font-size:22px;margin-top:24px;margin-bottom:12px;color:var(--accent2);">▰ DIVISIONS DETECTED</div>
+        <div class="div-grid">
+          ${divs.map(d => {
+            const race = raceFor(d.division);
+            const tapsCount = tapsForDiv(d.division).length;
+            const finishCount = resultsForDiv(d.division).length;
+            const started = race?.start_time != null;
+            return `<div class="div-tile ${started ? "started" : ""}">
+              <div class="code">${d.division}</div>
+              <div class="lbl">${esc(divLabel(d.division))}</div>
+              <div class="stat-line">${d.count} runners</div>
+              <div class="stat-line">${started ? `▶ ${tapsCount} taps · ${finishCount} done` : "Not started"}</div>
+            </div>`;
+          }).join("")}
+        </div>` : ""}
+    </div>`;
 }
-async function boot() { await handleRoute(); }
-boot();
+
+function goRole(view) {
+  const code = State.meet.code;
+  ensureAuth(code, () => go(`m/${code}/${view}`));
+}
+
+async function doEndMeet() {
+  const code = State.meet.code;
+  const token = MeetAuth.get(code);
+  if (!token) return ensureAuth(code, doEndMeet);
+  if (!confirm("Complete this meet? Timing will be locked. You can reopen it later if needed.")) return;
+
+  State.meet = { ...State.meet, status: "completed", completed_at: new Date().toISOString() };
+  render();
+
+  const { error } = await sb.rpc("end_meet", { p_token: token, p_meet: code });
+  if (error) {
+    alert("Failed: " + error.message);
+    State.meet = { ...State.meet, status: "active", completed_at: null };
+    render();
+  }
+}
+
+async function doReopenMeet() {
+  const code = State.meet.code;
+  const token = MeetAuth.get(code);
+  if (!token) return ensureAuth(code, doReopenMeet);
+  if (!confirm("Reopen this meet for further timing changes?")) return;
+
+  State.meet = { ...State.meet, status: "active", completed_at: null };
+  render();
+
+  const { error } = await sb.rpc("reopen_meet", { p_token: token, p_meet: code });
+  if (error) {
+    alert("Failed: " + error.message);
+    await loadMeet(code);
+    render();
+  }
+}
+
+/* ============================ MEET DETAILS ============================ */
+function renderDetails() {
+  const code = State.meet.code;
+  if (!MeetAuth.isAuthed(code)) { ensureAuth(code, () => render()); }
+  const m = State.meet;
+
+  $("app").innerHTML = `
+    ${header("MEET DETAILS", `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+    <div class="wrap-narrow">
+      <div class="display" style="font-size:48px;margin-bottom:24px;">COURSE<span style="color:var(--accent)">·</span>INFO</div>
+      <div class="panel" style="padding:28px;">
+        <div class="field-label">Course Name</div>
+        <input id="d-course" class="field-input" value="${esc(m.course_name || "")}" placeholder="Greenfield Park Loop" />
+        <div style="margin-top:16px;">
+          <div class="field-label">Location</div>
+          <input id="d-loc" class="field-input" value="${esc(m.location || "")}" placeholder="Greenfield, CA" />
+        </div>
+        <div style="margin-top:16px;">
+          <div class="field-label">Distance</div>
+          <input id="d-dist" class="field-input" value="${esc(m.distance || "")}" placeholder="3 miles, 5K, etc." />
+        </div>
+        <div style="margin-top:16px;">
+          <div class="field-label">Meet Date</div>
+          <input id="d-date" type="date" class="field-input" value="${esc(m.meet_date || "")}" />
+        </div>
+        <div style="margin-top:16px;">
+          <div class="field-label">League (optional)</div>
+          <input id="d-league" class="field-input" value="${esc(m.league || "")}" placeholder="sjusd, central-cal-xc, etc." />
+        </div>
+        <div style="margin-top:16px;">
+          <div class="field-label">Notes (optional)</div>
+          <textarea id="d-notes" class="field-input" rows="3" placeholder="Bag drop at the pavilion, awards at 12:30">${esc(m.notes || "")}</textarea>
+        </div>
+        <div id="d-err" class="err" style="display:none;"></div>
+        <div id="d-ok" class="ok" style="display:none;"></div>
+        <div style="margin-top:22px;">
+          <button id="d-save" class="btn btn-primary" onclick="doSaveDetails()">Save Details →</button>
+        </div>
+      </div>
+    </div>`;
+}
+async function doSaveDetails() {
+  const code = State.meet.code;
+  const token = MeetAuth.get(code);
+  if (!token) return ensureAuth(code, doSaveDetails);
+  const errEl = $("d-err"), okEl = $("d-ok");
+  errEl.style.display = "none"; okEl.style.display = "none";
+
+  const updates = {
+    course_name: $("d-course").value.trim() || null,
+    location:    $("d-loc").value.trim() || null,
+    distance:    $("d-dist").value.trim() || null,
+    meet_date:   $("d-date").value || null,
+    notes:       $("d-notes").value.trim() || null,
+    league:      $("d-league").value.trim() || null,
+  };
+
+  State.meet = { ...State.meet, ...updates };
+  render();
+
+  const btn = $("d-save");
+  if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
+
+  const { error } = await sb.rpc("set_meet_details", {
+    p_token: token, p_meet: code,
+    p_course: updates.course_name, p_location: updates.location,
+    p_distance: updates.distance, p_meet_date: updates.meet_date,
+    p_notes: updates.notes, p_league: updates.league
+  });
+
+  const okEl2 = $("d-ok"), errEl2 = $("d-err"), btn2 = $("d-save");
+  if (btn2) { btn2.disabled = false; btn2.textContent = "Save Details →"; }
+  if (error) {
+    if (errEl2) { errEl2.textContent = "⚠ " + error.message; errEl2.style.display = "block"; }
+  } else {
+    if (okEl2) { okEl2.textContent = "✓ Saved."; okEl2.style.display = "block"; }
+  }
+}
+
+/* ============================ ROSTER ============================ */
+let _rosterFilterTeam = "ALL";
+function renderRoster() {
+  const code = State.meet.code;
+  if (!MeetAuth.isAuthed(code)) { ensureAuth(code, () => render()); }
+  const filterOptions = ["ALL", ...State.teams.map(t => t.name)];
+  const visible = _rosterFilterTeam === "ALL" ? State.runners : State.runners.filter(r => r.team === _rosterFilterTeam);
+  const divs = computeDivisions();
+
+  $("app").innerHTML = `
+    ${header("ROSTER INTAKE", `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+    <div class="wrap">
+      <div class="display" style="font-size:48px;margin-bottom:24px;">UPLOAD<span style="color:var(--accent)">·</span>ROSTER</div>
+      <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:24px;margin-bottom:32px;" class="roster-grid">
+        <div class="panel" style="padding:22px;">
+          <div class="field-label">School / Team Name</div>
+          <input id="r-school" class="field-input" placeholder="Riverdale High" />
+          <div style="margin-top:16px;">
+            <div class="field-label">CSV File</div>
+            <input id="r-file" type="file" accept=".csv,text/csv" style="color:var(--ink-dim);font-size:13px;" />
+          </div>
+          <div style="margin-top:16px;">
+            <div class="field-label">Or paste CSV</div>
+            <textarea id="r-csv" rows="6" class="mono" placeholder="first,last,grade,gender&#10;Jamal,Reeves,7,M&#10;Lina,Park,6,F" style="width:100%;padding:12px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:12px;outline:none;resize:vertical;"></textarea>
+          </div>
+          <div id="r-err" class="err" style="display:none;"></div>
+          <div id="r-ok" class="ok" style="display:none;"></div>
+          <div style="margin-top:18px;">
+            <button id="r-submit" class="btn btn-primary" onclick="doUploadRoster()">Assign Bibs →</button>
+          </div>
+        </div>
+        <div class="panel" style="padding:22px;">
+          <div class="mono" style="font-size:10px;color:var(--accent2);letter-spacing:0.2em;margin-bottom:14px;">BIB + DIVISION ASSIGNMENT</div>
+          <div class="ui" style="font-size:13px;color:var(--ink-dim);line-height:1.6;">
+            Each team gets a 1000-block. Runners auto-assigned to divisions by grade+gender (6M, 7F, etc.).
+          </div>
+          <div class="hairline"></div>
+          <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:10px;">TEAMS REGISTERED</div>
+          ${State.teams.length === 0 ? `<div class="ui" style="font-size:13px;color:var(--ink-dim);font-style:italic;">No teams yet.</div>` :
+            State.teams.map(t => {
+              const teamRunners = State.runners.filter(r => r.team === t.name);
+              const count = teamRunners.length;
+              const bibs = teamRunners.map(r => parseInt(r.bib, 10));
+              const lo = bibs.length ? Math.min(...bibs) : t.team_index*1000+1;
+              const hi = bibs.length ? Math.max(...bibs) : t.team_index*1000+1;
+              return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);">
+                <div><span class="mono" style="color:var(--accent);margin-right:10px;">#${t.team_index}</span><span class="ui" style="font-size:14px;">${esc(t.name)}</span></div>
+                <div class="mono" style="font-size:12px;color:var(--ink-dim);">${count} runners · ${pad(lo,4)}–${pad(hi,4)}</div>
+              </div>`;
+            }).join("")}
+          ${divs.length > 0 ? `
+            <div class="hairline"></div>
+            <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:10px;">RACES (auto-detected)</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              ${divs.map(d => `<span style="font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--panel2);color:var(--accent);padding:4px 10px;border:1px solid var(--line);">${d.division} · ${d.count}</span>`).join("")}
+            </div>` : ""}
+        </div>
+      </div>
+
+      ${State.runners.length > 0 ? `
+      <div class="panel">
+        <div style="padding:14px 22px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);">
+          <div class="display" style="font-size:22px;letter-spacing:0.05em;">ENTERED RUNNERS · ${State.runners.length}</div>
+          <select id="r-filter" class="mono" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line);padding:6px 10px;font-size:12px;" onchange="changeFilter(this.value)">
+            ${filterOptions.map(t => `<option value="${esc(t)}" ${t === _rosterFilterTeam ? "selected" : ""}>${esc(t)}</option>`).join("")}
+          </select>
+        </div>
+        <div style="max-height:400px;overflow:auto;">
+          <table>
+            <thead><tr><th>BIB</th><th>NAME</th><th>GR</th><th>GEN</th><th>DIV</th><th>TEAM</th></tr></thead>
+            <tbody>
+              ${visible.map(r => {
+                const div = divFromRunner(r);
+                return `<tr>
+                  <td class="mono" style="color:var(--accent);font-weight:700;">${esc(r.bib)}</td>
+                  <td class="ui">${esc(r.first_name)} ${esc(r.last_name)}</td>
+                  <td class="mono" style="color:var(--ink-dim);">${esc(r.grade || "")}</td>
+                  <td class="mono" style="color:var(--ink-dim);">${esc(r.gender || "")}</td>
+                  <td class="mono" style="color:${div?"var(--accent2)":"var(--red)"};font-weight:700;">${div || "—"}</td>
+                  <td class="ui" style="color:var(--ink-dim);">${esc(r.team)}</td>
+                </tr>`;
+              }).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>` : ""}
+    </div>
+    <style>@media(max-width:760px){.roster-grid{grid-template-columns:1fr !important;}}</style>`;
+
+  $("r-file")?.addEventListener("change", (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    const fr = new FileReader();
+    fr.onload = (ev) => { $("r-csv").value = ev.target.result; };
+    fr.readAsText(f);
+  });
+}
+function changeFilter(v) { _rosterFilterTeam = v; renderRoster(); }
+
+async function doUploadRoster() {
+  const code = State.meet.code;
+  const token = MeetAuth.get(code);
+  if (!token) return ensureAuth(code, doUploadRoster);
+  const errEl = $("r-err"), okEl = $("r-ok");
+  errEl.style.display = "none"; okEl.style.display = "none";
+  const showErr = (msg) => { errEl.textContent = "⚠ " + msg; errEl.style.display = "block"; };
+  const showOk  = (msg) => { okEl.textContent  = "✓ " + msg; okEl.style.display  = "block"; };
+
+  const school = ($("r-school").value || "").trim();
+  if (!school) return showErr("Enter a school name first.");
+  const csv = $("r-csv").value;
+  const parsed = parseCSV(csv);
+  if (parsed === null) return showErr("CSV must have headers: first, last, grade, gender");
+  if (!parsed || parsed.length === 0) return showErr("No rows found.");
+
+  const btn = $("r-submit");
+  btn.disabled = true; btn.textContent = "Uploading…";
+
+  try {
+    const { data: teamIdx, error: teamErr } = await sb.rpc("register_team", {
+      p_token: token, p_meet: code, p_team: school
+    });
+    if (teamErr) throw teamErr;
+
+    const existingForTeam = State.runners.filter(r => r.team === school).map(r => parseInt(r.bib, 10));
+    let nextBib = existingForTeam.length ? Math.max(...existingForTeam) + 1 : teamIdx * 1000 + 1;
+
+    const rows = parsed.map(p => ({
+      bib: pad(nextBib++, 4),
+      first_name: p.first, last_name: p.last,
+      grade: p.grade, gender: p.gender, team: school
+    }));
+
+    const { error: insErr } = await sb.rpc("add_runners", {
+      p_token: token, p_meet: code, p_runners: rows
+    });
+    if (insErr) throw insErr;
+
+    const newDivs = new Set();
+    for (const r of rows) {
+      const d = divFromRunner(r);
+      if (d && !State.races.find(x => x.division === d)) newDivs.add(d);
+    }
+    for (const d of newDivs) {
+      await sb.rpc("register_race", { p_token: token, p_meet: code, p_division: d, p_label: divLabel(d) });
+    }
+
+    if (!State.teams.find(t => t.name === school)) {
+      State.teams.push({ meet_code: code, name: school, team_index: teamIdx });
+      State.teams.sort((a,b) => a.team_index - b.team_index);
+    }
+    for (const r of rows) {
+      if (!State.runnersByBib[r.bib]) {
+        State.runners.push({ ...r, meet_code: code });
+        State.runnersByBib[r.bib] = { bib: r.bib, first: r.first_name, last: r.last_name, grade: r.grade, gender: r.gender, team: r.team };
+      }
+    }
+    State.runners.sort((a,b) => a.bib.localeCompare(b.bib));
+    for (const d of newDivs) {
+      if (!State.races.find(x => x.division === d)) {
+        State.races.push({ meet_code: code, division: d, label: divLabel(d), start_time: null });
+      }
+    }
+
+    showOk(`Added ${rows.length} runner${rows.length === 1 ? "" : "s"} to ${school}.`);
+    renderRoster();
+  } catch (e) {
+    if (e?.message?.includes("Not authorized")) {
+      MeetAuth.clear(code);
+      showErr("Session expired. Please unlock again.");
+      ensureAuth(code, () => {});
+    } else {
+      showErr(e.message || "Upload failed.");
+    }
+  } finally {
+    const submitBtn = $("r-submit");
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Assign Bibs →"; }
+  }
+}
+
+/* ============================ DIVISION PICKER ============================ */
+function renderDivPicker(role) {
+  const code = State.meet.code;
+  const divs = computeDivisions();
+  $("app").innerHTML = `
+    ${header(`${role.toUpperCase()} · PICK RACE · ${code}`, `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+    <div class="wrap">
+      <div class="display" style="font-size:48px;margin-bottom:6px;">PICK A RACE</div>
+      <div class="ui" style="color:var(--ink-dim);font-size:14px;margin-bottom:28px;">
+        ${role === "timer" ? "Each race has its own start time and tap log." : "Each race has its own chute."}
+      </div>
+      ${divs.length === 0 ? `<div class="ui" style="color:var(--ink-dim);">No races detected yet. Upload runners first.</div>` :
+      `<div class="div-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));">
+        ${divs.map(d => {
+          const race = raceFor(d.division);
+          const tapsCount = tapsForDiv(d.division).length;
+          const finishCount = resultsForDiv(d.division).length;
+          const started = race?.start_time != null;
+          return `<div class="div-tile ${started?"started":""}" style="cursor:pointer;padding:24px 16px;" onclick="go('m/${code}/${role}/${d.division}')">
+            <div class="code" style="font-size:56px;">${d.division}</div>
+            <div class="lbl" style="font-size:12px;">${esc(divLabel(d.division))}</div>
+            <div class="stat-line" style="margin-top:10px;">${d.count} runners</div>
+            <div class="stat-line">${started ? `▶ ${tapsCount} taps · ${finishCount} done` : "Not started"}</div>
+          </div>`;
+        }).join("")}
+      </div>`}
+    </div>`;
+}
+
+/* ============================ TIMER ============================ */
+function renderTimer() {
+  const code = State.meet.code;
+  if (!MeetAuth.isAuthed(code)) { ensureAuth(code, () => render()); }
+  if (State.meet.status === "completed") return renderCompletedNotice();
+  const div = State.route.division;
+  if (!div) return renderDivPicker("timer");
+
+  const race = raceFor(div) || { start_time: null };
+  const started = race.start_time != null;
+  const taps = tapsForDiv(div);
+  const results = resultsForDiv(div);
+  const lastTaps = [...taps].slice(-8).reverse();
+
+  $("app").innerHTML = `
+    ${header(`TIMER · ${div} · ${esc(divLabel(div))}`,
+      `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}/timer')">↺ Switch Race</button>
+       <button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+    <div class="timer-grid">
+      <div style="padding:32px 32px 0;display:flex;flex-direction:column;">
+        <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:8px;">⏱ RACE CLOCK · ${div}</div>
+        <div id="t-clock" class="clock ${started ? "" : "idle"}">${fmtTime(started ? Date.now() - race.start_time : 0)}</div>
+        ${started ? `
+          <div class="tap-counter">
+            <span class="lbl">FINISHERS TAPPED</span>
+            <span id="tap-count">${taps.length}</span>
+          </div>` : `
+          <div class="mono" style="font-size:13px;color:var(--ink-dim);margin-top:8px;letter-spacing:0.15em;">NOT STARTED</div>`}
+        <div style="margin-top:auto;margin-bottom:32px;">
+          ${started
+            ? `<button id="tap-btn" class="tap-btn">TAP FINISH</button>
+               <div style="text-align:center;margin-top:14px;"><button class="btn btn-danger" onclick="doResetRace('${div}')">Reset This Race</button></div>`
+            : `<button id="start-btn" class="start-btn">START RACE ▶</button>`}
+        </div>
+      </div>
+      <div style="background:var(--panel);border-left:1px solid var(--line);padding:22px;">
+        <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:14px;">RECENT TAPS · ${div}</div>
+        <div id="recent-taps">
+        ${lastTaps.length === 0 ? `<div class="ui" style="font-size:13px;color:var(--ink-dim);font-style:italic;">None yet.</div>` :
+          lastTaps.map(t => {
+            const matched = results.find(r => r.place === t.place);
+            return `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--line);">
+              <div>
+                <span class="display" style="font-size:22px;color:var(--accent);margin-right:10px;">${pad(t.place, 3)}</span>
+                <span class="mono" style="font-size:16px;font-variant-numeric:tabular-nums;">${fmtTime(t.time_ms)}</span>
+              </div>
+              <div class="mono" style="font-size:11px;color:${matched ? "var(--green)" : "var(--ink-dim)"};align-self:center;">
+                ${matched ? "#" + matched.bib : "..."}
+              </div>
+            </div>`;
+          }).join("")
+        }
+        </div>
+      </div>
+    </div>`;
+
+  if (State.tickTimer) clearInterval(State.tickTimer);
+  if (started) {
+    State.tickTimer = setInterval(() => {
+      const el = $("t-clock");
+      const r = raceFor(div);
+      if (el && r?.start_time) el.textContent = fmtTime(Date.now() - r.start_time);
+    }, 50);
+  }
+
+  $("start-btn")?.addEventListener("click", () => doStartRace(div));
+
+  const tapBtn = $("tap-btn");
+  if (tapBtn) {
+    let cooling = false;
+    tapBtn.addEventListener("click", async () => {
+      if (cooling) return;
+      cooling = true;
+      setTimeout(() => cooling = false, 100);
+      playBeep();
+      tapBtn.classList.add("flash");
+      setTimeout(() => tapBtn.classList.remove("flash"), 400);
+
+      const token = MeetAuth.get(code);
+      if (!token) return ensureAuth(code, () => {});
+      const r = raceFor(div);
+      if (!r?.start_time) return;
+      const t = Date.now() - r.start_time;
+
+      const nextPlace = tapsForDiv(div).length + 1;
+      State.taps.push({ meet_code: code, division: div, place: nextPlace, time_ms: t });
+      const counter = $("tap-count");
+      if (counter) counter.textContent = nextPlace;
+      render();
+
+      const { error } = await sb.rpc("add_tap", { p_token: token, p_meet: code, p_division: div, p_time_ms: t });
+      if (error) {
+        console.error("tap failed", error);
+        State.taps = State.taps.filter(x => !(x.division === div && x.place === nextPlace));
+        render();
+        if (error.message?.includes("Not authorized")) {
+          MeetAuth.clear(code);
+          alert("Session expired. Please unlock again.");
+          ensureAuth(code, () => render());
+        }
+      }
+    });
+  }
+}
+
+function renderCompletedNotice() {
+  const code = State.meet.code;
+  $("app").innerHTML = `
+    ${header("MEET COMPLETED", `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+    <div class="wrap-narrow" style="text-align:center;">
+      <div class="display" style="font-size:64px;color:var(--green);">✓ COMPLETED</div>
+      <div class="ui" style="color:var(--ink-dim);margin-top:12px;">
+        This meet is marked complete. Reopen from the Hub if you need to make timing changes.
+      </div>
+      <div style="margin-top:24px;">
+        <button class="btn btn-primary" onclick="go('m/${code}/results')">View Results →</button>
+      </div>
+    </div>`;
+}
+
+async function doStartRace(div) {
+  const code = State.meet.code;
+  const token = MeetAuth.get(code);
+  if (!token) return ensureAuth(code, () => doStartRace(div));
+  // Tap audio context for iOS unlock
+  try { if (!_audioCtx) { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } if (_audioCtx.state === "suspended") _audioCtx.resume(); } catch(e){}
+
+  const t = Date.now();
+  const existing = raceFor(div);
+  if (existing) existing.start_time = t;
+  else State.races.push({ meet_code: code, division: div, label: divLabel(div), start_time: t });
+  render();
+
+  const { error } = await sb.rpc("start_race", { p_token: token, p_meet: code, p_division: div, p_start_time: t });
+  if (error) {
+    alert("Failed to start: " + error.message);
+    const e2 = raceFor(div); if (e2) e2.start_time = null;
+    render();
+  }
+}
+
+async function doResetRace(div) {
+  if (!confirm(`Reset ${divLabel(div)} race? Clears all taps and finishes for this race only.`)) return;
+  const code = State.meet.code;
+  const token = MeetAuth.get(code);
+  if (!token) return ensureAuth(code, () => doResetRace(div));
+  const r = raceFor(div); if (r) r.start_time = null;
+  State.taps = State.taps.filter(t => t.division !== div);
+  State.results = State.results.filter(x => x.division !== div);
+  render();
+  const { error } = await sb.rpc("reset_race", { p_token: token, p_meet: code, p_division: div });
+  if (error) { alert("Reset failed: " + error.message); await loadMeet(code); render(); }
+}
+
+/* ============================ RECORDER ============================ */
+function renderRecorder() {
+  const code = State.meet.code;
+  if (!MeetAuth.isAuthed(code)) { ensureAuth(code, () => render()); }
+  if (State.meet.status === "completed") return renderCompletedNotice();
+  const div = State.route.division;
+  if (!div) return renderDivPicker("recorder");
+
+  const taps = tapsForDiv(div);
+  const results = resultsForDiv(div);
+  const nextPlace = results.length + 1;
+  const nextTap = taps.find(t => t.place === nextPlace);
+  const recent = [...results].slice(-10).reverse();
+
+  $("app").innerHTML = `
+    ${header(`RECORDER · ${div} · ${esc(divLabel(div))}`,
+      `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}/recorder')">↺ Switch Race</button>
+       <button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+    <div class="timer-grid">
+      <div style="padding:32px;">
+        <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:8px;">NEXT FINISHER · ${div}</div>
+        <div class="display" style="font-size:96px;line-height:1;margin-bottom:4px;">PLACE <span style="color:var(--accent)">${pad(nextPlace, 3)}</span></div>
+        <div class="mono" style="font-size:22px;color:var(--ink-dim);font-variant-numeric:tabular-nums;margin-bottom:30px;">
+          ${nextTap ? `TIME · ${fmtTime(nextTap.time_ms)}` : "WAITING FOR TAP…"}
+        </div>
+        <div class="field-label">Enter Bib Number</div>
+        <input id="bib-input" class="bib-input" inputmode="numeric" placeholder="0000" ${nextTap ? "" : "disabled"} maxlength="4" />
+        <div id="bib-preview" style="margin-top:16px;display:none;"></div>
+        <div id="rec-err" class="err" style="display:none;"></div>
+        <div style="display:flex;gap:12px;margin-top:22px;">
+          <button id="rec-submit" class="btn btn-primary" ${nextTap ? "" : "disabled"}>Record (↵)</button>
+          <button class="btn" onclick="doUndo('${div}')" ${results.length ? "" : "disabled"}>Undo Last</button>
+        </div>
+        <div class="mono" style="font-size:11px;color:var(--ink-dim);margin-top:28px;letter-spacing:0.1em;">
+          ${taps.length} TAPS · ${results.length} MATCHED · ${taps.length - results.length} PENDING
+        </div>
+      </div>
+      <div style="background:var(--panel);border-left:1px solid var(--line);padding:22px;">
+        <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:14px;">LIVE FINISHERS · ${div}</div>
+        ${recent.length === 0 ? `<div class="ui" style="font-size:13px;color:var(--ink-dim);font-style:italic;">No finishers recorded yet.</div>` :
+          recent.map(r => {
+            const runner = State.runnersByBib[r.bib];
+            return `<div style="padding:10px 0;border-bottom:1px dashed var(--line);">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                <span class="display" style="font-size:24px;color:var(--accent);">${pad(r.place, 3)}</span>
+                <span class="mono" style="font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink-dim);">${fmtTime(r.time_ms)}</span>
+              </div>
+              <div class="ui" style="font-size:13px;margin-top:2px;">#${esc(r.bib)} · ${esc(runner?.first || "")} ${esc(runner?.last || "")}</div>
+              <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.1em;">${esc((runner?.team || "").toUpperCase())}</div>
+            </div>`;
+          }).join("")
+        }
+      </div>
+    </div>`;
+
+  const input = $("bib-input");
+  if (input) {
+    input.focus();
+    input.addEventListener("input", () => {
+      input.value = input.value.replace(/\D/g, "").slice(0, 4);
+      updatePreview(div);
+    });
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") doRecordBib(div); });
+  }
+  $("rec-submit")?.addEventListener("click", () => doRecordBib(div));
+}
+function updatePreview(div) {
+  const input = $("bib-input");
+  const preview = $("bib-preview");
+  if (!input || !preview) return;
+  const v = input.value.padStart(4, "0");
+  const runner = State.runnersByBib[v];
+  if (input.value && runner) {
+    const runnerDiv = divFromRunner(runner);
+    const mismatched = runnerDiv && runnerDiv !== div;
+    preview.style.display = "block";
+    preview.innerHTML = `<div style="padding:12px 18px;background:var(--panel);border-left:3px solid ${mismatched?"var(--red)":"var(--green)"};">
+      <div class="ui" style="font-size:17px;font-weight:600;">${esc(runner.first)} ${esc(runner.last)}</div>
+      <div class="mono" style="font-size:12px;color:var(--ink-dim);margin-top:2px;">${esc(runner.team)} · GR ${esc(runner.grade || "—")} · ${esc(runner.gender || "—")} · DIV ${runnerDiv || "—"}</div>
+      ${mismatched ? `<div class="mono" style="font-size:11px;color:var(--red);margin-top:6px;">⚠ This runner belongs to ${runnerDiv}, not ${div}.</div>` : ""}
+    </div>`;
+  } else { preview.style.display = "none"; }
+}
+async function doRecordBib(div) {
+  const code = State.meet.code;
+  const token = MeetAuth.get(code);
+  if (!token) return ensureAuth(code, () => doRecordBib(div));
+  const errEl = $("rec-err"); errEl.style.display = "none";
+  const showErr = (msg) => { errEl.textContent = "⚠ " + msg; errEl.style.display = "block"; };
+  const raw = ($("bib-input").value || "").trim();
+  if (!raw) return;
+  const bib = raw.padStart(4, "0");
+  const runner = State.runnersByBib[bib];
+  if (!runner) return showErr(`No runner with bib ${bib}`);
+  if (State.results.find(r => r.division === div && r.bib === bib)) return showErr(`Bib ${bib} already recorded in this race`);
+  const runnerDiv = divFromRunner(runner);
+  if (runnerDiv && runnerDiv !== div) {
+    if (!confirm(`Bib ${bib} (${runner.first} ${runner.last}) belongs to ${runnerDiv}, not ${div}. Record anyway?`)) return;
+  }
+  const nextPlace = resultsForDiv(div).length + 1;
+  const nextTap = tapsForDiv(div).find(t => t.place === nextPlace);
+  if (!nextTap) return showErr("No tap to match yet.");
+  const newResult = { meet_code: code, division: div, place: nextPlace, bib, time_ms: nextTap.time_ms };
+  State.results.push(newResult);
+  $("bib-input").value = "";
+  updatePreview(div);
+  render();
+  $("bib-input")?.focus();
+  const { error } = await sb.rpc("add_result", { p_token: token, p_meet: code, p_division: div, p_bib: bib });
+  if (error) {
+    State.results = State.results.filter(r => !(r.division === div && r.place === nextPlace && r.bib === bib));
+    render();
+    if (error.message?.includes("Not authorized")) {
+      MeetAuth.clear(code); showErr("Session expired. Please unlock again.");
+      ensureAuth(code, () => {}); return;
+    }
+    showErr(error.message);
+  }
+}
+async function doUndo(div) {
+  const divResults = resultsForDiv(div);
+  if (!divResults.length) return;
+  const code = State.meet.code;
+  const token = MeetAuth.get(code);
+  if (!token) return ensureAuth(code, () => doUndo(div));
+  const removed = divResults[divResults.length - 1];
+  State.results = State.results.filter(r => !(r.division === div && r.place === removed.place));
+  render();
+  const { error } = await sb.rpc("undo_result", { p_token: token, p_meet: code, p_division: div });
+  if (error) { alert("Undo failed: " + error.message); State.results.push(removed); render(); }
+}
+
+/* ============================ RESULTS ============================ */
+function renderResults() {
+  const code = State.meet.code;
+  const divs = computeDivisions().filter(d => resultsForDiv(d.division).length > 0);
+  const m = State.meet;
+  const publicLink = `${location.origin}${location.pathname}#/m/${code}/results`;
+  const isCompleted = m.status === "completed";
+
+  $("app").innerHTML = `
+    ${header(`RESULTS · ${code}`, `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+    <div class="wrap">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:16px;">
+        <div>
+          <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.2em;">${isCompleted?"OFFICIAL FINAL RESULTS":"LIVE RESULTS"}</div>
+          <div class="display" style="font-size:72px;line-height:0.95;">${isCompleted?"FINAL":"LIVE"} <span style="color:var(--accent)">RESULTS</span></div>
+          <div class="ui" style="font-size:13px;color:var(--ink);margin-top:8px;">${esc(m.name)} ${isCompleted?'<span class="status-badge completed">✓ COMPLETED</span>':'<span class="status-badge active">● ACTIVE</span>'}</div>
+          ${(m.course_name || m.location || m.distance || m.meet_date) ? `<div class="mono" style="font-size:12px;color:var(--ink-dim);margin-top:4px;">
+            ${[m.course_name, m.location, m.distance, fmtDate(m.meet_date)].filter(Boolean).map(esc).join(" · ")}
+          </div>` : ""}
+          ${m.league ? `<div class="ui" style="margin-top:6px;font-size:13px;"><a href="#/league/${encodeURIComponent(m.league)}">More meets in ${esc(m.league)} →</a></div>` : ""}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+          <button class="btn btn-sm" onclick="doCopyLink('${esc(publicLink)}')">📋 Copy Public Link</button>
+          <button class="btn btn-sm" onclick="doExportAllCSV()">⬇ Export All Races (CSV)</button>
+        </div>
+      </div>
+      <div id="link-copied" class="ok" style="display:none;text-align:right;">✓ Link copied.</div>
+
+      ${divs.length === 0 ? `<div class="panel" style="padding:48px;text-align:center;color:var(--ink-dim);">No results recorded yet.</div>` :
+        divs.map(d => renderResultBlock(d.division)).join("")}
+    </div>`;
+}
+function renderResultBlock(div) {
+  const divResults = resultsForDiv(div);
+  const teamScores = scoreRace(divResults, State.runnersByBib);
+  const scorePlaceLookup = {};
+  teamScores.forEach(t => t.runners.forEach(r => { scorePlaceLookup[r.bib] = r.scorePlace; }));
+  const sorted = [...divResults].sort((a, b) => a.place - b.place);
+  return `
+    <div style="margin-bottom:48px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <div class="display" style="font-size:30px;letter-spacing:0.05em;color:var(--accent2);">▰ ${esc(divLabel(div))} <span style="color:var(--ink-dim);font-size:18px;">[${div}]</span></div>
+        <button class="btn btn-ghost btn-sm" onclick="doExportDivCSV('${div}')">⬇ CSV · ${div}</button>
+      </div>
+      <div class="panel" style="margin-bottom:16px;">
+        ${teamScores.length === 0 ? `<div class="ui" style="padding:24px;text-align:center;color:var(--ink-dim);">No finishers in this race yet.</div>` : `
+        <table>
+          <thead><tr><th>RANK</th><th>TEAM</th><th>SCORE</th><th>FINISHERS</th><th>TOP 5 PLACES</th><th>6TH</th><th>7TH</th></tr></thead>
+          <tbody>
+            ${teamScores.map(t => `<tr>
+              <td>${t.rank ? `<span class="display" style="font-size:32px;color:${t.rank===1?"var(--accent)":"var(--ink)"};">${t.rank===1?"🏆 ":""}${t.rank}</span>` : `<span class="mono" style="font-size:11px;color:var(--ink-dim);">—</span>`}</td>
+              <td class="ui" style="font-size:16px;font-weight:600;">${esc(t.team)}</td>
+              <td class="display" style="font-size:28px;color:${t.rank===1?"var(--accent)":"var(--ink)"};">${t.isScoring ? t.total : "INC"}</td>
+              <td class="mono" style="color:var(--ink-dim);">${t.finishers}</td>
+              <td class="mono">${t.isScoring ? t.runners.slice(0,5).map(r=>r.scorePlace).join(" + ") : `<span style="color:var(--ink-dim);">needs 5 finishers</span>`}</td>
+              <td class="mono" style="color:var(--ink-dim);">${t.sixth || "—"}</td>
+              <td class="mono" style="color:var(--ink-dim);">${t.seventh || "—"}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>`}
+      </div>
+      ${sorted.length > 0 ? `
+      <div class="panel">
+        <table>
+          <thead><tr><th>PLACE</th><th>SCORE PL</th><th>BIB</th><th>NAME</th><th>TEAM</th><th>GR</th><th>TIME</th></tr></thead>
+          <tbody>
+            ${sorted.map(r => {
+              const runner = State.runnersByBib[r.bib];
+              const sp = scorePlaceLookup[r.bib];
+              return `<tr>
+                <td class="display" style="font-size:22px;color:${r.place<=3?"var(--accent)":"var(--ink)"};">${r.place}</td>
+                <td class="mono" style="color:${sp?"var(--accent2)":"var(--ink-dim)"};">${sp || "—"}</td>
+                <td class="mono" style="color:var(--accent);">${esc(r.bib)}</td>
+                <td class="ui">${esc(runner?.first || "")} ${esc(runner?.last || "")}</td>
+                <td class="ui" style="color:var(--ink-dim);">${esc(runner?.team || "")}</td>
+                <td class="mono" style="color:var(--ink-dim);">${esc(runner?.grade || "")}</td>
+                <td class="mono" style="font-variant-numeric:tabular-nums;">${fmtTime(r.time_ms)}</td>
+              </tr>`;
+            }).join("")}
+          </tbody>
+        </table>
+      </div>` : ""}
+    </div>`;
+}
+async function doCopyLink(link) {
+  try {
+    await navigator.clipboard.writeText(link);
+    const el = $("link-copied");
+    if (el) { el.style.display = "block"; setTimeout(() => { el.style.display = "none"; }, 2500); }
+  } catch (e) { prompt("Copy this link:", link); }
+}
+function csvEscape(v) {
+  const s = String(v ?? "");
+  if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+function downloadCSV(filename, rows) {
+  const csv = rows.map(r => r.map(csvEscape).join(",")).join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function buildCsvForDiv(div) {
+  const m = State.meet;
+  const divResults = resultsForDiv(div);
+  const teamScores = scoreRace(divResults, State.runnersByBib);
+  const scorePlaceLookup = {};
+  teamScores.forEach(t => t.runners.forEach(r => { scorePlaceLookup[r.bib] = r.scorePlace; }));
+  const rows = [];
+  rows.push(["Meet", m.name]);
+  if (m.course_name) rows.push(["Course", m.course_name]);
+  if (m.location)    rows.push(["Location", m.location]);
+  if (m.distance)    rows.push(["Distance", m.distance]);
+  if (m.meet_date)   rows.push(["Date", m.meet_date]);
+  if (m.league)      rows.push(["League", m.league]);
+  rows.push(["Race", `${divLabel(div)} [${div}]`]);
+  rows.push([]);
+  rows.push(["TEAM STANDINGS"]);
+  rows.push(["Rank", "Team", "Score", "Finishers", "Top 5 Places", "6th", "7th"]);
+  for (const t of teamScores) {
+    rows.push([t.rank || "", t.team, t.isScoring ? t.total : "INC", t.finishers,
+      t.isScoring ? t.runners.slice(0,5).map(r=>r.scorePlace).join("+") : "",
+      t.sixth || "", t.seventh || ""]);
+  }
+  rows.push([]);
+  rows.push(["INDIVIDUAL FINISHERS"]);
+  rows.push(["Place", "Score Place", "Bib", "First", "Last", "Grade", "Gender", "Team", "Time"]);
+  for (const r of [...divResults].sort((a,b)=>a.place-b.place)) {
+    const runner = State.runnersByBib[r.bib] || {};
+    rows.push([r.place, scorePlaceLookup[r.bib] || "", r.bib,
+      runner.first || "", runner.last || "", runner.grade || "",
+      runner.gender || "", runner.team || "", fmtTime(r.time_ms)]);
+  }
+  return rows;
+}
+function doExportDivCSV(div) {
+  const rows = buildCsvForDiv(div);
+  const slug = (State.meet.name || "meet").replace(/[^A-Za-z0-9]+/g, "_").slice(0, 40);
+  downloadCSV(`${slug}_${div}_results.csv`, rows);
+}
+function doExportAllCSV() {
+  const divs = computeDivisions().filter(d => resultsForDiv(d.division).length > 0);
+  if (divs.length === 0) return alert("No results to export.");
+  const rows = [];
+  for (let i = 0; i < divs.length; i++) {
+    if (i > 0) { rows.push([]); rows.push([]); rows.push(["─────"]); rows.push([]); }
+    rows.push(...buildCsvForDiv(divs[i].division));
+  }
+  const slug = (State.meet.name || "meet").replace(/[^A-Za-z0-9]+/g, "_").slice(0, 40);
+  downloadCSV(`${slug}_all_results.csv`, rows);
+}
+
+/* ============================ BOOT ============================ */
+(async function boot() {
+  await initAuth();
+  await handleRoute();
+})();
 </script>
 </body>
 </html>
