@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>XC Chrono — Cross Country Timer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1411;
+    --panel: #161c19;
+    --panel2: #1d2521;
+    --ink: #e8e4d8;
+    --ink-dim: #9a9587;
+    --line: #2a3530;
+    --accent: #ff6b1a;
+    --accent2: #d4ff3a;
+    --red: #e23636;
+    --green: #5ab86c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: radial-gradient(circle at 20% 0%, #1a2420 0%, var(--bg) 50%);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    -webkit-font-smoothing: antialiased;
+  }
+  .ui { font-family: 'Inter', sans-serif; }
+  .display { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.02em; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  input, select, button, textarea { font-family: inherit; }
+  button { cursor: pointer; }
+  button:disabled { cursor: not-allowed; opacity: 0.4; }
+  input::placeholder { color: var(--ink-dim); opacity: 0.6; }
+
+  .hdr {
+    border-bottom: 1px solid var(--line);
+    padding: 18px 24px;
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px; background: rgba(0,0,0,0.2); flex-wrap: wrap;
+  }
+  .hdr .logo { font-family: 'Bebas Neue', sans-serif; font-size: 34px; line-height: 1; color: var(--accent); }
+  .hdr .logo span { color: var(--ink); }
+  .hdr .sub { font-size: 11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.15em; }
+  .hdr .left { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .hdr .right { display: flex; align-items: center; gap: 14px; }
+
+  .btn {
+    padding: 12px 22px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; font-size: 12px; transition: transform 0.1s, opacity 0.2s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--accent); color: #000; border: 2px solid var(--accent); }
+  .btn-secondary { background: transparent; color: var(--ink); border: 2px solid var(--line); }
+  .btn-ghost { background: transparent; color: var(--ink-dim); border: 2px solid transparent; }
+  .btn-danger { background: transparent; color: var(--red); border: 2px solid var(--red); }
+  .btn-lime { background: var(--accent2); color: #000; border: 2px solid var(--accent2); }
+
+  .field-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-dim); margin-bottom: 6px; font-family: 'Inter', sans-serif; }
+  .field-input {
+    width: 100%; padding: 12px 14px; background: var(--panel2);
+    border: 1px solid var(--line); color: var(--ink); font-size: 16px; outline: none;
+  }
+  .field-input:focus { border-color: var(--accent); }
+
+  .panel { background: var(--panel); border: 1px solid var(--line); }
+  .hairline { border-top: 1px solid var(--line); margin: 18px 0; }
+
+  .conn { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; }
+  .conn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-dim); }
+  .conn.live .conn-dot { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .flash { animation: flash 0.4s ease-out; }
+  @keyframes flash { 0% { background: #fff !important; } 100% {} }
+
+  .lock-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; letter-spacing: 0.15em; padding: 4px 8px; border: 1px solid var(--line); }
+  .lock-badge.unlocked { color: var(--green); border-color: var(--green); }
+  .lock-badge.locked { color: var(--ink-dim); }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 10px 14px; font-size: 10px; color: var(--ink-dim);
+       letter-spacing: 0.2em; border-bottom: 1px solid var(--line); background: var(--panel2);
+       font-family: 'JetBrains Mono', monospace; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 13px; }
+
+  .land-hero { font-size: 88px; line-height: 0.95; margin-bottom: 8px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 760px) { .grid-2 { grid-template-columns: 1fr; } .land-hero { font-size: 56px; } }
+
+  .timer-grid { display: grid; grid-template-columns: 1fr 320px; min-height: calc(100vh - 73px); }
+  @media (max-width: 900px) { .timer-grid { grid-template-columns: 1fr; } }
+  .clock {
+    font-size: min(220px, 22vw); line-height: 0.85; color: var(--accent);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+    font-family: 'Bebas Neue', sans-serif;
+  }
+  .clock.idle { color: var(--ink-dim); }
+  .tap-btn {
+    width: 100%; padding: 80px 0; font-size: 88px;
+    font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.1em;
+    background: var(--accent); color: #000; border: none; cursor: pointer;
+    transition: background 0.1s;
+  }
+  .tap-btn:active { background: #fff; }
+  .start-btn {
+    width: 100%; padding: 60px 0; font-size: 56px;
+    font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.1em;
+    background: var(--accent2); color: #000; border: none; cursor: pointer;
+  }
+
+  .bib-input {
+    width: 100%; padding: 24px 28px; font-size: 72px;
+    letter-spacing: 0.2em; text-align: center;
+    background: var(--panel2); border: 2px solid var(--accent);
+    color: var(--ink); outline: none; font-variant-numeric: tabular-nums;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .bib-input:disabled { opacity: 0.5; border-color: var(--line); }
+
+  .role-card {
+    background: var(--panel); border: 1px solid var(--line); padding: 28px;
+    cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .role-card.disabled { opacity: 0.5; cursor: not-allowed; }
+  .role-card:not(.disabled):hover { border-color: var(--accent); }
+  .role-card .num { font-size: 10px; letter-spacing: 0.25em; margin-bottom: 12px;
+                    color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+  .role-card .title { font-size: 42px; line-height: 1; margin-bottom: 10px;
+                      font-family: 'Bebas Neue', sans-serif; }
+  .role-card .desc { font-size: 13px; color: var(--ink-dim); line-height: 1.5;
+                     font-family: 'Inter', sans-serif; }
+  .role-card .note { font-size: 11px; color: var(--accent); margin-top: 14px;
+                     letter-spacing: 0.1em; font-family: 'JetBrains Mono', monospace; }
+
+  .stat { display: inline-block; margin-left: 28px; text-align: right; }
+  .stat .v { font-size: 36px; line-height: 1; font-family: 'Bebas Neue', sans-serif; }
+  .stat .v.alert { color: var(--accent); }
+  .stat .l { font-size: 9px; color: var(--ink-dim); letter-spacing: 0.2em;
+             text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+
+  .err { color: var(--red); font-size: 12px; margin-top: 12px; font-family: 'JetBrains Mono', monospace; }
+  .ok  { color: var(--green); font-size: 12px; margin-top: 12px; font-family: 'JetBrains Mono', monospace; }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+  .wrap-narrow { max-width: 640px; margin: 60px auto; padding: 0 24px; }
+  .wrap-wide { max-width: 900px; margin: 0 auto; padding: 60px 24px; }
+
+  /* Auth modal */
+  .modal-back {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
+    padding: 20px;
+  }
+  .modal {
+    background: var(--panel); border: 1px solid var(--accent);
+    padding: 32px; max-width: 440px; width: 100%;
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal-root"></div>
+
+<!-- Env vars (Vercel serves /api/env; local dev falls back to env.js) -->
+<script src="/api/env" onerror="this.onerror=null;this.src='/env.js'"></script>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<script>
+/* =====================================================================
+ * CONFIG
+ * ===================================================================== */
+const SUPABASE_URL  = window.SUPABASE_URL  || "YOUR_SUPABASE_URL";
+const SUPABASE_ANON = window.SUPABASE_ANON || "YOUR_SUPABASE_ANON_KEY";
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  realtime: { params: { eventsPerSecond: 20 } }
+});
+
+/* =====================================================================
+ * HELPERS
+ * ===================================================================== */
+const pad = (n, w = 2) => String(n).padStart(w, "0");
+const fmtTime = (ms) => {
+  if (ms == null) return "--:--.--";
+  const m = Math.floor(ms / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  const cs = Math.floor((ms % 1000) / 10);
+  return `${pad(m)}:${pad(s)}.${pad(cs)}`;
+};
+const newMeetCode = () => {
+  const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  let out = "";
+  for (let i = 0; i < 6; i++) out += chars[Math.floor(Math.random() * chars.length)];
+  return out;
+};
+const parseCSV = (text) => {
+  const lines = text.split(/\r?\n/).filter(l => l.trim().length);
+  if (!lines.length) return [];
+  const headers = lines[0].split(",").map(h => h.trim().toLowerCase());
+  const idx = n => headers.indexOf(n);
+  const iF = idx("first"), iL = idx("last"), iG = idx("grade"), iX = idx("gender");
+  if (iF < 0 || iL < 0) return null;
+  return lines.slice(1).map(row => {
+    const cells = row.split(",").map(c => c.trim());
+    return { first: cells[iF]||"", last: cells[iL]||"", grade: cells[iG]||"", gender: cells[iX]||"" };
+  });
+};
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const $ = (id) => document.getElementById(id);
+
+/* =====================================================================
+ * AUTH — session tokens cached in localStorage per meet
+ * ===================================================================== */
+const Auth = {
+  tokenKey: (code) => `xc.tok.${code}`,
+  get(code)  { return localStorage.getItem(this.tokenKey(code)); },
+  set(code, t) { localStorage.setItem(this.tokenKey(code), t); },
+  clear(code){ localStorage.removeItem(this.tokenKey(code)); },
+  isAuthed(code) { return !!this.get(code); },
+};
+
+/* =====================================================================
+ * SCORING — official XC rules
+ * ===================================================================== */
+function scoreMeet(results, runnersByBib) {
+  const sorted = [...results].sort((a, b) => a.place - b.place);
+  const teamFinisherCount = {};
+  for (const r of sorted) {
+    const runner = runnersByBib[r.bib];
+    if (!runner) continue;
+    teamFinisherCount[runner.team] = (teamFinisherCount[runner.team] || 0) + 1;
+  }
+  const scoring = new Set(Object.keys(teamFinisherCount).filter(t => teamFinisherCount[t] >= 5));
+
+  let adj = 0;
+  const placed = [];
+  for (const r of sorted) {
+    const runner = runnersByBib[r.bib];
+    if (!runner) continue;
+    if (scoring.has(runner.team)) {
+      adj++;
+      placed.push({ ...r, runner, scorePlace: adj });
+    } else {
+      placed.push({ ...r, runner, scorePlace: null });
+    }
+  }
+
+  const byTeam = {};
+  for (const p of placed) {
+    if (!byTeam[p.runner.team]) byTeam[p.runner.team] = [];
+    byTeam[p.runner.team].push(p);
+  }
+
+  const teams = Object.keys(byTeam).map(team => {
+    const rs = byTeam[team];
+    const isScoring = scoring.has(team);
+    const top5 = isScoring ? rs.slice(0, 5).map(r => r.scorePlace) : [];
+    const total = isScoring ? top5.reduce((a, b) => a + b, 0) : null;
+    return {
+      team, finishers: rs.length, isScoring, total,
+      sixth: isScoring && rs[5] ? rs[5].scorePlace : null,
+      seventh: isScoring && rs[6] ? rs[6].scorePlace : null,
+      runners: rs,
+    };
+  });
+
+  teams.sort((a, b) => {
+    if (a.isScoring !== b.isScoring) return a.isScoring ? -1 : 1;
+    if (!a.isScoring) return a.team.localeCompare(b.team);
+    if (a.total !== b.total) return a.total - b.total;
+    if (a.sixth && b.sixth && a.sixth !== b.sixth) return a.sixth - b.sixth;
+    if (a.seventh && b.seventh) return a.seventh - b.seventh;
+    return 0;
+  });
+
+  let rank = 0;
+  return teams.map(t => ({ ...t, rank: t.isScoring ? ++rank : null }));
+}
+
+/* =====================================================================
+ * STATE + REALTIME
+ * Hash routes:
+ *   #/                       landing
+ *   #/create                 create meet
+ *   #/m/ABC123               hub
+ *   #/m/ABC123/roster        coach roster intake
+ *   #/m/ABC123/timer         start-line timer
+ *   #/m/ABC123/recorder      chute recorder
+ *   #/m/ABC123/results       live results
+ * ===================================================================== */
+const State = {
+  route: { name: "landing" },
+  meet: null,
+  teams: [],
+  runners: [],
+  runnersByBib: {},
+  taps: [],
+  results: [],
+  channel: null,
+  connected: false,
+  tickTimer: null,
+};
+
+function parseHash() {
+  const h = location.hash.replace(/^#\/?/, "");
+  if (!h) return { name: "landing" };
+  if (h === "create") return { name: "create" };
+  const m = h.match(/^m\/([A-Z0-9]{6})(\/(roster|timer|recorder|results))?$/);
+  if (m) return { name: "meet", code: m[1], view: m[3] || "hub" };
+  return { name: "landing" };
+}
+
+function go(path) { location.hash = "#/" + path; }
+window.addEventListener("hashchange", handleRoute);
+
+async function handleRoute() {
+  const next = parseHash();
+  const wasMeet = State.route.name === "meet";
+  const sameMeet = wasMeet && next.name === "meet" && next.code === State.route.code;
+  State.route = next;
+
+  if (next.name !== "meet" && wasMeet) await teardownMeet();
+  if (next.name === "meet" && !sameMeet) await loadMeet(next.code);
+  render();
+}
+
+async function loadMeet(code) {
+  await teardownMeet();
+  setConnected(false);
+
+  const { data: meet, error } = await sb.from("public_meets").select("*").eq("code", code).maybeSingle();
+  if (error) console.error(error);
+  State.meet = meet || null;
+  if (!meet) { render(); return; }
+
+  const [t, r, tp, rs] = await Promise.all([
+    sb.from("teams").select("*").eq("meet_code", code).order("team_index"),
+    sb.from("runners").select("*").eq("meet_code", code).order("bib"),
+    sb.from("taps").select("*").eq("meet_code", code).order("place"),
+    sb.from("results").select("*").eq("meet_code", code).order("place"),
+  ]);
+  State.teams = t.data || [];
+  State.runners = r.data || [];
+  State.runnersByBib = Object.fromEntries((r.data || []).map(x => [x.bib, {
+    bib: x.bib, first: x.first_name, last: x.last_name, grade: x.grade,
+    gender: x.gender, team: x.team
+  }]));
+  State.taps = tp.data || [];
+  State.results = rs.data || [];
+
+  State.channel = sb.channel(`meet:${code}`)
+    .on("postgres_changes", { event: "*", schema: "public", table: "meets",   filter: `code=eq.${code}` },      handleMeetChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "teams",   filter: `meet_code=eq.${code}` }, handleTeamChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "runners", filter: `meet_code=eq.${code}` }, handleRunnerChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "taps",    filter: `meet_code=eq.${code}` }, handleTapChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "results", filter: `meet_code=eq.${code}` }, handleResultChange)
+    .subscribe((status) => { setConnected(status === "SUBSCRIBED"); });
+}
+
+async function teardownMeet() {
+  if (State.channel) { await sb.removeChannel(State.channel); State.channel = null; }
+  if (State.tickTimer) { clearInterval(State.tickTimer); State.tickTimer = null; }
+  setConnected(false);
+}
+
+function setConnected(b) {
+  State.connected = b;
+  const el = document.querySelector(".conn");
+  if (el) {
+    el.classList.toggle("live", b);
+    const txt = el.querySelector(".conn-text");
+    if (txt) txt.textContent = b ? "LIVE" : "OFFLINE";
+  }
+}
+
+function handleMeetChange(payload) {
+  if (payload.eventType === "DELETE") { State.meet = null; render(); return; }
+  // strip password_hash if present
+  const { password_hash, ...rest } = payload.new || {};
+  State.meet = { ...State.meet, ...rest };
+  render();
+}
+function handleTeamChange(payload) {
+  if (payload.eventType === "INSERT") State.teams.push(payload.new);
+  else if (payload.eventType === "DELETE") State.teams = State.teams.filter(t => t.name !== payload.old.name);
+  State.teams.sort((a, b) => a.team_index - b.team_index);
+  render();
+}
+function handleRunnerChange(payload) {
+  if (payload.eventType === "INSERT") {
+    if (!State.runnersByBib[payload.new.bib]) {
+      State.runners.push(payload.new);
+      State.runnersByBib[payload.new.bib] = {
+        bib: payload.new.bib, first: payload.new.first_name, last: payload.new.last_name,
+        grade: payload.new.grade, gender: payload.new.gender, team: payload.new.team
+      };
+    }
+  } else if (payload.eventType === "DELETE") {
+    State.runners = State.runners.filter(r => r.bib !== payload.old.bib);
+    delete State.runnersByBib[payload.old.bib];
+  }
+  State.runners.sort((a, b) => a.bib.localeCompare(b.bib));
+  render();
+}
+function handleTapChange(payload) {
+  if (payload.eventType === "INSERT") {
+    if (!State.taps.find(t => t.place === payload.new.place)) State.taps.push(payload.new);
+  } else if (payload.eventType === "DELETE") {
+    State.taps = State.taps.filter(t => t.place !== payload.old.place);
+  }
+  State.taps.sort((a, b) => a.place - b.place);
+  render();
+}
+function handleResultChange(payload) {
+  if (payload.eventType === "INSERT") {
+    if (!State.results.find(r => r.place === payload.new.place)) State.results.push(payload.new);
+  } else if (payload.eventType === "DELETE") {
+    State.results = State.results.filter(r => r.place !== payload.old.place);
+  }
+  State.results.sort((a, b) => a.place - b.place);
+  render();
+}
+
+/* =====================================================================
+ * AUTH-GATED ACTIONS
+ * Show password modal if no token. On success, call the action.
+ * ===================================================================== */
+function ensureAuth(code, onAuthed) {
+  if (Auth.isAuthed(code)) { onAuthed(); return; }
+  showLoginModal(code, onAuthed);
+}
+
+function showLoginModal(code, onAuthed) {
+  const root = $("modal-root");
+  root.innerHTML = `
+    <div class="modal-back" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="mono" style="font-size:10px;color:var(--accent);letter-spacing:0.25em;margin-bottom:8px;">DIRECTOR ACCESS</div>
+        <div class="display" style="font-size:36px;margin-bottom:6px;">UNLOCK</div>
+        <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-bottom:22px;">
+          Enter the director password set when this meet was created. The token will be saved on this device until the meet ends.
+        </div>
+        <div class="field-label">Password</div>
+        <input id="auth-pwd" type="password" class="field-input" autofocus />
+        <div id="auth-err" class="err" style="display:none;"></div>
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button id="auth-submit" class="btn btn-primary">Unlock →</button>
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+
+  const submit = async () => {
+    const pwd = $("auth-pwd").value;
+    if (!pwd) return;
+    const errEl = $("auth-err");
+    errEl.style.display = "none";
+    $("auth-submit").disabled = true;
+    $("auth-submit").textContent = "Verifying…";
+    const { data: token, error } = await sb.rpc("login_meet", { p_code: code, p_password: pwd });
+    if (error || !token) {
+      errEl.textContent = "⚠ " + (error?.message || "Login failed");
+      errEl.style.display = "block";
+      $("auth-submit").disabled = false;
+      $("auth-submit").textContent = "Unlock →";
+      return;
+    }
+    Auth.set(code, token);
+    closeModal();
+    render(); // refresh badge
+    onAuthed();
+  };
+
+  $("auth-submit").addEventListener("click", submit);
+  $("auth-pwd").addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
+}
+
+function closeModal() { $("modal-root").innerHTML = ""; }
+
+function logout() {
+  if (!confirm("Lock this device? You'll need the password to make changes again.")) return;
+  Auth.clear(State.meet.code);
+  render();
+}
+
+/* =====================================================================
+ * RENDER ROUTER
+ * ===================================================================== */
+function render() {
+  const r = State.route;
+  if (r.name === "landing") return renderLanding();
+  if (r.name === "create")  return renderCreate();
+  if (r.name === "meet") {
+    if (!State.meet) return renderNotFound(r.code);
+    if (r.view === "hub")      return renderHub();
+    if (r.view === "roster")   return renderRoster();
+    if (r.view === "timer")    return renderTimer();
+    if (r.view === "recorder") return renderRecorder();
+    if (r.view === "results")  return renderResults();
+  }
+}
+
+/* =====================================================================
+ * VIEWS
+ * ===================================================================== */
+function header(subtitle, rightHTML = "") {
+  const showLock = State.route.name === "meet" && State.meet;
+  const isAuthed = showLock && Auth.isAuthed(State.meet.code);
+  return `
+    <div class="hdr">
+      <div class="left">
+        <div class="logo">XC<span>·CHRONO</span></div>
+        ${subtitle ? `<div class="sub">${esc(subtitle)}</div>` : ""}
+      </div>
+      <div class="right">
+        ${State.route.name === "meet" ? `<div class="conn"><div class="conn-dot"></div><span class="conn-text">${State.connected ? "LIVE" : "OFFLINE"}</span></div>` : ""}
+        ${showLock ? `<span class="lock-badge ${isAuthed ? "unlocked" : "locked"}">${isAuthed ? "🔓 UNLOCKED" : "🔒 READ-ONLY"}</span>` : ""}
+        ${showLock && isAuthed ? `<button class="btn btn-ghost" onclick="logout()">Lock</button>` : ""}
+        ${rightHTML}
+      </div>
+    </div>`;
+}
+
+/* ---- Landing ---- */
+function renderLanding() {
+  $("app").innerHTML = `
+    ${header("OFFICIAL TIMING")}
+    <div class="wrap-wide">
+      <div class="display land-hero">THE CLOCK<br><span style="color:var(--accent)">DOESN'T LIE.</span></div>
+      <div class="ui" style="font-size:16px;color:var(--ink-dim);max-width:520px;margin-bottom:48px;">
+        Multi-coach roster intake, dual-operator timing, official cross country scoring. Built for the chute.
+      </div>
+      <div class="grid-2">
+        <div class="panel" style="padding:28px;">
+          <div class="mono" style="font-size:11px;color:var(--accent);letter-spacing:0.15em;margin-bottom:14px;">01 / MEET DIRECTOR</div>
+          <div class="display" style="font-size:32px;margin-bottom:14px;">NEW MEET</div>
+          <div class="ui" style="font-size:14px;color:var(--ink-dim);margin-bottom:22px;">
+            Create a meet, set a director password, and share the 6-char code + password with operators.
+          </div>
+          <button class="btn btn-primary" onclick="go('create')">Create Meet →</button>
+        </div>
+        <div class="panel" style="padding:28px;">
+          <div class="mono" style="font-size:11px;color:var(--accent2);letter-spacing:0.15em;margin-bottom:14px;">02 / JOIN</div>
+          <div class="display" style="font-size:32px;margin-bottom:14px;">ENTER CODE</div>
+          <input id="join-code" maxlength="6" placeholder="ABC123" class="mono"
+                 style="width:100%;padding:14px 16px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:28px;letter-spacing:0.3em;text-align:center;outline:none;margin-bottom:16px;text-transform:uppercase;" />
+          <button class="btn btn-lime" onclick="doJoin()">Join Meet →</button>
+        </div>
+      </div>
+    </div>`;
+  $("join-code")?.addEventListener("keydown", e => { if (e.key === "Enter") doJoin(); });
+  $("join-code")?.addEventListener("input", e => { e.target.value = e.target.value.toUpperCase(); });
+}
+
+function doJoin() {
+  const v = ($("join-code").value || "").toUpperCase().trim();
+  if (v.length !== 6) return;
+  go(`m/${v}`);
+}
+
+/* ---- Create ---- */
+function renderCreate() {
+  const code = newMeetCode();
+  $("app").innerHTML = `
+    ${header("NEW MEET", `<button class="btn btn-ghost" onclick="go('')">← Cancel</button>`)}
+    <div class="wrap-narrow">
+      <div class="display" style="font-size:56px;margin-bottom:24px;">MEET<span style="color:var(--accent)">·</span>SETUP</div>
+      <div class="panel" style="padding:28px;">
+        <div class="field-label">Meet Name</div>
+        <input id="meet-name" class="field-input" placeholder="Tri-County Invitational" />
+
+        <div style="margin-top:18px;">
+          <div class="field-label">Director Password (share with operators)</div>
+          <input id="meet-pwd" type="password" class="field-input" placeholder="At least 4 characters" />
+        </div>
+        <div style="margin-top:12px;">
+          <div class="field-label">Confirm Password</div>
+          <input id="meet-pwd2" type="password" class="field-input" />
+        </div>
+
+        <div style="margin-top:22px;">
+          <div class="field-label">Your Meet Code</div>
+          <div class="display" style="font-size:72px;color:var(--accent2);letter-spacing:0.15em;line-height:1;">${code}</div>
+          <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-top:12px;">
+            Share <b>both</b> the code <i>and</i> the password with every coach and timing volunteer. Anyone can view; only those with the password can upload rosters or operate timing.
+          </div>
+        </div>
+        <div id="create-err" class="err" style="display:none;"></div>
+        <div style="margin-top:28px;">
+          <button id="create-btn" class="btn btn-primary" onclick="doCreate('${code}')">Create →</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function doCreate(code) {
+  const errEl = $("create-err");
+  errEl.style.display = "none";
+  const show = (msg) => { errEl.textContent = "⚠ " + msg; errEl.style.display = "block"; };
+
+  const name = ($("meet-name").value || "").trim() || "Untitled Meet";
+  const pwd  = $("meet-pwd").value;
+  const pwd2 = $("meet-pwd2").value;
+  if (!pwd || pwd.length < 4) return show("Password must be at least 4 characters.");
+  if (pwd !== pwd2) return show("Passwords don't match.");
+
+  const btn = $("create-btn");
+  btn.disabled = true;
+  btn.textContent = "Creating…";
+
+  const { data: token, error } = await sb.rpc("create_meet", { p_code: code, p_name: name, p_password: pwd });
+  if (error || !token) {
+    show(error?.message || "Could not create meet.");
+    btn.disabled = false;
+    btn.textContent = "Create →";
+    return;
+  }
+  Auth.set(code, token);
+  go(`m/${code}`);
+}
+
+/* ---- Not Found ---- */
+function renderNotFound(code) {
+  $("app").innerHTML = `
+    ${header("NOT FOUND", `<button class="btn btn-ghost" onclick="go('')">← Home</button>`)}
+    <div style="max-width:600px;margin:80px auto;padding:24px;text-align:center;">
+      <div class="display" style="font-size:56px;color:var(--red);">NO MEET</div>
+      <div class="ui" style="color:var(--ink-dim);margin-top:12px;">
+        No meet found with code <span class="mono" style="color:var(--ink)">${esc(code)}</span>. Check with the meet director.
+      </div>
+    </div>`;
+}
+
+/* ---- Hub ---- */
+function renderHub() {
+  const teamCount = State.teams.length;
+  const runnerCount = State.runners.length;
+  const tapped = State.taps.length;
+  const finishCount = State.results.length;
+  const pending = tapped - finishCount;
+  const code = State.meet.code;
+  const authed = Auth.isAuthed(code);
+
+  $("app").innerHTML = `
+    ${header(`MEET CODE · ${code}`, `<button class="btn btn-ghost" onclick="go('')">← Switch Meet</button>`)}
+    <div class="wrap">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
+        <div>
+          <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:6px;">
+            ${esc(State.meet.name)}
+          </div>
+          <div class="display" style="font-size:56px;line-height:1;letter-spacing:0.04em;">${code}</div>
+          <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-top:8px;max-width:520px;">
+            ${authed
+              ? "This device is unlocked — you can upload rosters and operate timing."
+              : `Read-only on this device. Tap any role and enter the director password to enable writes.`}
+          </div>
+        </div>
+        <div>
+          <div class="stat"><div class="v">${teamCount}</div><div class="l">Teams</div></div>
+          <div class="stat"><div class="v">${runnerCount}</div><div class="l">Runners</div></div>
+          <div class="stat"><div class="v ${pending ? "alert" : ""}">${tapped}</div><div class="l">Taps</div></div>
+          <div class="stat"><div class="v">${finishCount}</div><div class="l">Finishers</div></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="role-card" onclick="goRole('roster')">
+          <div class="num">01 · Upload Roster · Assign Bibs</div>
+          <div class="title">COACH</div>
+          <div class="desc">CSV upload with first, last, grade, gender. School name becomes the team. Bibs auto-assigned in sequential team blocks (1xxx, 2xxx, …).</div>
+        </div>
+        <div class="role-card ${finishCount === 0 ? "disabled" : ""}" ${finishCount === 0 ? "" : `onclick="go('m/${code}/results')"`}>
+          <div class="num" style="color:var(--accent2)">02 · Live Standings · Final Scoring</div>
+          <div class="title">RESULTS</div>
+          <div class="desc">Official XC scores: top 5 score, 6 &amp; 7 displace, low total wins. Tie-broken by 6th-runner place. Viewable by anyone.</div>
+        </div>
+        <div class="role-card" onclick="goRole('timer')">
+          <div class="num">03 · Tap Finish</div>
+          <div class="title">TIMER · START LINE</div>
+          <div class="desc">One big button. Captures finish times in order. Hold the line clock — no bib entry here.</div>
+        </div>
+        <div class="role-card ${tapped === 0 ? "disabled" : ""}" ${tapped === 0 ? "" : `onclick="goRole('recorder')"`}>
+          <div class="num">04 · Match Bibs to Times</div>
+          <div class="title">RECORDER · CHUTE</div>
+          <div class="desc">As runners flow through the chute in order, type each bib. Each entry pairs with the next unmatched tap.</div>
+          ${tapped > 0 ? `<div class="note">→ ${pending} unmatched tap${pending === 1 ? "" : "s"}</div>` : `<div class="note" style="color:var(--ink-dim)">→ Waiting for timer taps…</div>`}
+        </div>
+      </div>
+    </div>`;
+}
+
+// Auth-gated nav into operator roles
+function goRole(view) {
+  const code = State.meet.code;
+  ensureAuth(code, () => go(`m/${code}/${view}`));
+}
+
+/* ---- Roster ---- */
+let _rosterFilterTeam = "ALL";
+function renderRoster() {
+  const code = State.meet.code;
+  if (!Auth.isAuthed(code)) { ensureAuth(code, () => render()); }
+  const filterOptions = ["ALL", ...State.teams.map(t => t.name)];
+  const visible = _rosterFilterTeam === "ALL" ? State.runners : State.runners.filter(r => r.team === _rosterFilterTeam);
+
+  $("app").innerHTML = `
+    ${header("ROSTER INTAKE", `<button class="btn btn-ghost" onclick="go('m/${code}')">← Hub</button>`)}
+    <div class="wrap">
+      <div class="display" style="font-size:48px;margin-bottom:24px;">UPLOAD<span style="color:var(--accent)">·</span>ROSTER</div>
+      <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:24px;margin-bottom:32px;" class="roster-grid">
+        <div class="panel" style="padding:22px;">
+          <div class="field-label">School / Team Name</div>
+          <input id="r-school" class="field-input" placeholder="Riverdale High" />
+          <div style="margin-top:16px;">
+            <div class="field-label">CSV File</div>
+            <input id="r-file" type="file" accept=".csv,text/csv" style="color:var(--ink-dim);font-size:13px;" />
+          </div>
+          <div style="margin-top:16px;">
+            <div class="field-label">Or paste CSV</div>
+            <textarea id="r-csv" rows="6" class="mono" placeholder="first,last,grade,gender&#10;Jamal,Reeves,11,M&#10;Lina,Park,10,F" style="width:100%;padding:12px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);font-size:12px;outline:none;resize:vertical;"></textarea>
+          </div>
+          <div id="r-err" class="err" style="display:none;"></div>
+          <div id="r-ok" class="ok" style="display:none;"></div>
+          <div style="margin-top:18px;">
+            <button id="r-submit" class="btn btn-primary" onclick="doUploadRoster()">Assign Bibs →</button>
+          </div>
+        </div>
+        <div class="panel" style="padding:22px;">
+          <div class="mono" style="font-size:10px;color:var(--accent2);letter-spacing:0.2em;margin-bottom:14px;">BIB ASSIGNMENT</div>
+          <div class="ui" style="font-size:13px;color:var(--ink-dim);line-height:1.6;">
+            Each team gets a 1000-block: Team 1 = <span class="mono" style="color:var(--ink)">1001–1999</span>, Team 2 = <span class="mono" style="color:var(--ink)">2001–2999</span>, etc. Bibs are 4-digit, zero-padded, assigned in CSV row order.
+          </div>
+          <div class="hairline"></div>
+          <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:10px;">TEAMS REGISTERED</div>
+          ${State.teams.length === 0 ? `<div class="ui" style="font-size:13px;color:var(--ink-dim);font-style:italic;">No teams yet.</div>` :
+            State.teams.map(t => {
+              const teamRunners = State.runners.filter(r => r.team === t.name);
+              const count = teamRunners.length;
+              const bibs = teamRunners.map(r => parseInt(r.bib, 10));
+              const lo = bibs.length ? Math.min(...bibs) : t.team_index*1000+1;
+              const hi = bibs.length ? Math.max(...bibs) : t.team_index*1000+1;
+              return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);">
+                <div><span class="mono" style="color:var(--accent);margin-right:10px;">#${t.team_index}</span><span class="ui" style="font-size:14px;">${esc(t.name)}</span></div>
+                <div class="mono" style="font-size:12px;color:var(--ink-dim);">${count} runners · ${pad(lo,4)}–${pad(hi,4)}</div>
+              </div>`;
+            }).join("")}
+        </div>
+      </div>
+
+      ${State.runners.length > 0 ? `
+      <div class="panel">
+        <div style="padding:14px 22px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);">
+          <div class="display" style="font-size:22px;letter-spacing:0.05em;">ENTERED RUNNERS · ${State.runners.length}</div>
+          <select id="r-filter" class="mono" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line);padding:6px 10px;font-size:12px;" onchange="changeFilter(this.value)">
+            ${filterOptions.map(t => `<option value="${esc(t)}" ${t === _rosterFilterTeam ? "selected" : ""}>${esc(t)}</option>`).join("")}
+          </select>
+        </div>
+        <div style="max-height:400px;overflow:auto;">
+          <table>
+            <thead><tr><th>BIB</th><th>NAME</th><th>GR</th><th>GEN</th><th>TEAM</th></tr></thead>
+            <tbody>
+              ${visible.map(r => `<tr>
+                <td class="mono" style="color:var(--accent);font-weight:700;">${esc(r.bib)}</td>
+                <td class="ui">${esc(r.first_name)} ${esc(r.last_name)}</td>
+                <td class="mono" style="color:var(--ink-dim);">${esc(r.grade || "")}</td>
+                <td class="mono" style="color:var(--ink-dim);">${esc(r.gender || "")}</td>
+                <td class="ui" style="color:var(--ink-dim);">${esc(r.team)}</td>
+              </tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>` : ""}
+    </div>
+    <style>@media(max-width:760px){.roster-grid{grid-template-columns:1fr !important;}}</style>
+  `;
+
+  $("r-file")?.addEventListener("change", (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const fr = new FileReader();
+    fr.onload = (ev) => { $("r-csv").value = ev.target.result; };
+    fr.readAsText(f);
+  });
+}
+
+function changeFilter(v) { _rosterFilterTeam = v; renderRoster(); }
+
+async function doUploadRoster() {
+  const code = State.meet.code;
+  const token = Auth.get(code);
+  if (!token) return ensureAuth(code, doUploadRoster);
+
+  const errEl = $("r-err"), okEl = $("r-ok");
+  errEl.style.display = "none"; okEl.style.display = "none";
+  const showErr = (msg) => { errEl.textContent = "⚠ " + msg; errEl.style.display = "block"; };
+  const showOk  = (msg) => { okEl.textContent  = "✓ " + msg; okEl.style.display  = "block"; };
+
+  const school = ($("r-school").value || "").trim();
+  if (!school) return showErr("Enter a school name first.");
+  const csv = $("r-csv").value;
+  const parsed = parseCSV(csv);
+  if (parsed === null) return showErr("CSV must have headers: first, last, grade, gender");
+  if (!parsed || parsed.length === 0) return showErr("No rows found.");
+
+  const btn = $("r-submit");
+  btn.disabled = true;
+  btn.textContent = "Uploading…";
+
+  try {
+    // Atomic team registration
+    const { data: teamIdx, error: teamErr } = await sb.rpc("register_team", {
+      p_token: token, p_meet: code, p_team: school
+    });
+    if (teamErr) throw teamErr;
+
+    const existingForTeam = State.runners.filter(r => r.team === school).map(r => parseInt(r.bib, 10));
+    let nextBib = existingForTeam.length ? Math.max(...existingForTeam) + 1 : teamIdx * 1000 + 1;
+
+    const rows = parsed.map(p => ({
+      bib: pad(nextBib++, 4),
+      first_name: p.first, last_name: p.last,
+      grade: p.grade, gender: p.gender, team: school
+    }));
+
+    const { error: insErr } = await sb.rpc("add_runners", {
+      p_token: token, p_meet: code, p_runners: rows
+    });
+    if (insErr) throw insErr;
+
+    $("r-school").value = "";
+    $("r-csv").value = "";
+    if ($("r-file")) $("r-file").value = "";
+    showOk(`Added ${rows.length} runner${rows.length === 1 ? "" : "s"} to ${school}.`);
+  } catch (e) {
+    if (e?.message?.includes("Not authorized")) {
+      Auth.clear(code);
+      showErr("Session expired. Please unlock again.");
+      ensureAuth(code, () => {});
+    } else {
+      showErr(e.message || "Upload failed.");
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Assign Bibs →";
+  }
+}
+
+/* ---- Timer ---- */
+function renderTimer() {
+  const code = State.meet.code;
+  if (!Auth.isAuthed(code)) { ensureAuth(code, () => render()); }
+  const started = State.meet.start_time != null;
+  const taps = State.taps;
+  const results = State.results;
+  const lastTaps = [...taps].slice(-8).reverse();
+
+  $("app").innerHTML = `
+    ${header(`TIMER · START LINE · ${code}`, `<button class="btn btn-ghost" onclick="go('m/${code}')">← Hub</button>`)}
+    <div class="timer-grid">
+      <div style="padding:32px 32px 0;display:flex;flex-direction:column;">
+        <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:8px;">⏱ RACE CLOCK</div>
+        <div id="t-clock" class="clock ${started ? "" : "idle"}">${fmtTime(started ? Date.now() - State.meet.start_time : 0)}</div>
+        <div class="mono" style="font-size:13px;color:var(--ink-dim);margin-top:8px;letter-spacing:0.15em;">
+          ${started ? `STARTED · ${taps.length} TAPPED · ${taps.length - results.length} AWAITING BIB` : "NOT STARTED"}
+        </div>
+        <div style="margin-top:auto;margin-bottom:32px;">
+          ${started
+            ? `<button id="tap-btn" class="tap-btn">TAP FINISH</button>
+               <div style="text-align:center;margin-top:14px;"><button class="btn btn-danger" onclick="doResetRace()">Reset Race</button></div>`
+            : `<button class="start-btn" onclick="doStartRace()">START RACE ▶</button>`}
+        </div>
+      </div>
+      <div style="background:var(--panel);border-left:1px solid var(--line);padding:22px;">
+        <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:14px;">RECENT TAPS</div>
+        ${lastTaps.length === 0 ? `<div class="ui" style="font-size:13px;color:var(--ink-dim);font-style:italic;">None yet.</div>` :
+          lastTaps.map(t => {
+            const matched = results.find(r => r.place === t.place);
+            return `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed var(--line);">
+              <div>
+                <span class="display" style="font-size:22px;color:var(--accent);margin-right:10px;">${pad(t.place, 3)}</span>
+                <span class="mono" style="font-size:16px;font-variant-numeric:tabular-nums;">${fmtTime(t.time_ms)}</span>
+              </div>
+              <div class="mono" style="font-size:11px;color:${matched ? "var(--green)" : "var(--ink-dim)"};align-self:center;">
+                ${matched ? "#" + matched.bib : "..."}
+              </div>
+            </div>`;
+          }).join("")
+        }
+      </div>
+    </div>`;
+
+  if (State.tickTimer) clearInterval(State.tickTimer);
+  if (started) {
+    State.tickTimer = setInterval(() => {
+      const el = $("t-clock");
+      if (el && State.meet?.start_time) el.textContent = fmtTime(Date.now() - State.meet.start_time);
+    }, 50);
+  }
+
+  const tapBtn = $("tap-btn");
+  if (tapBtn) {
+    let cooling = false;
+    tapBtn.addEventListener("click", async () => {
+      if (cooling) return;
+      cooling = true;
+      setTimeout(() => cooling = false, 100);
+      tapBtn.classList.add("flash");
+      setTimeout(() => tapBtn.classList.remove("flash"), 400);
+
+      const token = Auth.get(code);
+      if (!token) return ensureAuth(code, () => {});
+      const t = Date.now() - State.meet.start_time;
+      const { error } = await sb.rpc("add_tap", { p_token: token, p_meet: code, p_time_ms: t });
+      if (error) {
+        console.error("tap failed", error);
+        if (error.message?.includes("Not authorized")) {
+          Auth.clear(code);
+          alert("Session expired. Please unlock again.");
+          ensureAuth(code, () => render());
+        }
+      }
+    });
+  }
+}
+
+async function doStartRace() {
+  const code = State.meet.code;
+  const token = Auth.get(code);
+  if (!token) return ensureAuth(code, doStartRace);
+  const t = Date.now();
+  const { error } = await sb.rpc("start_race", { p_token: token, p_meet: code, p_start_time: t });
+  if (error) alert("Failed to start: " + error.message);
+}
+
+async function doResetRace() {
+  if (!confirm("Reset start time? This clears all taps and finish data.")) return;
+  const code = State.meet.code;
+  const token = Auth.get(code);
+  if (!token) return ensureAuth(code, doResetRace);
+  const { error } = await sb.rpc("reset_race", { p_token: token, p_meet: code });
+  if (error) alert("Reset failed: " + error.message);
+}
+
+/* ---- Recorder ---- */
+function renderRecorder() {
+  const code = State.meet.code;
+  if (!Auth.isAuthed(code)) { ensureAuth(code, () => render()); }
+  const taps = State.taps;
+  const results = State.results;
+  const nextPlace = results.length + 1;
+  const nextTap = taps.find(t => t.place === nextPlace);
+  const recent = [...results].slice(-10).reverse();
+
+  $("app").innerHTML = `
+    ${header(`RECORDER · CHUTE · ${code}`, `<button class="btn btn-ghost" onclick="go('m/${code}')">← Hub</button>`)}
+    <div class="timer-grid">
+      <div style="padding:32px;">
+        <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:8px;">NEXT FINISHER</div>
+        <div class="display" style="font-size:96px;line-height:1;margin-bottom:4px;">PLACE <span style="color:var(--accent)">${pad(nextPlace, 3)}</span></div>
+        <div class="mono" style="font-size:22px;color:var(--ink-dim);font-variant-numeric:tabular-nums;margin-bottom:30px;">
+          ${nextTap ? `TIME · ${fmtTime(nextTap.time_ms)}` : "WAITING FOR TAP…"}
+        </div>
+        <div class="field-label">Enter Bib Number</div>
+        <input id="bib-input" class="bib-input" inputmode="numeric" placeholder="0000" ${nextTap ? "" : "disabled"} maxlength="4" />
+        <div id="bib-preview" style="margin-top:16px;display:none;"></div>
+        <div id="rec-err" class="err" style="display:none;"></div>
+        <div style="display:flex;gap:12px;margin-top:22px;">
+          <button id="rec-submit" class="btn btn-primary" ${nextTap ? "" : "disabled"}>Record (↵)</button>
+          <button class="btn btn-secondary" onclick="doUndo()" ${results.length ? "" : "disabled"}>Undo Last</button>
+        </div>
+        <div class="mono" style="font-size:11px;color:var(--ink-dim);margin-top:28px;letter-spacing:0.1em;">
+          ${taps.length} TAPS · ${results.length} MATCHED · ${taps.length - results.length} PENDING
+        </div>
+      </div>
+      <div style="background:var(--panel);border-left:1px solid var(--line);padding:22px;">
+        <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:14px;">LIVE FINISHERS</div>
+        ${recent.length === 0 ? `<div class="ui" style="font-size:13px;color:var(--ink-dim);font-style:italic;">No finishers recorded yet.</div>` :
+          recent.map(r => {
+            const runner = State.runnersByBib[r.bib];
+            return `<div style="padding:10px 0;border-bottom:1px dashed var(--line);">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                <span class="display" style="font-size:24px;color:var(--accent);">${pad(r.place, 3)}</span>
+                <span class="mono" style="font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink-dim);">${fmtTime(r.time_ms)}</span>
+              </div>
+              <div class="ui" style="font-size:13px;margin-top:2px;">#${esc(r.bib)} · ${esc(runner?.first || "")} ${esc(runner?.last || "")}</div>
+              <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.1em;">${esc((runner?.team || "").toUpperCase())}</div>
+            </div>`;
+          }).join("")
+        }
+      </div>
+    </div>`;
+
+  const input = $("bib-input");
+  if (input) {
+    input.focus();
+    input.addEventListener("input", () => {
+      input.value = input.value.replace(/\D/g, "").slice(0, 4);
+      updatePreview();
+    });
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") doRecordBib(); });
+  }
+  $("rec-submit")?.addEventListener("click", doRecordBib);
+}
+
+function updatePreview() {
+  const input = $("bib-input");
+  const preview = $("bib-preview");
+  if (!input || !preview) return;
+  const v = input.value.padStart(4, "0");
+  const runner = State.runnersByBib[v];
+  if (input.value && runner) {
+    preview.style.display = "block";
+    preview.innerHTML = `<div style="padding:12px 18px;background:var(--panel);border-left:3px solid var(--green);">
+      <div class="ui" style="font-size:17px;font-weight:600;">${esc(runner.first)} ${esc(runner.last)}</div>
+      <div class="mono" style="font-size:12px;color:var(--ink-dim);margin-top:2px;">${esc(runner.team)} · GR ${esc(runner.grade || "—")} · ${esc(runner.gender || "—")}</div>
+    </div>`;
+  } else {
+    preview.style.display = "none";
+  }
+}
+
+async function doRecordBib() {
+  const code = State.meet.code;
+  const token = Auth.get(code);
+  if (!token) return ensureAuth(code, doRecordBib);
+
+  const errEl = $("rec-err");
+  errEl.style.display = "none";
+  const showErr = (msg) => { errEl.textContent = "⚠ " + msg; errEl.style.display = "block"; };
+
+  const raw = ($("bib-input").value || "").trim();
+  if (!raw) return;
+  const bib = raw.padStart(4, "0");
+  if (!State.runnersByBib[bib]) return showErr(`No runner with bib ${bib}`);
+  if (State.results.find(r => r.bib === bib)) return showErr(`Bib ${bib} already recorded`);
+
+  const { error } = await sb.rpc("add_result", { p_token: token, p_meet: code, p_bib: bib });
+  if (error) {
+    if (error.message?.includes("Not authorized")) {
+      Auth.clear(code);
+      showErr("Session expired. Please unlock again.");
+      ensureAuth(code, () => {});
+      return;
+    }
+    return showErr(error.message);
+  }
+  $("bib-input").value = "";
+  updatePreview();
+  $("bib-input").focus();
+}
+
+async function doUndo() {
+  if (!State.results.length) return;
+  const code = State.meet.code;
+  const token = Auth.get(code);
+  if (!token) return ensureAuth(code, doUndo);
+  const { error } = await sb.rpc("undo_result", { p_token: token, p_meet: code });
+  if (error) alert("Undo failed: " + error.message);
+}
+
+/* ---- Results ---- */
+function renderResults() {
+  const code = State.meet.code;
+  const teamScores = scoreMeet(State.results, State.runnersByBib);
+  const scorePlaceLookup = {};
+  teamScores.forEach(t => t.runners.forEach(r => { scorePlaceLookup[r.bib] = r.scorePlace; }));
+  const sorted = [...State.results].sort((a, b) => a.place - b.place);
+
+  $("app").innerHTML = `
+    ${header(`RESULTS · ${code}`, `<button class="btn btn-ghost" onclick="go('m/${code}')">← Hub</button>`)}
+    <div class="wrap">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
+        <div>
+          <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.2em;">OFFICIAL SCORING · TOP 5 + DISPLACERS</div>
+          <div class="display" style="font-size:72px;line-height:0.95;">FINAL <span style="color:var(--accent)">RESULTS</span></div>
+        </div>
+        <div class="ui" style="font-size:12px;color:var(--ink-dim);text-align:right;max-width:280px;">
+          Top 5 finishers per team score. Teams need 5 to be ranked. 6th &amp; 7th displace. Low total wins; 6th runner breaks ties.
+        </div>
+      </div>
+
+      <div class="display" style="font-size:24px;letter-spacing:0.05em;margin-bottom:14px;color:var(--accent2);">▰ TEAM STANDINGS</div>
+      <div class="panel" style="margin-bottom:32px;">
+        ${teamScores.length === 0 ? `<div class="ui" style="padding:32px;text-align:center;color:var(--ink-dim);">No finishers recorded yet.</div>` : `
+        <table>
+          <thead><tr><th>RANK</th><th>TEAM</th><th>SCORE</th><th>FINISHERS</th><th>TOP 5 PLACES</th><th>6TH</th><th>7TH</th></tr></thead>
+          <tbody>
+            ${teamScores.map(t => `<tr>
+              <td>${t.rank ? `<span class="display" style="font-size:32px;color:${t.rank===1?"var(--accent)":"var(--ink)"};">${t.rank===1?"🏆 ":""}${t.rank}</span>` : `<span class="mono" style="font-size:11px;color:var(--ink-dim);">—</span>`}</td>
+              <td class="ui" style="font-size:16px;font-weight:600;">${esc(t.team)}</td>
+              <td class="display" style="font-size:28px;color:${t.rank===1?"var(--accent)":"var(--ink)"};">${t.isScoring ? t.total : "INC"}</td>
+              <td class="mono" style="color:var(--ink-dim);">${t.finishers}</td>
+              <td class="mono">${t.isScoring ? t.runners.slice(0,5).map(r=>r.scorePlace).join(" + ") : `<span style="color:var(--ink-dim);">needs 5 finishers</span>`}</td>
+              <td class="mono" style="color:var(--ink-dim);">${t.sixth || "—"}</td>
+              <td class="mono" style="color:var(--ink-dim);">${t.seventh || "—"}</td>
+            </tr>`).join("")}
+          </tbody>
+        </table>`}
+      </div>
+
+      <div class="display" style="font-size:24px;letter-spacing:0.05em;margin-bottom:14px;color:var(--accent2);">▰ INDIVIDUAL FINISHERS</div>
+      <div class="panel">
+        <table>
+          <thead><tr><th>PLACE</th><th>SCORE PL</th><th>BIB</th><th>NAME</th><th>TEAM</th><th>GR</th><th>TIME</th></tr></thead>
+          <tbody>
+            ${sorted.map(r => {
+              const runner = State.runnersByBib[r.bib];
+              const sp = scorePlaceLookup[r.bib];
+              return `<tr>
+                <td class="display" style="font-size:22px;color:${r.place<=3?"var(--accent)":"var(--ink)"};">${r.place}</td>
+                <td class="mono" style="color:${sp?"var(--accent2)":"var(--ink-dim)"};">${sp || "—"}</td>
+                <td class="mono" style="color:var(--accent);">${esc(r.bib)}</td>
+                <td class="ui">${esc(runner?.first || "")} ${esc(runner?.last || "")}</td>
+                <td class="ui" style="color:var(--ink-dim);">${esc(runner?.team || "")}</td>
+                <td class="mono" style="color:var(--ink-dim);">${esc(runner?.grade || "")}</td>
+                <td class="mono" style="font-variant-numeric:tabular-nums;">${fmtTime(r.time_ms)}</td>
+              </tr>`;
+            }).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+/* =====================================================================
+ * BOOT
+ * ===================================================================== */
+(async function boot() {
+  if (SUPABASE_URL === "YOUR_SUPABASE_URL") {
+    document.body.innerHTML = `<div style="padding:40px;color:#e8e4d8;font-family:monospace;">
+      <h1 style="color:#ff6b1a;">CONFIG REQUIRED</h1>
+      <p>Set <code>SUPABASE_URL</code> and <code>SUPABASE_ANON</code> as Vercel env vars,
+      <br>or copy <code>env.example.js</code> to <code>env.js</code> for local dev.</p>
+    </div>`;
+    return;
+  }
+  await handleRoute();
+})();
+</script>
+</body>
+</html>

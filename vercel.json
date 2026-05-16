@@ -1,0 +1,7 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/m/:code", "destination": "/index.html" },
+    { "source": "/m/:code/:view", "destination": "/index.html" }
+  ]
+}
