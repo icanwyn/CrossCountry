@@ -329,6 +329,8 @@ const State = {
   races: [], taps: [], results: [],
   leagueMeets: [],      // for league listing page
   myMeets: [],          // for /me dashboard
+  isAdmin: false,       // computed once user is loaded
+  admin: null,          // admin dashboard data
   selectedDivision: null,
   channel: null, connected: false, tickTimer: null, loading: false,
 };
@@ -340,6 +342,7 @@ function parseHash() {
   if (h === "create") return { name: "create" };
   if (h === "signin") return { name: "signin" };
   if (h === "me") return { name: "me" };
+  if (h === "admin") return { name: "admin" };
   const lm = h.match(/^league\/(.+)$/);
   if (lm) return { name: "league", slug: decodeURIComponent(lm[1]) };
   const m = h.match(/^m\/([A-Z0-9-]{3,20})(\/(details|roster|timer|recorder|results))?(\/([0-9A-Z]+))?$/i);
@@ -372,6 +375,11 @@ async function handleRoute() {
     State.loading = true;
     render();
     await loadMyMeets();
+    State.loading = false;
+  } else if (next.name === "admin") {
+    State.loading = true;
+    render();
+    await loadAdminData();
     State.loading = false;
   }
 
@@ -428,6 +436,27 @@ async function loadMyMeets() {
   const { data, error } = await sb.rpc("my_meets");
   if (error) console.error("my_meets:", error);
   State.myMeets = data || [];
+}
+
+async function loadAdminData() {
+  if (!State.user) { State.admin = null; return; }
+  // Check admin status
+  const { data: isAdminData } = await sb.rpc("is_admin");
+  State.isAdmin = !!isAdminData;
+  if (!State.isAdmin) { State.admin = { unauthorized: true }; return; }
+  // Load stats, users, meets, activity in parallel
+  const [stats, users, meets, activity] = await Promise.all([
+    sb.rpc("admin_stats"),
+    sb.rpc("admin_list_users"),
+    sb.rpc("admin_list_meets"),
+    sb.rpc("admin_daily_activity"),
+  ]);
+  State.admin = {
+    stats: stats.data?.[0] || null,
+    users: users.data || [],
+    meets: meets.data || [],
+    activity: activity.data || [],
+  };
 }
 
 async function teardownMeet() {
@@ -579,13 +608,24 @@ function meetLogout() {
 /* ============================ SUPABASE AUTH ============================ */
 sb.auth.onAuthStateChange((event, session) => {
   State.user = session?.user || null;
+  checkAdminStatus();
   if (State.route.name === "me") loadMyMeets().then(render);
+  else if (State.route.name === "admin") loadAdminData().then(render);
   else render();
 });
+
+async function checkAdminStatus() {
+  if (!State.user) { State.isAdmin = false; return; }
+  try {
+    const { data } = await sb.rpc("is_admin");
+    State.isAdmin = !!data;
+  } catch { State.isAdmin = false; }
+}
 
 async function initAuth() {
   const { data } = await sb.auth.getSession();
   State.user = data.session?.user || null;
+  await checkAdminStatus();
 }
 
 async function signInWithEmail(email) {
@@ -608,6 +648,7 @@ function render() {
   if (r.name === "create")  return renderCreate();
   if (r.name === "signin")  return renderSignIn();
   if (r.name === "me")      return renderMe();
+  if (r.name === "admin")   return renderAdmin();
   if (r.name === "league")  return renderLeague();
   if (r.name === "meet") {
     if (State.loading) return renderLoading();
@@ -629,7 +670,7 @@ function header(subtitle, rightHTML = "") {
   const showLock = State.route.name === "meet" && State.meet;
   const isAuthed = showLock && MeetAuth.isAuthed(State.meet.code);
   const userBlock = State.user
-    ? `<a class="auth-link" href="#/me">${esc(State.user.email)}</a> · <a class="auth-link" href="javascript:signOut()">Sign out</a>`
+    ? `<a class="auth-link" href="#/me">${esc(State.user.email)}</a>${State.isAdmin ? ` · <a class="auth-link" href="#/admin" style="color:var(--accent2);">admin</a>` : ""} · <a class="auth-link" href="javascript:signOut()">Sign out</a>`
     : `<a class="auth-link" href="#/signin">Sign in</a>`;
   return `
     <div class="hdr">
@@ -773,6 +814,136 @@ function renderMe() {
             </div>`).join("")}
       </div>
     </div>`;
+}
+
+/* ============================ /admin DASHBOARD ============================ */
+function renderAdmin() {
+  if (!State.user) { go("signin"); return; }
+  if (State.admin?.unauthorized) {
+    $("app").innerHTML = `
+      ${header("ACCESS DENIED", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Home</button>`)}
+      <div style="max-width:600px;margin:80px auto;padding:24px;text-align:center;">
+        <div class="display" style="font-size:56px;color:var(--red);">NOT AN ADMIN</div>
+        <div class="ui" style="color:var(--ink-dim);margin-top:12px;">
+          ${esc(State.user.email)} doesn't have admin access. Contact the site owner.
+        </div>
+      </div>`;
+    return;
+  }
+  if (!State.admin) {
+    $("app").innerHTML = `${header("ADMIN")}<div style="padding:60px;text-align:center;color:var(--ink-dim);">Loading admin data…</div>`;
+    return;
+  }
+
+  const s = State.admin.stats || {};
+  const users = State.admin.users || [];
+  const meets = State.admin.meets || [];
+  const activity = State.admin.activity || [];
+  const maxAct = Math.max(1, ...activity.map(a => Math.max(a.meets_created || 0, a.results_logged || 0)));
+
+  $("app").innerHTML = `
+    ${header("ADMIN DASHBOARD", `<button class="btn btn-ghost btn-sm" onclick="go('')">← Home</button>`)}
+    <div class="wrap">
+      <div style="margin-bottom:32px;">
+        <div class="mono" style="font-size:11px;color:var(--accent2);letter-spacing:0.2em;">ADMIN · ${esc(State.user.email)}</div>
+        <div class="display" style="font-size:64px;line-height:1;">XC<span style="color:var(--accent)">·</span>CHRONO <span style="color:var(--accent2);">/ ADMIN</span></div>
+      </div>
+
+      <!-- STATS GRID -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:36px;">
+        ${statCard("Users", s.total_users, "var(--accent2)")}
+        ${statCard("Meets", s.total_meets, "var(--accent)")}
+        ${statCard("Active", s.active_meets, "var(--accent)")}
+        ${statCard("Completed", s.completed_meets, "var(--green)")}
+        ${statCard("Runners", s.total_runners, "var(--ink)")}
+        ${statCard("Finishers", s.total_results, "var(--ink)")}
+        ${statCard("Meets (7d)", s.meets_last_7_days, "var(--blue)")}
+        ${statCard("Meets (30d)", s.meets_last_30_days, "var(--blue)")}
+      </div>
+
+      <!-- ACTIVITY CHART -->
+      <div class="display" style="font-size:24px;color:var(--accent2);margin-bottom:12px;">▰ ACTIVITY · LAST 30 DAYS</div>
+      <div class="panel" style="padding:22px;margin-bottom:36px;">
+        <div style="display:flex;align-items:flex-end;gap:4px;height:120px;">
+          ${activity.map(a => {
+            const mHeight = ((a.meets_created || 0) / maxAct) * 100;
+            const rHeight = ((a.results_logged || 0) / maxAct) * 100;
+            const day = new Date(a.day).toLocaleDateString(undefined, {month:"numeric", day:"numeric"});
+            return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;">
+              <div style="flex:1;display:flex;align-items:flex-end;gap:2px;width:100%;">
+                <div title="${day}: ${a.meets_created} meets created" style="flex:1;background:var(--accent);height:${mHeight}%;min-height:${a.meets_created?2:0}px;"></div>
+                <div title="${day}: ${a.results_logged} results logged" style="flex:1;background:var(--accent2);height:${rHeight}%;min-height:${a.results_logged?2:0}px;"></div>
+              </div>
+            </div>`;
+          }).join("")}
+        </div>
+        <div style="display:flex;gap:18px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-dim);margin-top:10px;letter-spacing:0.15em;">
+          <span><span style="display:inline-block;width:10px;height:10px;background:var(--accent);vertical-align:middle;"></span> MEETS CREATED</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:var(--accent2);vertical-align:middle;"></span> FINISHERS LOGGED</span>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="display" style="font-size:24px;color:var(--accent2);margin-bottom:12px;">▰ USERS · ${users.length}</div>
+      <div class="panel" style="margin-bottom:36px;max-height:400px;overflow:auto;">
+        <table>
+          <thead><tr><th>EMAIL</th><th>SIGNED UP</th><th>LAST SIGN-IN</th><th>MEETS</th></tr></thead>
+          <tbody>
+            ${users.length === 0 ? `<tr><td colspan="4" style="text-align:center;color:var(--ink-dim);padding:24px;">No users yet.</td></tr>` :
+              users.map(u => `<tr>
+                <td class="ui">${esc(u.email)}</td>
+                <td class="mono" style="color:var(--ink-dim);">${new Date(u.created_at).toLocaleDateString()}</td>
+                <td class="mono" style="color:var(--ink-dim);">${u.last_sign_in ? new Date(u.last_sign_in).toLocaleDateString() : "—"}</td>
+                <td class="mono" style="color:var(--accent);">${u.meet_count}</td>
+              </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MEETS -->
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">
+        <div class="display" style="font-size:24px;color:var(--accent2);">▰ ALL MEETS · ${meets.length}</div>
+        <button class="btn btn-ghost btn-sm" onclick="doExportAdminMeets()">⬇ CSV</button>
+      </div>
+      <div class="panel" style="max-height:600px;overflow:auto;">
+        <table>
+          <thead><tr><th>CODE</th><th>NAME</th><th>LEAGUE</th><th>OWNER</th><th>DATE</th><th>STATUS</th><th>RUNNERS</th><th>RESULTS</th></tr></thead>
+          <tbody>
+            ${meets.length === 0 ? `<tr><td colspan="8" style="text-align:center;color:var(--ink-dim);padding:24px;">No meets yet.</td></tr>` :
+              meets.map(m => `<tr style="cursor:pointer;" onclick="go('m/${m.code}')">
+                <td class="mono" style="color:var(--accent);font-weight:700;">${esc(m.code)}</td>
+                <td class="ui">${esc(m.name)}</td>
+                <td class="mono" style="color:var(--accent2);">${esc(m.league || "—")}</td>
+                <td class="ui" style="color:var(--ink-dim);font-size:12px;">${esc(m.owner_email || "anon")}</td>
+                <td class="mono" style="color:var(--ink-dim);">${m.meet_date ? esc(fmtDate(m.meet_date)) : "—"}</td>
+                <td>${m.status === "completed" ? '<span class="status-badge completed">✓</span>' : '<span class="status-badge active">●</span>'}</td>
+                <td class="mono">${m.runner_count}</td>
+                <td class="mono">${m.result_count}</td>
+              </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function statCard(label, val, color) {
+  return `<div class="panel" style="padding:16px;text-align:center;">
+    <div class="display" style="font-size:42px;line-height:1;color:${color};">${val ?? 0}</div>
+    <div class="mono" style="font-size:9px;color:var(--ink-dim);letter-spacing:0.2em;margin-top:6px;">${esc(label.toUpperCase())}</div>
+  </div>`;
+}
+
+function doExportAdminMeets() {
+  const meets = State.admin?.meets || [];
+  if (meets.length === 0) return alert("No meets to export.");
+  const rows = [["Code","Name","League","Owner Email","Course","Location","Distance","Date","Status","Created","Runners","Results"]];
+  for (const m of meets) {
+    rows.push([m.code, m.name, m.league || "", m.owner_email || "anonymous",
+      m.course_name || "", m.location || "", m.distance || "",
+      m.meet_date || "", m.status, new Date(m.created_at).toISOString(),
+      m.runner_count, m.result_count]);
+  }
+  downloadCSV(`xc_chrono_all_meets_${new Date().toISOString().slice(0,10)}.csv`, rows);
 }
 
 /* ============================ /league/SLUG ============================ */
