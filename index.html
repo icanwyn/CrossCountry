@@ -725,7 +725,14 @@ function handleRaceChange(p) {
     const i = State.races.findIndex(r => r.division === p.new.division);
     if (i >= 0) State.races[i] = p.new;
   } else if (p.eventType === "DELETE") State.races = State.races.filter(r => r.division !== p.old.division);
-  State.races.sort((a,b) => a.division.localeCompare(b.division)); render();
+  State.races.sort((a,b) => a.division.localeCompare(b.division));
+  // On mobile timer view: skip render if the change isn't for the division we're showing
+  if (State.route.name === "meet" && State.route.view === "timer" &&
+      State.route.division && isMobileViewport()) {
+    const affectedDiv = p.new?.division || p.old?.division;
+    if (affectedDiv && affectedDiv !== State.route.division) return;
+  }
+  render();
 }
 function handleTapChange(p) {
   if (p.eventType === "INSERT") {
@@ -734,7 +741,30 @@ function handleTapChange(p) {
   } else if (p.eventType === "DELETE") {
     State.taps = State.taps.filter(t => !(t.division === p.old.division && t.place === p.old.place));
   }
+  // On mobile timer view, do an in-place update instead of full re-render
+  // (full re-render causes flicker, kills event listeners, and can momentarily show wrong state)
+  if (State.route.name === "meet" && State.route.view === "timer" &&
+      State.route.division && isMobileViewport()) {
+    updateMobileTapCounter(State.route.division);
+    return;
+  }
   render();
+}
+
+function updateMobileTapCounter(div) {
+  const taps = tapsForDiv(div);
+  const results = resultsForDiv(div);
+  const counter = $("tap-count");
+  if (counter && counter.textContent !== String(taps.length)) {
+    counter.textContent = taps.length;
+  }
+  // Update the matched / pending pills too
+  const blocks = document.querySelectorAll(".m-counter-block .v");
+  if (blocks.length >= 3) {
+    blocks[0].textContent = taps.length;
+    blocks[1].textContent = results.length;
+    blocks[2].textContent = taps.length - results.length;
+  }
 }
 function handleResultChange(p) {
   if (p.eventType === "INSERT") {
@@ -742,6 +772,12 @@ function handleResultChange(p) {
     if (!exists) State.results.push(p.new);
   } else if (p.eventType === "DELETE") {
     State.results = State.results.filter(r => !(r.division === p.old.division && r.place === p.old.place));
+  }
+  // On mobile timer view, update in place
+  if (State.route.name === "meet" && State.route.view === "timer" &&
+      State.route.division && isMobileViewport()) {
+    updateMobileTapCounter(State.route.division);
+    return;
   }
   render();
 }
@@ -2337,7 +2373,8 @@ function attachTapHandler(tapBtn, div, code, isMobile) {
     if (error) {
       console.error("tap failed", error);
       State.taps = State.taps.filter(x => !(x.division === div && x.place === nextPlace));
-      if (!isMobile) render();
+      if (isMobile) updateMobileTapCounter(div);
+      else render();
       if (error.message?.includes("Not authorized")) {
         MeetAuth.clear(code);
         alert("Session expired.");
