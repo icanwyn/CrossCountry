@@ -357,10 +357,19 @@
   }
   .m-key:active { background: var(--gold); color: #1a1408; }
   .m-key.back { color: var(--red); font-size: 28px; }
-  .m-key.submit { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: #1a1408; font-size: 20px; letter-spacing: 0.1em; }
+  .m-key.submit { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: #1a1408; font-size: 28px; letter-spacing: 0.1em; padding: 18px 0; min-height: 80px; box-shadow: inset 0 2px 0 rgba(255,255,255,0.2); }
   .m-key.submit:active { background: #fff; }
   .m-key.undo { color: var(--ink-dim); font-size: 18px; letter-spacing: 0.1em; }
   .m-key:disabled { opacity: 0.3; }
+
+  .m-rec-preview { position: relative; }
+  .m-auto-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: var(--gold);
+    width: 0%; transition: width 0.4s linear; border-radius: 0 0 8px 0; }
+  .m-auto-bar.go { width: 100%; }
+  .m-toggle-pill { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.15em;
+    padding: 6px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel);
+    color: var(--ink-dim); cursor: pointer; touch-action: manipulation; }
+  .m-toggle-pill.on { background: var(--gold); color: #1a1408; border-color: var(--gold); }
 
   /* ---- Results collapsible ---- */
   .result-section { margin-bottom: 24px; border: 1px solid var(--line); border-radius: 14px;
@@ -2103,12 +2112,61 @@ function renderRecorder() {
 
 let _mobileBibBuffer = "";
 let _mobileInputMode = (localStorage.getItem("xc.recorderInputMode") || "keypad"); // "keypad" or "native"
+let _mobileAutoRecord = (localStorage.getItem("xc.recorderAutoRecord") || "on") === "on";
+let _autoRecordTimer = null;
 
 function setRecorderInputMode(mode) {
   _mobileInputMode = mode;
   localStorage.setItem("xc.recorderInputMode", mode);
   _mobileBibBuffer = "";
+  cancelAutoRecord();
   renderRecorderMobile(State.route.division);
+}
+
+function toggleAutoRecord() {
+  _mobileAutoRecord = !_mobileAutoRecord;
+  localStorage.setItem("xc.recorderAutoRecord", _mobileAutoRecord ? "on" : "off");
+  cancelAutoRecord();
+  renderRecorderMobile(State.route.division);
+}
+
+function cancelAutoRecord() {
+  if (_autoRecordTimer) { clearTimeout(_autoRecordTimer); _autoRecordTimer = null; }
+  const bar = document.querySelector(".m-auto-bar");
+  if (bar) bar.classList.remove("go");
+}
+
+function maybeAutoRecord(div) {
+  cancelAutoRecord();
+  if (!_mobileAutoRecord) return;
+  if (_mobileBibBuffer.length !== 4) return;
+  const bib = _mobileBibBuffer;
+  const runner = State.runnersByBib[bib];
+  if (!runner) return; // unknown bib, don't auto
+  // Don't auto on duplicate (already recorded)
+  if (State.results.find(r => r.division === div && r.bib === bib)) return;
+  // Don't auto on division mismatch — require manual confirm for safety
+  const runnerDiv = divFromRunner(runner);
+  if (runnerDiv && runnerDiv !== div) return;
+  // Need a tap to match against
+  const taps = tapsForDiv(div);
+  const nextPlace = resultsForDiv(div).length + 1;
+  const nextTap = taps.find(t => t.place === nextPlace);
+  if (!nextTap) return;
+
+  // Trigger the progress bar
+  setTimeout(() => {
+    const bar = document.querySelector(".m-auto-bar");
+    if (bar) bar.classList.add("go");
+  }, 10);
+
+  _autoRecordTimer = setTimeout(() => {
+    // Final safety check — buffer must still match what we started for
+    if (_mobileBibBuffer === bib) {
+      mobileBibSubmit(div);
+    }
+    _autoRecordTimer = null;
+  }, 400);
 }
 
 function renderRecorderMobile(div) {
@@ -2145,14 +2203,16 @@ function renderRecorderMobile(div) {
           <div class="m-rec-preview ${mismatched?'mismatch':''}">
             <div class="nm">${esc(previewRunner.first)} ${esc(previewRunner.last)}</div>
             <div class="mt">${esc(previewRunner.team)} · DIV ${previewDiv || "—"}${mismatched?` ⚠ should be ${previewDiv}`:''}</div>
+            <div class="m-auto-bar"></div>
           </div>` : ""}
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px;flex-wrap:wrap;">
           <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-dim);letter-spacing:0.15em;">
-            ${taps.length} TAPS · ${results.length} MATCHED · ${taps.length - results.length} PENDING
+            ${taps.length}T · ${results.length}M · ${taps.length - results.length}P
           </div>
-          <div style="display:flex;gap:4px;">
-            <button class="m-back ${_mobileInputMode==='keypad'?'':'btn-ghost'}" style="${_mobileInputMode==='keypad'?'background:var(--gold);color:#1a1408;border-color:var(--gold);':''}font-size:9px;padding:6px 8px;" onclick="setRecorderInputMode('keypad')">KEYPAD</button>
-            <button class="m-back ${_mobileInputMode==='native'?'':'btn-ghost'}" style="${_mobileInputMode==='native'?'background:var(--gold);color:#1a1408;border-color:var(--gold);':''}font-size:9px;padding:6px 8px;" onclick="setRecorderInputMode('native')">NATIVE</button>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <button class="m-toggle-pill ${_mobileAutoRecord?'on':''}" onclick="toggleAutoRecord()" title="Auto-record on 4-digit match">⚡ AUTO</button>
+            <button class="m-toggle-pill ${_mobileInputMode==='keypad'?'on':''}" onclick="setRecorderInputMode('keypad')">KEYPAD</button>
+            <button class="m-toggle-pill ${_mobileInputMode==='native'?'on':''}" onclick="setRecorderInputMode('native')">NATIVE</button>
           </div>
         </div>
       </div>
@@ -2178,25 +2238,28 @@ function renderRecorderMobile(div) {
     const inp = $("m-rec-input");
     if (inp) {
       inp.addEventListener("input", (e) => {
+        cancelAutoRecord();
         _mobileBibBuffer = e.target.value.replace(/\D/g, "").slice(0, 4);
         // Soft re-render to update preview without losing focus
         updateMobileNativePreview(div);
+        setTimeout(() => maybeAutoRecord(div), 20);
       });
       inp.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") { e.preventDefault(); mobileBibSubmit(div); }
+        if (e.key === "Enter") { e.preventDefault(); cancelAutoRecord(); mobileBibSubmit(div); }
       });
     }
+  } else {
+    // For keypad mode, trigger auto-record check on initial render too (in case buffer was preserved)
+    setTimeout(() => maybeAutoRecord(div), 20);
   }
 }
 
 function updateMobileNativePreview(div) {
-  // Update the preview block + submit-button enabled state without re-rendering whole screen
   const buf = _mobileBibBuffer.padStart(4, "0");
   const previewRunner = _mobileBibBuffer ? State.runnersByBib[buf] : null;
   const previewDiv = previewRunner ? divFromRunner(previewRunner) : null;
   const mismatched = previewRunner && previewDiv && previewDiv !== div;
 
-  // Remove old preview if present
   const existing = document.querySelector(".m-rec-preview");
   if (existing) existing.remove();
 
@@ -2205,13 +2268,12 @@ function updateMobileNativePreview(div) {
     newPreview.className = "m-rec-preview" + (mismatched ? " mismatch" : "");
     newPreview.innerHTML = `
       <div class="nm">${esc(previewRunner.first)} ${esc(previewRunner.last)}</div>
-      <div class="mt">${esc(previewRunner.team)} · DIV ${previewDiv || "—"}${mismatched?` ⚠ should be ${previewDiv}`:''}</div>`;
-    // Insert after the input
+      <div class="mt">${esc(previewRunner.team)} · DIV ${previewDiv || "—"}${mismatched?` ⚠ should be ${previewDiv}`:''}</div>
+      <div class="m-auto-bar"></div>`;
     const inp = $("m-rec-input");
     inp?.parentNode?.insertBefore(newPreview, inp.nextSibling);
   }
 
-  // Update submit button enabled state
   const submitBtn = document.querySelector(".m-key.submit");
   const taps = tapsForDiv(div);
   const nextPlace = resultsForDiv(div).length + 1;
@@ -2220,6 +2282,7 @@ function updateMobileNativePreview(div) {
 }
 
 function mobileBibKey(k) {
+  cancelAutoRecord();
   if (k === 'back') {
     _mobileBibBuffer = _mobileBibBuffer.slice(0, -1);
   } else if (_mobileBibBuffer.length < 4) {
@@ -2228,9 +2291,12 @@ function mobileBibKey(k) {
   // Tiny vibration on keypress
   try { if (navigator.vibrate) navigator.vibrate(15); } catch(e){}
   renderRecorderMobile(State.route.division);
+  // Schedule auto-record check after re-render
+  setTimeout(() => maybeAutoRecord(State.route.division), 20);
 }
 
 async function mobileBibSubmit(div) {
+  cancelAutoRecord();
   const raw = _mobileBibBuffer;
   if (!raw) return;
   const bib = raw.padStart(4, "0");
