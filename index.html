@@ -1278,29 +1278,58 @@ function renderAdmin() {
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
-        <div class="display" style="font-size:24px;color:var(--gold-2);">▰ INVITE CODES · ${invites.filter(i=>!i.used_by_email).length} UNUSED · ${invites.filter(i=>i.used_by_email).length} USED</div>
+        <div class="display" style="font-size:24px;color:var(--gold-2);">▰ INVITE CODES · ${invites.filter(i=>(!i.max_uses||i.use_count<i.max_uses)&&(!i.expires_at||new Date(i.expires_at)>new Date())).length} ACTIVE</div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          <input id="invite-note" class="field-input" placeholder="Note (e.g. Coach Smith)" style="font-size:12px;padding:8px 12px;width:200px;" />
-          <input id="invite-count" type="number" min="1" max="50" value="1" class="field-input" style="font-size:12px;padding:8px 12px;width:60px;" />
-          <button class="btn btn-primary btn-sm" onclick="doGenerateInvites()">+ Generate</button>
-          <button class="btn btn-ghost btn-sm" onclick="doCleanupInvites('used')" title="Delete invite records that have been claimed">🧹 Clear Used</button>
+          <button class="btn btn-ghost btn-sm" onclick="doCleanupInvites('used')" title="Delete fully-claimed/expired invite records">🧹 Clear Used</button>
           <button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="doCleanupInvites('unused')" title="Revoke all unused invite codes">⚠ Revoke All Unused</button>
         </div>
       </div>
+      <div class="panel" style="padding:14px 16px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:10px;align-items:end;">
+        <div>
+          <div class="field-label">Note</div>
+          <input id="invite-note" class="field-input" placeholder="Coach Smith, Riverdale" style="font-size:12px;padding:8px 10px;" />
+        </div>
+        <div>
+          <div class="field-label">Codes to generate</div>
+          <input id="invite-count" type="number" min="1" max="50" value="1" class="field-input" style="font-size:12px;padding:8px 10px;" />
+        </div>
+        <div>
+          <div class="field-label">Max uses (blank = unlimited)</div>
+          <input id="invite-max-uses" type="number" min="1" placeholder="1" class="field-input" style="font-size:12px;padding:8px 10px;" />
+        </div>
+        <div>
+          <div class="field-label">Expires</div>
+          <select id="invite-expiry-preset" class="field-input" style="font-size:12px;padding:8px 10px;" onchange="onExpiryPresetChange()">
+            <option value="">Never</option>
+            <option value="1">In 1 day</option>
+            <option value="7">In 7 days</option>
+            <option value="30">In 30 days</option>
+            <option value="custom">Custom date…</option>
+          </select>
+          <input id="invite-expiry-date" type="date" class="field-input" style="font-size:12px;padding:8px 10px;margin-top:6px;display:none;" />
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="doGenerateInvites()">+ Generate</button>
+      </div>
       <div class="panel" style="margin-bottom:36px;max-height:300px;overflow:auto;">
         <table>
-          <thead><tr><th>CODE</th><th>NOTE</th><th>CREATED</th><th>STATUS</th><th></th></tr></thead>
+          <thead><tr><th>CODE</th><th>NOTE</th><th>USES</th><th>EXPIRES</th><th>STATUS</th><th></th></tr></thead>
           <tbody>
-            ${invites.length === 0 ? `<tr><td colspan="5" style="text-align:center;color:var(--ink-dim);padding:24px;">No invite codes yet.</td></tr>` :
-              invites.map(inv => `<tr>
-                <td class="mono" style="font-weight:700;color:${inv.used_by_email?'var(--ink-dim)':'var(--gold-2)'};letter-spacing:0.15em;">${esc(inv.code)}</td>
-                <td class="ui" style="color:var(--ink-dim);">${esc(inv.note || "—")}</td>
-                <td class="mono" style="color:var(--ink-dim);font-size:11px;">${new Date(inv.created_at).toLocaleDateString()}</td>
-                <td class="mono" style="font-size:11px;color:${inv.used_by_email?'var(--green)':'var(--gold)'};">
-                  ${inv.used_by_email ? `✓ ${esc(inv.used_by_email)}` : "● UNUSED"}
-                </td>
-                <td>${!inv.used_by_email ? `<button class="btn btn-ghost btn-sm" onclick="doRevokeInvite('${esc(inv.code)}')" style="font-size:10px;">Revoke</button>` : ""}</td>
-              </tr>`).join("")}
+            ${invites.length === 0 ? `<tr><td colspan="6" style="text-align:center;color:var(--ink-dim);padding:24px;">No invite codes yet.</td></tr>` :
+              invites.map(inv => {
+                const isExpired = inv.expires_at && new Date(inv.expires_at) < new Date();
+                const isFullyClaimed = inv.max_uses && inv.use_count >= inv.max_uses;
+                const isActive = !isExpired && !isFullyClaimed;
+                const statusColor = isActive ? 'var(--gold)' : (isExpired ? 'var(--red)' : 'var(--ink-dim)');
+                const statusText = isActive ? '● ACTIVE' : (isExpired ? '⌛ EXPIRED' : '✓ CLAIMED');
+                return `<tr>
+                  <td class="mono" style="font-weight:700;color:${isActive?'var(--gold-2)':'var(--ink-dim)'};letter-spacing:0.15em;">${esc(inv.code)}</td>
+                  <td class="ui" style="color:var(--ink-dim);">${esc(inv.note || "—")}</td>
+                  <td class="mono" style="color:var(--ink-dim);">${inv.use_count}${inv.max_uses ? `/${inv.max_uses}` : ' / ∞'}</td>
+                  <td class="mono" style="color:var(--ink-dim);font-size:11px;">${inv.expires_at ? new Date(inv.expires_at).toLocaleDateString() : "—"}</td>
+                  <td class="mono" style="font-size:11px;color:${statusColor};">${statusText}</td>
+                  <td>${isActive ? `<button class="btn btn-ghost btn-sm" onclick="doRevokeInvite('${esc(inv.code)}')" style="font-size:10px;">Revoke</button>` : ""}</td>
+                </tr>`;
+              }).join("")}
           </tbody>
         </table>
       </div>
@@ -1371,19 +1400,51 @@ function doExportAdminMeets() {
   }
   downloadCSV(`xc_chrono_all_meets_${new Date().toISOString().slice(0,10)}.csv`, rows);
 }
+function onExpiryPresetChange() {
+  const sel = $("invite-expiry-preset");
+  const dateInput = $("invite-expiry-date");
+  if (!sel || !dateInput) return;
+  dateInput.style.display = sel.value === "custom" ? "block" : "none";
+}
+
 async function doGenerateInvites() {
   const note = $("invite-note").value.trim() || null;
   const count = parseInt($("invite-count").value || "1", 10);
   if (count < 1 || count > 50) return alert("Count must be 1-50.");
-  const { data, error } = await sb.rpc("admin_create_invite", { p_count: count, p_note: note });
+  const maxUsesRaw = ($("invite-max-uses").value || "").trim();
+  const maxUses = maxUsesRaw ? parseInt(maxUsesRaw, 10) : null;
+  if (maxUses !== null && (isNaN(maxUses) || maxUses < 1)) return alert("Max uses must be 1+ or blank for unlimited.");
+
+  // Resolve expiry
+  let expiresAt = null;
+  const preset = $("invite-expiry-preset").value;
+  if (preset === "1" || preset === "7" || preset === "30") {
+    const d = new Date(); d.setDate(d.getDate() + parseInt(preset, 10));
+    expiresAt = d.toISOString();
+  } else if (preset === "custom") {
+    const v = $("invite-expiry-date").value;
+    if (!v) return alert("Pick a date for custom expiry.");
+    expiresAt = new Date(v + "T23:59:59").toISOString();
+  }
+
+  const { data, error } = await sb.rpc("admin_create_invite", {
+    p_count: count, p_note: note, p_max_uses: maxUses, p_expires_at: expiresAt
+  });
   if (error) return alert("Failed: " + error.message);
   const codes = (data || []).map(d => d.code);
+
+  let descBits = [];
+  if (maxUses === null) descBits.push("unlimited uses");
+  else if (maxUses > 1) descBits.push(`${maxUses} uses each`);
+  if (expiresAt) descBits.push(`expires ${new Date(expiresAt).toLocaleDateString()}`);
+
   $("modal-root").innerHTML = `
     <div class="modal-back" onclick="if(event.target===this)closeModal()">
       <div class="modal">
         <div class="display" style="font-size:32px;color:var(--gold-2);margin-bottom:10px;">✓ INVITES CREATED</div>
         <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-bottom:18px;">
           ${note ? `Note: <span style="color:var(--ink);">${esc(note)}</span><br>` : ""}
+          ${descBits.length ? `<span class="mono" style="font-size:11px;color:var(--gold);">${descBits.join(' · ')}</span><br>` : ""}
           Share these codes with the people you want to invite.
         </div>
         <div style="background:var(--bg-2);padding:18px;border:1px dashed var(--line);max-height:240px;overflow:auto;border-radius:10px;">
@@ -1729,6 +1790,7 @@ function renderRoster() {
       <div class="display" style="font-size:48px;margin-bottom:24px;">UPLOAD<span style="color:var(--gold)">·</span>ROSTER</div>
       <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:24px;margin-bottom:32px;" class="roster-grid">
         <div class="panel panel-gold" style="padding:24px;">
+          <div class="display" style="font-size:24px;margin-bottom:14px;">CSV UPLOAD</div>
           <div class="field-label">School / Team Name</div>
           <input id="r-school" class="field-input" placeholder="Riverdale High" />
           <div style="margin-top:16px;"><div class="field-label">CSV File</div><input id="r-file" type="file" accept=".csv,text/csv" style="color:var(--ink-dim);font-size:13px;" /></div>
@@ -1736,11 +1798,42 @@ function renderRoster() {
           <div id="r-err" class="err" style="display:none;"></div>
           <div id="r-ok" class="ok" style="display:none;"></div>
           <div style="margin-top:18px;"><button id="r-submit" class="btn btn-primary" onclick="doUploadRoster()">Assign Bibs →</button></div>
+
+          <div class="hairline"></div>
+          <div class="display" style="font-size:18px;margin-bottom:12px;">+ ADD SINGLE ATHLETE</div>
+          <div class="ui" style="font-size:11px;color:var(--ink-dim);margin-bottom:12px;">For late adds — adds one runner to an existing team.</div>
+          <div class="field-label">Team</div>
+          <select id="sa-team" class="field-input" style="font-size:13px;">
+            <option value="">— pick a team —</option>
+            ${State.teams.map(t => `<option value="${esc(t.name)}">${esc(t.name)}</option>`).join("")}
+            <option value="__new__">+ New team…</option>
+          </select>
+          <input id="sa-new-team" class="field-input" placeholder="New team name" style="display:none;margin-top:8px;" />
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+            <div><div class="field-label">First Name</div><input id="sa-first" class="field-input" /></div>
+            <div><div class="field-label">Last Name</div><input id="sa-last" class="field-input" /></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+            <div><div class="field-label">Grade</div><input id="sa-grade" class="field-input" placeholder="6, 7, 8, V, JV" /></div>
+            <div><div class="field-label">Gender</div><select id="sa-gender" class="field-input"><option value="">—</option><option value="M">M (Boys)</option><option value="F">F (Girls)</option></select></div>
+          </div>
+          <div id="sa-err" class="err" style="display:none;"></div>
+          <div id="sa-ok" class="ok" style="display:none;"></div>
+          <div style="margin-top:14px;"><button id="sa-submit" class="btn btn-primary btn-sm" onclick="doAddSingleAthlete()">+ Add Athlete</button></div>
+
+          ${State.user ? `
+            <div class="hairline"></div>
+            <div class="display" style="font-size:18px;margin-bottom:8px;">↻ REUSE PREVIOUS ROSTER</div>
+            <div class="ui" style="font-size:11px;color:var(--ink-dim);margin-bottom:12px;">
+              Copy teams + runners from any meet in your league (or your own past meets). Bib numbers preserved.
+            </div>
+            <button class="btn btn-sm" onclick="openReuseRosterModal()">Pick Source Meet →</button>
+          ` : ""}
         </div>
         <div class="panel" style="padding:24px;">
           <div class="mono" style="font-size:10px;color:var(--gold-2);letter-spacing:0.2em;margin-bottom:14px;">BIB + DIVISION ASSIGNMENT</div>
           <div class="ui" style="font-size:13px;color:var(--ink-dim);line-height:1.6;">
-            Each team gets a 1000-block. Runners auto-assigned by grade+gender (6M, 7F, etc.).
+            Each team gets a 500-bib block (up to 22 teams per division). Runners auto-assigned by grade+gender (6M, 7F, etc.).
           </div>
           <div class="hairline"></div>
           <div class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.2em;margin-bottom:10px;">TEAMS REGISTERED</div>
@@ -1749,8 +1842,8 @@ function renderRoster() {
               const teamRunners = State.runners.filter(r => r.team === t.name);
               const count = teamRunners.length;
               const bibs = teamRunners.map(r => parseInt(r.bib, 10));
-              const lo = bibs.length ? Math.min(...bibs) : t.team_index*1000+1;
-              const hi = bibs.length ? Math.max(...bibs) : t.team_index*1000+1;
+              const lo = bibs.length ? Math.min(...bibs) : t.team_index*500+1;
+              const hi = bibs.length ? Math.max(...bibs) : t.team_index*500+1;
               return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);">
                 <div><span class="mono" style="color:var(--gold);margin-right:10px;">#${t.team_index}</span><span class="ui" style="font-size:14px;">${esc(t.name)}</span></div>
                 <div class="mono" style="font-size:12px;color:var(--ink-dim);">${count} runners · ${pad(lo,4)}–${pad(hi,4)}</div>
@@ -1799,6 +1892,9 @@ function renderRoster() {
     fr.onload = (ev) => { $("r-csv").value = ev.target.result; };
     fr.readAsText(f);
   });
+  $("sa-team")?.addEventListener("change", (e) => {
+    $("sa-new-team").style.display = e.target.value === "__new__" ? "block" : "none";
+  });
 }
 function changeFilter(v) { _rosterFilterTeam = v; renderRoster(); }
 async function doUploadRoster() {
@@ -1820,7 +1916,7 @@ async function doUploadRoster() {
     const { data: teamIdx, error: teamErr } = await sb.rpc("register_team", { p_token: token, p_meet: code, p_team: school });
     if (teamErr) throw teamErr;
     const existingForTeam = State.runners.filter(r => r.team === school).map(r => parseInt(r.bib, 10));
-    let nextBib = existingForTeam.length ? Math.max(...existingForTeam) + 1 : teamIdx * 1000 + 1;
+    let nextBib = existingForTeam.length ? Math.max(...existingForTeam) + 1 : teamIdx * 500 + 1;
     const rows = parsed.map(p => ({
       bib: pad(nextBib++, 4),
       first_name: p.first, last_name: p.last,
@@ -1860,6 +1956,193 @@ async function doUploadRoster() {
     const submitBtn = $("r-submit");
     if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Assign Bibs →"; }
   }
+}
+
+/* ============================ SINGLE ATHLETE ADD ============================ */
+async function doAddSingleAthlete() {
+  const code = State.meet.code;
+  const token = MeetAuth.get(code);
+  if (!token) return ensureAuth(code, doAddSingleAthlete);
+
+  const errEl = $("sa-err"), okEl = $("sa-ok");
+  errEl.style.display = "none"; okEl.style.display = "none";
+  const showErr = (m) => { errEl.textContent = "⚠ " + m; errEl.style.display = "block"; };
+  const showOk  = (m) => { okEl.textContent  = "✓ " + m; okEl.style.display  = "block";
+                           setTimeout(() => { okEl.style.display = "none"; }, 4000); };
+
+  let team = $("sa-team").value;
+  if (team === "__new__") team = ($("sa-new-team").value || "").trim();
+  if (!team) return showErr("Pick or enter a team.");
+  const first = $("sa-first").value.trim();
+  const last  = $("sa-last").value.trim();
+  const grade = $("sa-grade").value.trim();
+  const gender = $("sa-gender").value;
+  if (!first || !last) return showErr("First and last name required.");
+  if (!grade || !gender) return showErr("Grade and gender required for division assignment.");
+
+  const btn = $("sa-submit");
+  btn.disabled = true; btn.textContent = "Adding…";
+  try {
+    // Register team if new
+    const { data: teamIdx, error: teamErr } = await sb.rpc("register_team", {
+      p_token: token, p_meet: code, p_team: team
+    });
+    if (teamErr) throw teamErr;
+
+    // Compute next bib for this team
+    const existingForTeam = State.runners.filter(r => r.team === team).map(r => parseInt(r.bib, 10));
+    const nextBib = existingForTeam.length ? Math.max(...existingForTeam) + 1 : teamIdx * 500 + 1;
+    const bib = pad(nextBib, 4);
+
+    const row = { bib, first_name: first, last_name: last, grade, gender, team };
+    const { error: insErr } = await sb.rpc("add_runners", {
+      p_token: token, p_meet: code, p_runners: [row]
+    });
+    if (insErr) throw insErr;
+
+    // Register division if new
+    const div = divFromRunner({ grade, gender });
+    if (div && !State.races.find(x => x.division === div)) {
+      await sb.rpc("register_race", { p_token: token, p_meet: code, p_division: div, p_label: divLabel(div) });
+    }
+
+    // Optimistic local update
+    if (!State.teams.find(t => t.name === team)) {
+      State.teams.push({ meet_code: code, name: team, team_index: teamIdx });
+      State.teams.sort((a,b) => a.team_index - b.team_index);
+    }
+    if (!State.runnersByBib[bib]) {
+      State.runners.push({ ...row, meet_code: code });
+      State.runnersByBib[bib] = { bib, first, last, grade, gender, team };
+      State.runners.sort((a,b) => a.bib.localeCompare(b.bib));
+    }
+    if (div && !State.races.find(x => x.division === div)) {
+      State.races.push({ meet_code: code, division: div, label: divLabel(div), start_time: null });
+    }
+
+    showOk(`Added ${first} ${last} to ${team} (bib ${bib})`);
+    // Clear form except team
+    $("sa-first").value = ""; $("sa-last").value = "";
+    $("sa-grade").value = ""; $("sa-gender").value = "";
+    renderRoster();
+  } catch (e) {
+    showErr(e.message || "Add failed.");
+  } finally {
+    const b = $("sa-submit");
+    if (b) { b.disabled = false; b.textContent = "+ Add Athlete"; }
+  }
+}
+
+/* ============================ REUSE ROSTER ============================ */
+async function openReuseRosterModal() {
+  const currentCode = State.meet.code;
+  const currentLeague = State.meet.league;
+  const { data: meets, error } = await sb.rpc("meets_with_rosters_for_target", { p_target_meet: currentCode });
+  if (error) return alert("Failed: " + error.message);
+  const list = meets || [];
+
+  $("modal-root").innerHTML = `
+    <div class="modal-back" onclick="if(event.target===this)closeModal()">
+      <div class="modal" style="max-width:640px;">
+        <div class="display" style="font-size:32px;margin-bottom:6px;">↻ REUSE ROSTER</div>
+        <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-bottom:18px;">
+          ${currentLeague
+            ? `Showing meets in league <span class="mono" style="color:var(--gold-2);">${esc(currentLeague)}</span>. Bib numbers preserved.`
+            : `No league set — showing only your own past meets. Set a league on the meet details to pull from teammates.`}
+        </div>
+        ${list.length === 0 ? `
+          <div class="ui" style="padding:24px;text-align:center;color:var(--ink-dim);">
+            ${currentLeague
+              ? `No meets with rosters found in this league.`
+              : `No previous meets with rosters found.`}
+          </div>
+        ` : `
+          <div style="max-height:50vh;overflow:auto;border:1px solid var(--line);border-radius:8px;">
+            ${list.map(m => `
+              <div class="meet-row" onclick="openReuseTeamsModal('${m.code}', '${esc(m.name).replace(/'/g,"\\'")}')">
+                <div style="flex:1;min-width:0;">
+                  <div class="name">${esc(m.name)} ${m.is_mine ? '<span class="status-badge" style="color:var(--gold-2);border-color:var(--gold-2);background:rgba(240,200,120,0.08);">YOURS</span>' : ''}</div>
+                  <div class="meta">${m.meet_date ? fmtDate(m.meet_date) : new Date(m.created_at).toLocaleDateString()} · ${m.team_count} team${m.team_count===1?'':'s'} · ${m.runner_count} runner${m.runner_count===1?'':'s'}</div>
+                  ${!m.is_mine && m.owner_email ? `<div class="meta" style="color:var(--ink-dim);">by ${esc(m.owner_email)}</div>` : ''}
+                </div>
+                <div class="code-pill">${esc(m.code)}</div>
+              </div>
+            `).join("")}
+          </div>
+        `}
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function openReuseTeamsModal(sourceCode, sourceName) {
+  const targetCode = State.meet.code;
+  const { data: teams, error } = await sb.rpc("teams_from_meet", {
+    p_source_meet: sourceCode, p_target_meet: targetCode
+  });
+  if (error) return alert("Failed: " + error.message);
+  const existingTeamNames = new Set(State.teams.map(t => t.name));
+
+  $("modal-root").innerHTML = `
+    <div class="modal-back" onclick="if(event.target===this)closeModal()">
+      <div class="modal" style="max-width:620px;">
+        <div class="display" style="font-size:28px;margin-bottom:6px;">PICK TEAMS</div>
+        <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-bottom:14px;">
+          From <span class="mono" style="color:var(--ink);">${esc(sourceName)}</span>. Check the teams you want to import.
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.team-cb').forEach(c=>c.checked=true)">✓ Select All</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.querySelectorAll('.team-cb').forEach(c=>c.checked=false)">✕ Deselect All</button>
+        </div>
+        <div style="max-height:50vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px;">
+          ${(teams||[]).length === 0 ? `<div style="padding:24px;text-align:center;color:var(--ink-dim);">No teams in this meet.</div>` :
+            (teams||[]).map(t => {
+              const already = existingTeamNames.has(t.name);
+              return `<label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer;${already?'opacity:0.7':''}">
+                <input type="checkbox" class="team-cb" data-team="${esc(t.name)}" ${already?'':'checked'} style="width:18px;height:18px;accent-color:var(--gold);" />
+                <div style="flex:1;">
+                  <div class="ui" style="font-weight:600;">${esc(t.name)}${already?' <span class="mono" style="color:var(--gold-2);font-size:10px;">· ALREADY IN MEET</span>':''}</div>
+                  <div class="mono" style="font-size:11px;color:var(--ink-dim);">${t.runner_count} runner${t.runner_count===1?'':'s'}</div>
+                </div>
+              </label>`;
+            }).join("")}
+        </div>
+        <div id="reuse-err" class="err" style="display:none;"></div>
+        <div style="display:flex;gap:10px;margin-top:18px;">
+          <button id="reuse-go" class="btn btn-primary" onclick="doReuseRoster('${sourceCode}')">↻ Copy Selected →</button>
+          <button class="btn btn-ghost" onclick="openReuseRosterModal()">← Back</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function doReuseRoster(sourceCode) {
+  const code = State.meet.code;
+  const token = MeetAuth.get(code);
+  if (!token) return ensureAuth(code, () => doReuseRoster(sourceCode));
+
+  const selected = [...document.querySelectorAll(".team-cb:checked")].map(c => c.dataset.team);
+  const errEl = $("reuse-err");
+  errEl.style.display = "none";
+  if (selected.length === 0) {
+    errEl.textContent = "⚠ Select at least one team."; errEl.style.display = "block"; return;
+  }
+  const btn = $("reuse-go");
+  btn.disabled = true; btn.textContent = "Copying…";
+  const { data: count, error } = await sb.rpc("copy_roster_from_meet", {
+    p_token: token, p_target_meet: code, p_source_meet: sourceCode, p_team_names: selected
+  });
+  if (error) {
+    errEl.textContent = "⚠ " + error.message; errEl.style.display = "block";
+    btn.disabled = false; btn.textContent = "↻ Copy Selected →";
+    return;
+  }
+  closeModal();
+  await loadMeet(code);
+  alert(`✓ Copied ${count} runner${count===1?'':'s'} from ${selected.length} team${selected.length===1?'':'s'}.`);
+  render();
 }
 
 /* ============================ DIVISION PICKER ============================ */
