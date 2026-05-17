@@ -1961,9 +1961,10 @@ async function doUploadRoster() {
     const { error: insErr } = await sb.rpc("add_runners", { p_token: token, p_meet: code, p_runners: rows });
     if (insErr) throw insErr;
     const newDivs = new Set();
-    for (const r of rows) { const d = divFromRunner(r); if (d && !State.races.find(x => x.division === d)) newDivs.add(d); }
+    for (const r of rows) { const d = divFromRunner(r); if (d) newDivs.add(d); }
     for (const d of newDivs) {
-      await sb.rpc("register_race", { p_token: token, p_meet: code, p_division: d, p_label: divLabel(d) });
+      const { error: regErr } = await sb.rpc("register_race", { p_token: token, p_meet: code, p_division: d, p_label: divLabel(d) });
+      if (regErr) console.warn("register_race failed for", d, regErr.message);
     }
     if (!State.teams.find(t => t.name === school)) {
       State.teams.push({ meet_code: code, name: school, team_index: teamIdx });
@@ -2177,6 +2178,22 @@ async function doReuseRoster(sourceCode) {
   }
   closeModal();
   await loadMeet(code);
+
+  // Register races for any divisions introduced by the copied runners
+  const presentDivs = new Set();
+  for (const r of State.runners) {
+    const d = divFromRunner(r);
+    if (d) presentDivs.add(d);
+  }
+  const knownDivs = new Set(State.races.map(r => r.division));
+  for (const d of presentDivs) {
+    if (!knownDivs.has(d)) {
+      const { error: regErr } = await sb.rpc("register_race", { p_token: token, p_meet: code, p_division: d, p_label: divLabel(d) });
+      if (regErr) console.warn("register_race after copy:", regErr.message);
+    }
+  }
+  await loadMeet(code);
+
   alert(`✓ Copied ${count} runner${count===1?'':'s'} from ${selected.length} team${selected.length===1?'':'s'}.`);
   render();
 }
