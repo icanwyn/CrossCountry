@@ -68,6 +68,9 @@
   .btn-primary:hover { background: linear-gradient(135deg, var(--gold-2) 0%, var(--gold) 100%); }
   .btn-ghost { background: transparent; color: var(--ink-dim); border-color: transparent; }
   .btn-ghost:hover { color: var(--ink); background: transparent; }
+  .btn-hub { background: transparent; color: var(--gold); border-color: var(--gold);
+    font-weight: 700; letter-spacing: 0.1em; }
+  .btn-hub:hover { background: rgba(212,168,81,0.12); color: var(--gold-2); }
   .btn-danger { color: var(--red); border-color: var(--red); background: transparent; }
   .btn-danger:hover { background: rgba(226,107,91,0.1); }
   .btn-silver { background: linear-gradient(135deg, var(--silver) 0%, #9ba3b5 100%); color: #1a2540; border-color: var(--silver); }
@@ -137,8 +140,7 @@
     color: #1a1408; border: none; cursor: pointer; border-radius: 16px;
     box-shadow: 0 12px 32px rgba(212,168,81,0.35), inset 0 2px 0 rgba(255,255,255,0.2);
     transition: transform 0.1s, box-shadow 0.1s; }
-  .tap-btn:active { transform: translateY(2px); box-shadow: 0 4px 16px rgba(212,168,81,0.2), inset 0 2px 0 rgba(255,255,255,0.2); background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold) 100%); }
-  .start-btn { width: 100%; padding: 60px 0; font-size: 56px;
+  .tap-btn:active { transform: translateY(2px); box-shadow: 0 4px 16px rgba(212,168,81,0.2), inset 0 2px 0 rgba(255,255,255,0.2); background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold) 100%); }  .start-btn { width: 100%; padding: 60px 0; font-size: 56px;
     font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.12em;
     background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold) 100%);
     color: #1a1408; border: none; cursor: pointer; border-radius: 16px;
@@ -1731,11 +1733,12 @@ function renderHub() {
             const tapsCount = tapsForDiv(d.division).length;
             const finishCount = resultsForDiv(d.division).length;
             const started = race?.start_time != null;
+            const finished = race?.finished_at != null;
             return `<div class="div-tile ${started ? "started" : ""}">
-              <div class="code">${d.division}</div>
+              <div class="code">${d.division}${finished?' ✓':''}</div>
               <div class="lbl">${esc(divLabel(d.division))}</div>
               <div class="stat-line">${d.count} runners</div>
-              <div class="stat-line">${started ? `▶ ${tapsCount} taps · ${finishCount} done` : "Not started"}</div>
+              <div class="stat-line">${finished ? `✓ ${tapsCount} taps · ${finishCount} done` : (started ? `▶ ${tapsCount} taps · ${finishCount} done` : "Not started")}</div>
             </div>`;
           }).join("")}
         </div>` : ""}
@@ -1768,7 +1771,7 @@ function renderDetails() {
   if (!MeetAuth.isAuthed(code)) { ensureAuth(code, () => render()); }
   const m = State.meet;
   $("app").innerHTML = `
-    ${header("MEET DETAILS", `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+    ${header("MEET DETAILS", `<button class="btn btn-hub btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
     <div class="wrap-narrow">
       <div class="display" style="font-size:48px;margin-bottom:24px;">COURSE<span style="color:var(--gold)">·</span>INFO</div>
       <div class="panel panel-gold" style="padding:32px;">
@@ -1821,7 +1824,7 @@ function renderRoster() {
   const visible = _rosterFilterTeam === "ALL" ? State.runners : State.runners.filter(r => r.team === _rosterFilterTeam);
   const divs = computeDivisions();
   $("app").innerHTML = `
-    ${header("ROSTER INTAKE", `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+    ${header("ROSTER INTAKE", `<button class="btn btn-hub btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
     <div class="wrap">
       <div class="display" style="font-size:48px;margin-bottom:24px;">UPLOAD<span style="color:var(--gold)">·</span>ROSTER</div>
       <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:24px;margin-bottom:32px;" class="roster-grid">
@@ -2203,7 +2206,7 @@ function renderDivPicker(role) {
   const code = State.meet.code;
   const divs = computeDivisions();
   $("app").innerHTML = `
-    ${header(`${role.toUpperCase()} · PICK RACE · ${code}`, `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+    ${header(`${role.toUpperCase()} · PICK RACE · ${code}`, `<button class="btn btn-hub btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
     <div class="wrap">
       <div class="display" style="font-size:48px;margin-bottom:6px;">PICK A RACE</div>
       <div class="ui" style="color:var(--ink-dim);font-size:14px;margin-bottom:28px;">
@@ -2216,11 +2219,12 @@ function renderDivPicker(role) {
           const tapsCount = tapsForDiv(d.division).length;
           const finishCount = resultsForDiv(d.division).length;
           const started = race?.start_time != null;
+          const finished = race?.finished_at != null;
           return `<div class="div-tile ${started?"started":""}" style="cursor:pointer;padding:24px 16px;" onclick="go('m/${code}/${role}/${d.division}')">
-            <div class="code" style="font-size:56px;">${d.division}</div>
+            <div class="code" style="font-size:56px;">${d.division}${finished?' ✓':''}</div>
             <div class="lbl" style="font-size:12px;">${esc(divLabel(d.division))}</div>
             <div class="stat-line" style="margin-top:10px;">${d.count} runners</div>
-            <div class="stat-line">${started ? `▶ ${tapsCount} taps · ${finishCount} done` : "Not started"}</div>
+            <div class="stat-line">${finished ? `✓ Finished · ${finishCount} done` : (started ? `▶ ${tapsCount} taps · ${finishCount} done` : "Not started")}</div>
           </div>`;
         }).join("")}
       </div>`}
@@ -2242,6 +2246,8 @@ function renderTimerMobile(div) {
   const code = State.meet.code;
   const race = raceFor(div) || { start_time: null };
   const started = race.start_time != null;
+  const finished = race.finished_at != null;
+  const displayTime = finished ? race.final_time_ms : (started ? Date.now() - race.start_time : 0);
   const taps = tapsForDiv(div);
   const results = resultsForDiv(div);
   requestWakeLock();
@@ -2250,37 +2256,47 @@ function renderTimerMobile(div) {
     <div class="mobile-timer-screen">
       <div class="m-top">
         <div class="m-top-row">
-          <button class="m-back" onclick="go('m/${code}')">← Hub</button>
-          <span class="m-div-pill">${div} · ${esc(divLabel(div))}</span>
+          <button class="m-back" style="color:var(--gold);border-color:var(--gold);" onclick="go('m/${code}')">← Hub</button>
+          <span class="m-div-pill">${div} · ${esc(divLabel(div))}${finished?' ✓':''}</span>
           <button class="m-back" onclick="go('m/${code}/timer')">↺ Race</button>
         </div>
-        <div id="t-clock" class="m-clock">${fmtTime(started ? Date.now() - race.start_time : 0)}</div>
+        <div id="t-clock" class="m-clock" ${finished?'style="opacity:0.85;"':''}>${fmtTime(displayTime)}</div>
         ${started ? `
           <div class="m-counter-row">
-            <div class="m-counter-block"><div class="v" id="tap-count">${taps.length}</div><div class="l">Tapped</div></div>
+            <div class="m-counter-block"><div class="v" id="tap-count">${taps.length}</div><div class="l">${finished?'Final':'Tapped'}</div></div>
             <div class="m-counter-block"><div class="v" style="color:var(--green);">${results.length}</div><div class="l">Matched</div></div>
             <div class="m-counter-block"><div class="v" style="color:${taps.length-results.length?'var(--gold)':'var(--ink-dim)'};">${taps.length - results.length}</div><div class="l">Pending</div></div>
           </div>` : ""}
       </div>
-      ${started
-        ? `<button id="tap-btn" class="m-tap-zone">
+      ${!started
+        ? `<button id="start-btn" class="m-start-zone">START RACE ▶</button>`
+        : `<button id="tap-btn" class="m-tap-zone">
              <div class="m-tap-label">TAP</div>
-             <div class="m-tap-sub">FINISH LINE</div>
+             <div class="m-tap-sub">${finished ? 'STRAGGLERS' : 'FINISH LINE'}</div>
              <div id="tap-pop" class="m-tap-pop"></div>
            </button>
-           <div style="background:var(--bg-2);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);">
+           ${finished ? `
+             <div style="background:rgba(127,184,140,0.15);border-top:2px solid var(--green);padding:8px 16px;text-align:center;">
+               <div class="mono" style="font-size:12px;color:var(--green);letter-spacing:0.2em;font-weight:700;">✓ RACE FINISHED · CLOCK STOPPED · TAPS STILL ALLOWED</div>
+             </div>
+           ` : ""}
+           <div style="background:var(--bg-2);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);gap:8px;">
              <span class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.2em;">LAST: ${taps.length ? fmtTime(taps[taps.length-1].time_ms) : '—'}</span>
-             <button class="btn btn-danger btn-sm" onclick="doResetRace('${div}')">Reset</button>
-           </div>`
-        : `<button id="start-btn" class="m-start-zone">START RACE ▶</button>`}
+             <div style="display:flex;gap:6px;">
+               ${finished
+                 ? `<button class="btn btn-sm" onclick="doReopenRaceClock('${div}')">↻ Reopen</button>`
+                 : `<button class="btn btn-primary btn-sm" onclick="doFinishRace('${div}')">✓ Finish</button>`}
+               <button class="btn btn-danger btn-sm" onclick="doResetRace('${div}')">Reset</button>
+             </div>
+           </div>`}
     </div>`;
 
   if (State.tickTimer) clearInterval(State.tickTimer);
-  if (started) {
+  if (started && !finished) {
     State.tickTimer = setInterval(() => {
       const el = $("t-clock");
       const r = raceFor(div);
-      if (el && r?.start_time) el.textContent = fmtTime(Date.now() - r.start_time);
+      if (el && r?.start_time && !r.finished_at) el.textContent = fmtTime(Date.now() - r.start_time);
     }, 50);
   }
   $("start-btn")?.addEventListener("click", () => doStartRace(div));
@@ -2291,6 +2307,8 @@ function renderTimerDesktop(div) {
   const code = State.meet.code;
   const race = raceFor(div) || { start_time: null };
   const started = race.start_time != null;
+  const finished = race.finished_at != null;
+  const displayTime = finished ? race.final_time_ms : (started ? Date.now() - race.start_time : 0);
   const taps = tapsForDiv(div);
   const results = resultsForDiv(div);
   const lastTaps = [...taps].slice(-8).reverse();
@@ -2299,22 +2317,35 @@ function renderTimerDesktop(div) {
   $("app").innerHTML = `
     ${header(`TIMER · ${div} · ${esc(divLabel(div))}`,
       `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}/timer')">↺ Switch Race</button>
-       <button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+       <button class="btn btn-hub btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
     <div class="timer-grid">
       <div style="padding:32px 32px 0;display:flex;flex-direction:column;">
-        <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:8px;">⏱ RACE CLOCK · ${div}</div>
-        <div id="t-clock" class="clock ${started ? "" : "idle"}">${fmtTime(started ? Date.now() - race.start_time : 0)}</div>
+        <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:8px;">
+          ⏱ RACE CLOCK · ${div}${finished ? ' <span style="color:var(--green);">✓ FINISHED</span>' : ''}
+        </div>
+        <div id="t-clock" class="clock ${started ? "" : "idle"}" ${finished?'style="opacity:0.85;"':''}>${fmtTime(displayTime)}</div>
         ${started ? `
           <div class="tap-counter">
-            <span class="lbl">FINISHERS TAPPED</span>
+            <span class="lbl">FINISHERS TAPPED${finished?' · FINAL':''}</span>
             <span id="tap-count">${taps.length}</span>
           </div>` : `
           <div class="mono" style="font-size:13px;color:var(--ink-dim);margin-top:8px;letter-spacing:0.15em;">NOT STARTED</div>`}
         <div style="margin-top:auto;margin-bottom:32px;">
-          ${started
-            ? `<button id="tap-btn" class="tap-btn">TAP FINISH</button>
-               <div style="text-align:center;margin-top:14px;"><button class="btn btn-danger" onclick="doResetRace('${div}')">Reset This Race</button></div>`
-            : `<button id="start-btn" class="start-btn">START RACE ▶</button>`}
+          ${!started ? `<button id="start-btn" class="start-btn">START RACE ▶</button>` : `
+            <button id="tap-btn" class="tap-btn">${finished ? 'TAP STRAGGLERS' : 'TAP FINISH'}</button>
+            ${finished ? `
+              <div style="margin-top:14px;padding:14px 18px;background:rgba(127,184,140,0.12);border:1px solid var(--green);border-radius:10px;text-align:center;">
+                <div class="display" style="font-size:18px;color:var(--green);letter-spacing:0.1em;">✓ RACE FINISHED · CLOCK STOPPED</div>
+                <div class="ui" style="font-size:12px;color:var(--ink-dim);margin-top:4px;">Taps still allowed for stragglers. Tap times will use the elapsed clock at the moment of tap.</div>
+              </div>
+            ` : ""}
+            <div style="text-align:center;margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+              ${finished
+                ? `<button class="btn" onclick="doReopenRaceClock('${div}')">↻ Reopen Race</button>`
+                : `<button class="btn btn-primary" onclick="doFinishRace('${div}')">✓ Finish Race</button>`}
+              <button class="btn btn-danger" onclick="doResetRace('${div}')">Reset This Race</button>
+            </div>
+          `}
         </div>
       </div>
       <div style="background:var(--bg-2);border-left:1px solid var(--line);padding:22px;">
@@ -2336,11 +2367,11 @@ function renderTimerDesktop(div) {
     </div>`;
 
   if (State.tickTimer) clearInterval(State.tickTimer);
-  if (started) {
+  if (started && !finished) {
     State.tickTimer = setInterval(() => {
       const el = $("t-clock");
       const r = raceFor(div);
-      if (el && r?.start_time) el.textContent = fmtTime(Date.now() - r.start_time);
+      if (el && r?.start_time && !r.finished_at) el.textContent = fmtTime(Date.now() - r.start_time);
     }, 50);
   }
   $("start-btn")?.addEventListener("click", () => doStartRace(div));
@@ -2404,7 +2435,7 @@ function attachTapHandler(tapBtn, div, code, isMobile) {
 function renderCompletedNotice() {
   const code = State.meet.code;
   $("app").innerHTML = `
-    ${header("MEET COMPLETED", `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+    ${header("MEET COMPLETED", `<button class="btn btn-hub btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
     <div class="wrap-narrow" style="text-align:center;">
       <div class="display" style="font-size:64px;color:var(--green);">✓ COMPLETED</div>
       <div class="ui" style="color:var(--ink-dim);margin-top:12px;">This meet is marked complete.</div>
@@ -2428,11 +2459,43 @@ async function doResetRace(div) {
   if (!confirm(`Reset ${divLabel(div)} race? Clears taps and finishes.`)) return;
   const code = State.meet.code; const token = MeetAuth.get(code);
   if (!token) return ensureAuth(code, () => doResetRace(div));
-  const r = raceFor(div); if (r) r.start_time = null;
+  const r = raceFor(div); if (r) { r.start_time = null; r.finished_at = null; r.final_time_ms = null; }
   State.taps = State.taps.filter(t => t.division !== div);
   State.results = State.results.filter(x => x.division !== div);
   render();
   const { error } = await sb.rpc("reset_race", { p_token: token, p_meet: code, p_division: div });
+  if (error) { alert("Failed: " + error.message); await loadMeet(code); render(); }
+}
+
+async function doFinishRace(div) {
+  if (!confirm(`Finish ${divLabel(div)} race? The clock will stop. You can reopen it later if needed.`)) return;
+  const code = State.meet.code; const token = MeetAuth.get(code);
+  if (!token) return ensureAuth(code, () => doFinishRace(div));
+  const r = raceFor(div);
+  if (!r?.start_time) return alert("Race has not been started.");
+  // Optimistic update
+  const elapsed = Date.now() - r.start_time;
+  r.finished_at = new Date().toISOString();
+  r.final_time_ms = elapsed;
+  if (State.tickTimer) { clearInterval(State.tickTimer); State.tickTimer = null; }
+  render();
+  const { error } = await sb.rpc("finish_race", { p_token: token, p_meet: code, p_division: div });
+  if (error) {
+    alert("Failed: " + error.message);
+    r.finished_at = null; r.final_time_ms = null;
+    render();
+  }
+}
+
+async function doReopenRaceClock(div) {
+  if (!confirm(`Reopen ${divLabel(div)} race? The clock will resume counting from where it would be now.`)) return;
+  const code = State.meet.code; const token = MeetAuth.get(code);
+  if (!token) return ensureAuth(code, () => doReopenRaceClock(div));
+  const r = raceFor(div);
+  if (!r) return;
+  r.finished_at = null; r.final_time_ms = null;
+  render();
+  const { error } = await sb.rpc("reopen_race", { p_token: token, p_meet: code, p_division: div });
   if (error) { alert("Failed: " + error.message); await loadMeet(code); render(); }
 }
 
@@ -2523,7 +2586,7 @@ function renderRecorderMobile(div) {
     <div class="mobile-rec-screen">
       <div class="m-rec-top">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-          <button class="m-back" onclick="_mobileBibBuffer='';go('m/${code}')">← Hub</button>
+          <button class="m-back" style="color:var(--gold);border-color:var(--gold);" onclick="_mobileBibBuffer='';go('m/${code}')">← Hub</button>
           <span class="m-div-pill">${div} · ${esc(divLabel(div))}</span>
           <button class="m-back" onclick="_mobileBibBuffer='';go('m/${code}/recorder')">↺ Race</button>
         </div>
@@ -2683,7 +2746,7 @@ function renderRecorderDesktop(div) {
   $("app").innerHTML = `
     ${header(`RECORDER · ${div} · ${esc(divLabel(div))}`,
       `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}/recorder')">↺ Switch Race</button>
-       <button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+       <button class="btn btn-hub btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
     <div class="timer-grid">
       <div style="padding:32px;">
         <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.25em;margin-bottom:8px;">NEXT FINISHER · ${div}</div>
@@ -2848,7 +2911,7 @@ function renderResults() {
   }
 
   $("app").innerHTML = `
-    ${header(`RESULTS · ${code}`, `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+    ${header(`RESULTS · ${code}`, `<button class="btn btn-hub btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
     <div class="wrap">
       <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:16px;">
         <div>
