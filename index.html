@@ -219,6 +219,164 @@
     border: 1px solid var(--gold); border-radius: 12px; padding: 18px 22px;
     display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap;
     margin-bottom: 24px; }
+
+  /* ============================ MOBILE RACE-DAY ============================ */
+  .mobile-timer-screen {
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; flex-direction: column; touch-action: manipulation;
+    -webkit-user-select: none; user-select: none; overflow: hidden;
+  }
+  .m-top {
+    flex: 0 0 30%;
+    display: flex; flex-direction: column; padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+  }
+  .m-top-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px; gap: 8px;
+  }
+  .m-back {
+    background: var(--panel); color: var(--ink); border: 1px solid var(--line);
+    padding: 8px 12px; border-radius: 8px; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; touch-action: manipulation;
+  }
+  .m-div-pill {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--gold); background: rgba(212,168,81,0.1);
+    padding: 6px 12px; border-radius: 6px; letter-spacing: 0.15em;
+  }
+  .m-clock {
+    font-family: 'Bebas Neue', sans-serif;
+    background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    font-size: clamp(48px, 14vw, 96px); line-height: 0.9;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
+    text-align: center;
+  }
+  .m-counter-row {
+    display: flex; justify-content: space-around; align-items: baseline;
+    margin-top: 6px; padding-top: 6px;
+  }
+  .m-counter-block { text-align: center; }
+  .m-counter-block .v {
+    font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 9vw, 64px);
+    line-height: 1; color: var(--gold-2); font-variant-numeric: tabular-nums;
+  }
+  .m-counter-block .l {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    color: var(--ink-dim); letter-spacing: 0.2em; text-transform: uppercase;
+  }
+  .m-tap-zone {
+    flex: 1; min-height: 0;
+    background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+    color: #1a1408; border: none; cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.1em;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    position: relative; overflow: hidden;
+    box-shadow: inset 0 4px 0 rgba(255,255,255,0.15);
+  }
+  .m-tap-zone:active { background: linear-gradient(180deg, #fff 0%, var(--gold-2) 100%); }
+  .m-tap-zone.flash-tap { animation: tapflash 0.15s ease-out; }
+  @keyframes tapflash { 0% { background: #fff !important; } 100% {} }
+  .m-tap-label { font-size: clamp(48px, 12vw, 88px); line-height: 0.9; margin-bottom: 8px; }
+  .m-tap-sub { font-size: 13px; opacity: 0.6; letter-spacing: 0.2em; }
+  .m-tap-pop {
+    position: absolute; top: 12px; right: 16px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 24px;
+    background: rgba(26,20,8,0.2); padding: 4px 10px; border-radius: 6px;
+    pointer-events: none; opacity: 0;
+  }
+  .m-tap-pop.show { animation: poprise 1s ease-out; }
+  @keyframes poprise {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-30px); }
+  }
+  .m-start-zone {
+    flex: 1; min-height: 0;
+    background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold) 100%);
+    color: #1a1408; border: none; cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.1em;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(36px, 11vw, 72px); touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ---- Mobile Recorder ---- */
+  .mobile-rec-screen {
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; flex-direction: column; touch-action: manipulation;
+    overflow: hidden;
+  }
+  .m-rec-top {
+    flex: 0 0 auto; padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+  }
+  .m-rec-status {
+    font-family: 'Bebas Neue', sans-serif; font-size: 28px; line-height: 1;
+    text-align: center; padding: 8px 0;
+  }
+  .m-rec-time {
+    font-family: 'JetBrains Mono', monospace; font-size: 15px;
+    color: var(--ink-dim); text-align: center; margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .m-rec-display {
+    background: var(--bg-2); border: 2px solid var(--gold);
+    border-radius: 12px; padding: 18px;
+    margin: 12px 0; text-align: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 56px;
+    font-variant-numeric: tabular-nums; letter-spacing: 0.15em;
+    color: var(--gold); min-height: 88px;
+  }
+  .m-rec-display.empty { color: var(--ink-dim); }
+  .m-rec-preview {
+    padding: 10px 14px; background: var(--panel); border-left: 3px solid var(--green);
+    border-radius: 0 8px 8px 0; margin-bottom: 10px;
+  }
+  .m-rec-preview.mismatch { border-left-color: var(--red); }
+  .m-rec-preview .nm { font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; }
+  .m-rec-preview .mt { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-dim); margin-top: 2px; }
+  .m-keypad {
+    flex: 1; min-height: 0; display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 6px; padding: 6px;
+  }
+  .m-key {
+    background: linear-gradient(180deg, var(--panel-2) 0%, var(--panel) 100%);
+    border: 1px solid var(--line); border-radius: 12px;
+    color: var(--ink); font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 8vw, 56px); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none; user-select: none;
+    transition: background 0.05s;
+  }
+  .m-key:active { background: var(--gold); color: #1a1408; }
+  .m-key.back { color: var(--red); font-size: 28px; }
+  .m-key.submit { background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%); color: #1a1408; font-size: 20px; letter-spacing: 0.1em; }
+  .m-key.submit:active { background: #fff; }
+  .m-key.undo { color: var(--ink-dim); font-size: 18px; letter-spacing: 0.1em; }
+  .m-key:disabled { opacity: 0.3; }
+
+  /* ---- Results collapsible ---- */
+  .result-section { margin-bottom: 24px; border: 1px solid var(--line); border-radius: 14px;
+    background: linear-gradient(180deg, var(--panel) 0%, var(--bg-2) 100%); overflow: hidden; }
+  .result-section-header {
+    padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; cursor: pointer; flex-wrap: wrap; transition: background 0.15s;
+  }
+  .result-section-header:hover { background: var(--panel-2); }
+  .result-section-header .caret { font-family: monospace; color: var(--gold); transition: transform 0.2s; font-size: 18px; }
+  .result-section.collapsed .caret { transform: rotate(-90deg); }
+  .result-section-body { padding: 0 20px 20px; }
+  .result-section.collapsed .result-section-body { display: none; }
+  .result-section-summary { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11px;
+    color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
+  .result-section-summary .winner { color: var(--gold); }
 </style>
 </head>
 <body>
@@ -264,6 +422,27 @@ function playBeep() {
   } catch (e) {}
   try { if (navigator.vibrate) navigator.vibrate(45); } catch(e){}
 }
+
+/* ============================ WAKE LOCK + MOBILE ============================ */
+let _wakeLock = null;
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    _wakeLock = await navigator.wakeLock.request('screen');
+    _wakeLock.addEventListener('release', () => { _wakeLock = null; });
+  } catch (e) { console.log('Wake lock failed:', e.message); }
+}
+async function releaseWakeLock() {
+  try { if (_wakeLock) { await _wakeLock.release(); _wakeLock = null; } } catch(e){}
+}
+// Re-request wake lock when tab becomes visible again
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' &&
+      (State.route.view === 'timer' || State.route.view === 'recorder')) {
+    requestWakeLock();
+  }
+});
+function isMobileViewport() { return window.innerWidth < 900; }
 
 /* ============================ HELPERS ============================ */
 const pad = (n, w = 2) => String(n).padStart(w, "0");
@@ -411,9 +590,14 @@ window.addEventListener("hashchange", handleRoute);
 async function handleRoute() {
   const next = parseHash();
   const wasMeet = State.route.name === "meet";
+  const wasTimerOrRec = wasMeet && (State.route.view === "timer" || State.route.view === "recorder");
   const sameMeet = wasMeet && next.name === "meet" && next.code === State.route.code;
   State.route = next;
   if (next.division) State.selectedDivision = next.division;
+
+  // Release wake lock when leaving timer/recorder
+  const nowTimerOrRec = next.name === "meet" && (next.view === "timer" || next.view === "recorder");
+  if (wasTimerOrRec && !nowTimerOrRec) releaseWakeLock();
 
   if (next.name !== "meet" && wasMeet) await teardownMeet();
   if (next.name === "meet" && !sameMeet) { State.loading = true; render(); await loadMeet(next.code); State.loading = false; }
@@ -1705,11 +1889,67 @@ function renderTimer() {
   if (State.meet.status === "completed") return renderCompletedNotice();
   const div = State.route.division;
   if (!div) return renderDivPicker("timer");
+  if (isMobileViewport()) return renderTimerMobile(div);
+  return renderTimerDesktop(div);
+}
+
+function renderTimerMobile(div) {
+  const code = State.meet.code;
+  const race = raceFor(div) || { start_time: null };
+  const started = race.start_time != null;
+  const taps = tapsForDiv(div);
+  const results = resultsForDiv(div);
+  requestWakeLock();
+
+  $("app").innerHTML = `
+    <div class="mobile-timer-screen">
+      <div class="m-top">
+        <div class="m-top-row">
+          <button class="m-back" onclick="go('m/${code}')">← Hub</button>
+          <span class="m-div-pill">${div} · ${esc(divLabel(div))}</span>
+          <button class="m-back" onclick="go('m/${code}/timer')">↺ Race</button>
+        </div>
+        <div id="t-clock" class="m-clock">${fmtTime(started ? Date.now() - race.start_time : 0)}</div>
+        ${started ? `
+          <div class="m-counter-row">
+            <div class="m-counter-block"><div class="v" id="tap-count">${taps.length}</div><div class="l">Tapped</div></div>
+            <div class="m-counter-block"><div class="v" style="color:var(--green);">${results.length}</div><div class="l">Matched</div></div>
+            <div class="m-counter-block"><div class="v" style="color:${taps.length-results.length?'var(--gold)':'var(--ink-dim)'};">${taps.length - results.length}</div><div class="l">Pending</div></div>
+          </div>` : ""}
+      </div>
+      ${started
+        ? `<button id="tap-btn" class="m-tap-zone">
+             <div class="m-tap-label">TAP</div>
+             <div class="m-tap-sub">FINISH LINE</div>
+             <div id="tap-pop" class="m-tap-pop"></div>
+           </button>
+           <div style="background:var(--bg-2);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);">
+             <span class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.2em;">LAST: ${taps.length ? fmtTime(taps[taps.length-1].time_ms) : '—'}</span>
+             <button class="btn btn-danger btn-sm" onclick="doResetRace('${div}')">Reset</button>
+           </div>`
+        : `<button id="start-btn" class="m-start-zone">START RACE ▶</button>`}
+    </div>`;
+
+  if (State.tickTimer) clearInterval(State.tickTimer);
+  if (started) {
+    State.tickTimer = setInterval(() => {
+      const el = $("t-clock");
+      const r = raceFor(div);
+      if (el && r?.start_time) el.textContent = fmtTime(Date.now() - r.start_time);
+    }, 50);
+  }
+  $("start-btn")?.addEventListener("click", () => doStartRace(div));
+  attachTapHandler($("tap-btn"), div, code, true);
+}
+
+function renderTimerDesktop(div) {
+  const code = State.meet.code;
   const race = raceFor(div) || { start_time: null };
   const started = race.start_time != null;
   const taps = tapsForDiv(div);
   const results = resultsForDiv(div);
   const lastTaps = [...taps].slice(-8).reverse();
+  requestWakeLock();
 
   $("app").innerHTML = `
     ${header(`TIMER · ${div} · ${esc(divLabel(div))}`,
@@ -1758,50 +1998,61 @@ function renderTimer() {
       if (el && r?.start_time) el.textContent = fmtTime(Date.now() - r.start_time);
     }, 50);
   }
-
   $("start-btn")?.addEventListener("click", () => doStartRace(div));
+  attachTapHandler($("tap-btn"), div, code, false);
+}
 
-  const tapBtn = $("tap-btn");
-  if (tapBtn) {
-    let cooling = false;
-    tapBtn.addEventListener("click", async () => {
-      if (cooling) return;
-      cooling = true;
-      setTimeout(() => cooling = false, 100);
-      playBeep();
-      tapBtn.classList.add("flash");
-      setTimeout(() => tapBtn.classList.remove("flash"), 400);
+function attachTapHandler(tapBtn, div, code, isMobile) {
+  if (!tapBtn) return;
+  let cooling = false;
+  tapBtn.addEventListener("click", async () => {
+    if (cooling) return;
+    cooling = true;
+    setTimeout(() => cooling = false, 100);
+    playBeep();
+    if (isMobile) tapBtn.classList.add("flash-tap");
+    else tapBtn.classList.add("flash");
+    setTimeout(() => tapBtn.classList.remove(isMobile ? "flash-tap" : "flash"), 400);
 
-      const token = MeetAuth.get(code);
-      if (!token) return ensureAuth(code, () => {});
-      const r = raceFor(div);
-      if (!r?.start_time) return;
-      const t = Date.now() - r.start_time;
+    const token = MeetAuth.get(code);
+    if (!token) return ensureAuth(code, () => {});
+    const r = raceFor(div);
+    if (!r?.start_time) return;
+    const t = Date.now() - r.start_time;
 
-      const nextPlace = tapsForDiv(div).length + 1;
-      State.taps.push({ meet_code: code, division: div, place: nextPlace, time_ms: t });
-      const counter = $("tap-count");
-      if (counter) {
-        counter.textContent = nextPlace;
-        counter.classList.remove("pop");
-        void counter.offsetWidth; // restart animation
-        counter.classList.add("pop");
+    const nextPlace = tapsForDiv(div).length + 1;
+    State.taps.push({ meet_code: code, division: div, place: nextPlace, time_ms: t });
+    const counter = $("tap-count");
+    if (counter) {
+      counter.textContent = nextPlace;
+      counter.classList.remove("pop");
+      void counter.offsetWidth;
+      counter.classList.add("pop");
+    }
+    if (isMobile) {
+      const pop = $("tap-pop");
+      if (pop) {
+        pop.textContent = `+${nextPlace}`;
+        pop.classList.remove("show");
+        void pop.offsetWidth;
+        pop.classList.add("show");
       }
+    } else {
       render();
+    }
 
-      const { error } = await sb.rpc("add_tap", { p_token: token, p_meet: code, p_division: div, p_time_ms: t });
-      if (error) {
-        console.error("tap failed", error);
-        State.taps = State.taps.filter(x => !(x.division === div && x.place === nextPlace));
-        render();
-        if (error.message?.includes("Not authorized")) {
-          MeetAuth.clear(code);
-          alert("Session expired.");
-          ensureAuth(code, () => render());
-        }
+    const { error } = await sb.rpc("add_tap", { p_token: token, p_meet: code, p_division: div, p_time_ms: t });
+    if (error) {
+      console.error("tap failed", error);
+      State.taps = State.taps.filter(x => !(x.division === div && x.place === nextPlace));
+      if (!isMobile) render();
+      if (error.message?.includes("Not authorized")) {
+        MeetAuth.clear(code);
+        alert("Session expired.");
+        ensureAuth(code, () => render());
       }
-    });
-  }
+    }
+  });
 }
 
 function renderCompletedNotice() {
@@ -1846,11 +2097,186 @@ function renderRecorder() {
   if (State.meet.status === "completed") return renderCompletedNotice();
   const div = State.route.division;
   if (!div) return renderDivPicker("recorder");
+  if (isMobileViewport()) return renderRecorderMobile(div);
+  return renderRecorderDesktop(div);
+}
+
+let _mobileBibBuffer = "";
+let _mobileInputMode = (localStorage.getItem("xc.recorderInputMode") || "keypad"); // "keypad" or "native"
+
+function setRecorderInputMode(mode) {
+  _mobileInputMode = mode;
+  localStorage.setItem("xc.recorderInputMode", mode);
+  _mobileBibBuffer = "";
+  renderRecorderMobile(State.route.division);
+}
+
+function renderRecorderMobile(div) {
+  const code = State.meet.code;
+  const taps = tapsForDiv(div);
+  const results = resultsForDiv(div);
+  const nextPlace = results.length + 1;
+  const nextTap = taps.find(t => t.place === nextPlace);
+  requestWakeLock();
+
+  const buf = _mobileBibBuffer.padStart(4, "0");
+  const previewRunner = _mobileBibBuffer ? State.runnersByBib[buf] : null;
+  const previewDiv = previewRunner ? divFromRunner(previewRunner) : null;
+  const mismatched = previewRunner && previewDiv && previewDiv !== div;
+
+  $("app").innerHTML = `
+    <div class="mobile-rec-screen">
+      <div class="m-rec-top">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <button class="m-back" onclick="_mobileBibBuffer='';go('m/${code}')">← Hub</button>
+          <span class="m-div-pill">${div} · ${esc(divLabel(div))}</span>
+          <button class="m-back" onclick="_mobileBibBuffer='';go('m/${code}/recorder')">↺ Race</button>
+        </div>
+        <div class="m-rec-status">PLACE <span style="color:var(--gold);">${pad(nextPlace, 3)}</span></div>
+        <div class="m-rec-time">${nextTap ? `⏱ ${fmtTime(nextTap.time_ms)}` : "WAITING FOR TAP…"}</div>
+        ${_mobileInputMode === "keypad" ? `
+          <div class="m-rec-display ${_mobileBibBuffer?'':'empty'}">
+            ${_mobileBibBuffer ? esc(buf) : "0000"}
+          </div>` : `
+          <input id="m-rec-input" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="0000"
+            class="m-rec-display" style="width:100%;outline:none;text-align:center;background:var(--bg-2);"
+            value="${esc(_mobileBibBuffer)}" autofocus />`}
+        ${previewRunner ? `
+          <div class="m-rec-preview ${mismatched?'mismatch':''}">
+            <div class="nm">${esc(previewRunner.first)} ${esc(previewRunner.last)}</div>
+            <div class="mt">${esc(previewRunner.team)} · DIV ${previewDiv || "—"}${mismatched?` ⚠ should be ${previewDiv}`:''}</div>
+          </div>` : ""}
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-dim);letter-spacing:0.15em;">
+            ${taps.length} TAPS · ${results.length} MATCHED · ${taps.length - results.length} PENDING
+          </div>
+          <div style="display:flex;gap:4px;">
+            <button class="m-back ${_mobileInputMode==='keypad'?'':'btn-ghost'}" style="${_mobileInputMode==='keypad'?'background:var(--gold);color:#1a1408;border-color:var(--gold);':''}font-size:9px;padding:6px 8px;" onclick="setRecorderInputMode('keypad')">KEYPAD</button>
+            <button class="m-back ${_mobileInputMode==='native'?'':'btn-ghost'}" style="${_mobileInputMode==='native'?'background:var(--gold);color:#1a1408;border-color:var(--gold);':''}font-size:9px;padding:6px 8px;" onclick="setRecorderInputMode('native')">NATIVE</button>
+          </div>
+        </div>
+      </div>
+      ${_mobileInputMode === "keypad" ? `
+        <div class="m-keypad">
+          ${[1,2,3,4,5,6,7,8,9].map(n => `<button class="m-key" onclick="mobileBibKey('${n}')">${n}</button>`).join("")}
+          <button class="m-key undo" onclick="mobileBibUndo('${div}')" ${results.length?'':'disabled'}>UNDO</button>
+          <button class="m-key" onclick="mobileBibKey('0')">0</button>
+          <button class="m-key back" onclick="mobileBibKey('back')">⌫</button>
+          <button class="m-key submit" style="grid-column:1/-1;" onclick="mobileBibSubmit('${div}')" ${(nextTap && _mobileBibBuffer)?'':'disabled'}>RECORD ↵</button>
+        </div>` : `
+        <div style="padding:16px;display:flex;flex-direction:column;gap:10px;">
+          <button class="m-key submit" style="padding:24px;font-size:24px;" onclick="mobileBibSubmit('${div}')" ${(nextTap && _mobileBibBuffer)?'':'disabled'}>RECORD ↵</button>
+          <button class="m-key undo" style="padding:18px;font-size:14px;background:var(--panel);" onclick="mobileBibUndo('${div}')" ${results.length?'':'disabled'}>UNDO LAST</button>
+          <div class="ui" style="font-size:12px;color:var(--ink-dim);text-align:center;padding:10px;">
+            Native input uses your phone's number keyboard. Tap the bib field above to type.
+          </div>
+        </div>`}
+    </div>`;
+
+  // Wire up the native input
+  if (_mobileInputMode === "native") {
+    const inp = $("m-rec-input");
+    if (inp) {
+      inp.addEventListener("input", (e) => {
+        _mobileBibBuffer = e.target.value.replace(/\D/g, "").slice(0, 4);
+        // Soft re-render to update preview without losing focus
+        updateMobileNativePreview(div);
+      });
+      inp.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); mobileBibSubmit(div); }
+      });
+    }
+  }
+}
+
+function updateMobileNativePreview(div) {
+  // Update the preview block + submit-button enabled state without re-rendering whole screen
+  const buf = _mobileBibBuffer.padStart(4, "0");
+  const previewRunner = _mobileBibBuffer ? State.runnersByBib[buf] : null;
+  const previewDiv = previewRunner ? divFromRunner(previewRunner) : null;
+  const mismatched = previewRunner && previewDiv && previewDiv !== div;
+
+  // Remove old preview if present
+  const existing = document.querySelector(".m-rec-preview");
+  if (existing) existing.remove();
+
+  if (previewRunner) {
+    const newPreview = document.createElement("div");
+    newPreview.className = "m-rec-preview" + (mismatched ? " mismatch" : "");
+    newPreview.innerHTML = `
+      <div class="nm">${esc(previewRunner.first)} ${esc(previewRunner.last)}</div>
+      <div class="mt">${esc(previewRunner.team)} · DIV ${previewDiv || "—"}${mismatched?` ⚠ should be ${previewDiv}`:''}</div>`;
+    // Insert after the input
+    const inp = $("m-rec-input");
+    inp?.parentNode?.insertBefore(newPreview, inp.nextSibling);
+  }
+
+  // Update submit button enabled state
+  const submitBtn = document.querySelector(".m-key.submit");
+  const taps = tapsForDiv(div);
+  const nextPlace = resultsForDiv(div).length + 1;
+  const nextTap = taps.find(t => t.place === nextPlace);
+  if (submitBtn) submitBtn.disabled = !(nextTap && _mobileBibBuffer);
+}
+
+function mobileBibKey(k) {
+  if (k === 'back') {
+    _mobileBibBuffer = _mobileBibBuffer.slice(0, -1);
+  } else if (_mobileBibBuffer.length < 4) {
+    _mobileBibBuffer += k;
+  }
+  // Tiny vibration on keypress
+  try { if (navigator.vibrate) navigator.vibrate(15); } catch(e){}
+  renderRecorderMobile(State.route.division);
+}
+
+async function mobileBibSubmit(div) {
+  const raw = _mobileBibBuffer;
+  if (!raw) return;
+  const bib = raw.padStart(4, "0");
+  const runner = State.runnersByBib[bib];
+  if (!runner) { alert(`No runner with bib ${bib}`); return; }
+  if (State.results.find(r => r.division === div && r.bib === bib)) {
+    alert(`Bib ${bib} already recorded`); return;
+  }
+  const runnerDiv = divFromRunner(runner);
+  if (runnerDiv && runnerDiv !== div) {
+    if (!confirm(`Bib ${bib} (${runner.first} ${runner.last}) belongs to ${runnerDiv}, not ${div}. Record anyway?`)) return;
+  }
+  const code = State.meet.code;
+  const token = MeetAuth.get(code);
+  if (!token) return ensureAuth(code, () => mobileBibSubmit(div));
+  const nextPlace = resultsForDiv(div).length + 1;
+  const nextTap = tapsForDiv(div).find(t => t.place === nextPlace);
+  if (!nextTap) { alert("No tap to match yet."); return; }
+
+  State.results.push({ meet_code: code, division: div, place: nextPlace, bib, time_ms: nextTap.time_ms });
+  _mobileBibBuffer = "";
+  try { if (navigator.vibrate) navigator.vibrate([30, 30, 30]); } catch(e){}
+  renderRecorderMobile(div);
+
+  const { error } = await sb.rpc("add_result", { p_token: token, p_meet: code, p_division: div, p_bib: bib });
+  if (error) {
+    State.results = State.results.filter(r => !(r.division === div && r.place === nextPlace && r.bib === bib));
+    renderRecorderMobile(div);
+    alert("Failed: " + error.message);
+  }
+}
+
+async function mobileBibUndo(div) {
+  const code = State.meet.code;
+  await doUndo(div);
+  renderRecorderMobile(div);
+}
+
+function renderRecorderDesktop(div) {
+  const code = State.meet.code;
   const taps = tapsForDiv(div);
   const results = resultsForDiv(div);
   const nextPlace = results.length + 1;
   const nextTap = taps.find(t => t.place === nextPlace);
   const recent = [...results].slice(-10).reverse();
+  requestWakeLock();
   $("app").innerHTML = `
     ${header(`RECORDER · ${div} · ${esc(divLabel(div))}`,
       `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}/recorder')">↺ Switch Race</button>
@@ -1963,12 +2389,61 @@ async function doUndo(div) {
 }
 
 /* ============================ RESULTS ============================ */
+const _collapsedDivs = new Set(); // divisions that are collapsed
+
+function toggleResultDiv(div) {
+  if (_collapsedDivs.has(div)) _collapsedDivs.delete(div);
+  else _collapsedDivs.add(div);
+  // Persist for session
+  try { sessionStorage.setItem("xc.collapsedDivs", JSON.stringify([..._collapsedDivs])); } catch(e){}
+  render();
+}
+function expandAllResults() {
+  _collapsedDivs.clear();
+  try { sessionStorage.setItem("xc.collapsedDivs", "[]"); } catch(e){}
+  render();
+}
+function collapseAllResults() {
+  const divs = computeDivisions().filter(d => resultsForDiv(d.division).length > 0);
+  divs.forEach(d => _collapsedDivs.add(d.division));
+  try { sessionStorage.setItem("xc.collapsedDivs", JSON.stringify([..._collapsedDivs])); } catch(e){}
+  render();
+}
+// Restore on load
+try {
+  const stored = sessionStorage.getItem("xc.collapsedDivs");
+  if (stored) JSON.parse(stored).forEach(d => _collapsedDivs.add(d));
+} catch(e){}
+
 function renderResults() {
   const code = State.meet.code;
   const divs = computeDivisions().filter(d => resultsForDiv(d.division).length > 0);
   const m = State.meet;
   const publicLink = `${location.origin}${location.pathname}#/m/${code}/results`;
   const isCompleted = m.status === "completed";
+
+  // Default state: latest active race open (most recent finisher activity), rest collapsed.
+  // Applied once per meet per session.
+  if (divs.length > 1) {
+    const firstDefault = sessionStorage.getItem("xc.resultsDefaultApplied");
+    if (firstDefault !== code) {
+      // Find division with most recent result
+      let latestDiv = divs[0].division;
+      let latestTs = 0;
+      for (const d of divs) {
+        const lastResult = resultsForDiv(d.division).slice(-1)[0];
+        if (lastResult) {
+          const ts = lastResult.recorded_at ? new Date(lastResult.recorded_at).getTime() : 0;
+          if (ts >= latestTs) { latestTs = ts; latestDiv = d.division; }
+        }
+      }
+      _collapsedDivs.clear();
+      divs.forEach(d => { if (d.division !== latestDiv) _collapsedDivs.add(d.division); });
+      sessionStorage.setItem("xc.resultsDefaultApplied", code);
+      sessionStorage.setItem("xc.collapsedDivs", JSON.stringify([..._collapsedDivs]));
+    }
+  }
+
   $("app").innerHTML = `
     ${header(`RESULTS · ${code}`, `<button class="btn btn-ghost btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
     <div class="wrap">
@@ -1988,60 +2463,83 @@ function renderResults() {
         </div>
       </div>
       <div id="link-copied" class="ok" style="display:none;text-align:right;">✓ Link copied.</div>
+
+      ${divs.length > 1 ? `
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="expandAllResults()">▼ Expand All</button>
+          <button class="btn btn-ghost btn-sm" onclick="collapseAllResults()">▶ Collapse All</button>
+          <span class="ui" style="font-size:11px;color:var(--ink-dim);align-self:center;margin-left:8px;">Tap any race header to expand/collapse</span>
+        </div>` : ""}
+
       ${divs.length === 0 ? `<div class="panel" style="padding:48px;text-align:center;color:var(--ink-dim);">No results recorded yet.</div>` :
         divs.map(d => renderResultBlock(d.division)).join("")}
     </div>`;
 }
+
 function renderResultBlock(div) {
   const divResults = resultsForDiv(div);
   const teamScores = scoreRace(divResults, State.runnersByBib);
   const scorePlaceLookup = {};
   teamScores.forEach(t => t.runners.forEach(r => { scorePlaceLookup[r.bib] = r.scorePlace; }));
   const sorted = [...divResults].sort((a, b) => a.place - b.place);
+  const winner = teamScores.find(t => t.rank === 1);
+  const isCollapsed = _collapsedDivs.has(div);
+
   return `
-    <div style="margin-bottom:48px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
-        <div class="display" style="font-size:30px;letter-spacing:0.05em;color:var(--gold-2);">▰ ${esc(divLabel(div))} <span style="color:var(--ink-dim);font-size:18px;">[${div}]</span></div>
-        <button class="btn btn-ghost btn-sm" onclick="doExportDivCSV('${div}')">⬇ CSV · ${div}</button>
+    <div class="result-section ${isCollapsed?'collapsed':''}">
+      <div class="result-section-header" onclick="toggleResultDiv('${div}')">
+        <div style="flex:1;min-width:0;">
+          <div class="display" style="font-size:26px;letter-spacing:0.04em;color:var(--gold-2);">
+            <span class="caret">▼</span> ${esc(divLabel(div))} <span style="color:var(--ink-dim);font-size:15px;">[${div}]</span>
+          </div>
+          <div class="result-section-summary">
+            <span>${sorted.length} FINISHERS</span>
+            ${winner ? `<span class="winner">🏆 ${esc(winner.team).toUpperCase()} · ${winner.total}</span>` : ""}
+            <span>${teamScores.filter(t => t.isScoring).length} SCORING TEAM${teamScores.filter(t => t.isScoring).length===1?'':'S'}</span>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();doExportDivCSV('${div}')">⬇ CSV</button>
       </div>
-      <div class="panel" style="margin-bottom:16px;">
-        ${teamScores.length === 0 ? `<div class="ui" style="padding:24px;text-align:center;color:var(--ink-dim);">No finishers yet.</div>` : `
-        <table>
-          <thead><tr><th>RANK</th><th>TEAM</th><th>SCORE</th><th>FINISHERS</th><th>TOP 5</th><th>6TH</th><th>7TH</th></tr></thead>
-          <tbody>
-            ${teamScores.map(t => `<tr>
-              <td>${t.rank ? `<span class="display" style="font-size:32px;color:${t.rank===1?"var(--gold)":"var(--ink)"};">${t.rank===1?"🏆 ":""}${t.rank}</span>` : `<span class="mono" style="font-size:11px;color:var(--ink-dim);">—</span>`}</td>
-              <td class="ui" style="font-size:16px;font-weight:600;">${esc(t.team)}</td>
-              <td class="display" style="font-size:28px;color:${t.rank===1?"var(--gold)":"var(--ink)"};">${t.isScoring ? t.total : "INC"}</td>
-              <td class="mono" style="color:var(--ink-dim);">${t.finishers}</td>
-              <td class="mono">${t.isScoring ? t.runners.slice(0,5).map(r=>r.scorePlace).join(" + ") : `<span style="color:var(--ink-dim);">needs 5</span>`}</td>
-              <td class="mono" style="color:var(--ink-dim);">${t.sixth || "—"}</td>
-              <td class="mono" style="color:var(--ink-dim);">${t.seventh || "—"}</td>
-            </tr>`).join("")}
-          </tbody>
-        </table>`}
+      <div class="result-section-body">
+        <div class="panel" style="margin-bottom:16px;">
+          ${teamScores.length === 0 ? `<div class="ui" style="padding:24px;text-align:center;color:var(--ink-dim);">No finishers yet.</div>` : `
+          <table>
+            <thead><tr><th>RANK</th><th>TEAM</th><th>SCORE</th><th>FINISHERS</th><th>TOP 5</th><th>6TH</th><th>7TH</th></tr></thead>
+            <tbody>
+              ${teamScores.map(t => `<tr>
+                <td>${t.rank ? `<span class="display" style="font-size:32px;color:${t.rank===1?"var(--gold)":"var(--ink)"};">${t.rank===1?"🏆 ":""}${t.rank}</span>` : `<span class="mono" style="font-size:11px;color:var(--ink-dim);">—</span>`}</td>
+                <td class="ui" style="font-size:16px;font-weight:600;">${esc(t.team)}</td>
+                <td class="display" style="font-size:28px;color:${t.rank===1?"var(--gold)":"var(--ink)"};">${t.isScoring ? t.total : "INC"}</td>
+                <td class="mono" style="color:var(--ink-dim);">${t.finishers}</td>
+                <td class="mono">${t.isScoring ? t.runners.slice(0,5).map(r=>r.scorePlace).join(" + ") : `<span style="color:var(--ink-dim);">needs 5</span>`}</td>
+                <td class="mono" style="color:var(--ink-dim);">${t.sixth || "—"}</td>
+                <td class="mono" style="color:var(--ink-dim);">${t.seventh || "—"}</td>
+              </tr>`).join("")}
+            </tbody>
+          </table>`}
+        </div>
+        ${sorted.length > 0 ? `
+        <div class="panel">
+          <table>
+            <thead><tr><th>PLACE</th><th>SCORE PL</th><th>BIB</th><th>NAME</th><th>TEAM</th><th>GR</th><th>TIME</th></tr></thead>
+            <tbody>
+              ${sorted.map(r => {
+                const runner = State.runnersByBib[r.bib];
+                const sp = scorePlaceLookup[r.bib];
+                return `<tr>
+                  <td class="display" style="font-size:22px;color:${r.place<=3?"var(--gold)":"var(--ink)"};">${r.place}</td>
+                  <td class="mono" style="color:${sp?"var(--gold-2)":"var(--ink-dim)"};">${sp || "—"}</td>
+                  <td class="mono" style="color:var(--gold);">${esc(r.bib)}</td>
+                  <td class="ui">${esc(runner?.first || "")} ${esc(runner?.last || "")}</td>
+                  <td class="ui" style="color:var(--ink-dim);">${esc(runner?.team || "")}</td>
+                  <td class="mono" style="color:var(--ink-dim);">${esc(runner?.grade || "")}</td>
+                  <td class="mono" style="font-variant-numeric:tabular-nums;">${fmtTime(r.time_ms)}</td>
+                </tr>`;
+              }).join("")}
+            </tbody>
+          </table>
+        </div>` : ""}
       </div>
-      ${sorted.length > 0 ? `
-      <div class="panel">
-        <table>
-          <thead><tr><th>PLACE</th><th>SCORE PL</th><th>BIB</th><th>NAME</th><th>TEAM</th><th>GR</th><th>TIME</th></tr></thead>
-          <tbody>
-            ${sorted.map(r => {
-              const runner = State.runnersByBib[r.bib];
-              const sp = scorePlaceLookup[r.bib];
-              return `<tr>
-                <td class="display" style="font-size:22px;color:${r.place<=3?"var(--gold)":"var(--ink)"};">${r.place}</td>
-                <td class="mono" style="color:${sp?"var(--gold-2)":"var(--ink-dim)"};">${sp || "—"}</td>
-                <td class="mono" style="color:var(--gold);">${esc(r.bib)}</td>
-                <td class="ui">${esc(runner?.first || "")} ${esc(runner?.last || "")}</td>
-                <td class="ui" style="color:var(--ink-dim);">${esc(runner?.team || "")}</td>
-                <td class="mono" style="color:var(--ink-dim);">${esc(runner?.grade || "")}</td>
-                <td class="mono" style="font-variant-numeric:tabular-nums;">${fmtTime(r.time_ms)}</td>
-              </tr>`;
-            }).join("")}
-          </tbody>
-        </table>
-      </div>` : ""}
     </div>`;
 }
 async function doCopyLink(link) {
