@@ -388,6 +388,11 @@
   .result-section-summary { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11px;
     color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
   .result-section-summary .winner { color: var(--gold); }
+
+  /* Hide on narrow screens */
+  @media (max-width: 700px) {
+    .col-hide-mobile { display: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -2281,13 +2286,11 @@ function renderTimerMobile(div) {
              </div>
            ` : ""}
            <div style="background:var(--bg-2);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);gap:8px;">
-             <span class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.2em;">LAST: ${taps.length ? fmtTime(taps[taps.length-1].time_ms) : '—'}</span>
-             <div style="display:flex;gap:6px;">
-               ${finished
-                 ? `<button class="btn btn-sm" onclick="doReopenRaceClock('${div}')">↻ Reopen</button>`
-                 : `<button class="btn btn-primary btn-sm" onclick="doFinishRace('${div}')">✓ Finish</button>`}
-               <button class="btn btn-danger btn-sm" onclick="doResetRace('${div}')">Reset</button>
-             </div>
+             <button class="btn btn-danger btn-sm" onclick="doResetRace('${div}')">Reset</button>
+             <span class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.2em;flex:1;text-align:center;">LAST: ${taps.length ? fmtTime(taps[taps.length-1].time_ms) : '—'}</span>
+             ${finished
+               ? `<button class="btn btn-sm" onclick="doReopenRaceClock('${div}')">↻ Reopen</button>`
+               : `<button class="btn btn-primary btn-sm" onclick="doFinishRace('${div}')">✓ Finish</button>`}
            </div>`}
     </div>`;
 
@@ -2339,11 +2342,11 @@ function renderTimerDesktop(div) {
                 <div class="ui" style="font-size:12px;color:var(--ink-dim);margin-top:4px;">Taps still allowed for stragglers. Tap times will use the elapsed clock at the moment of tap.</div>
               </div>
             ` : ""}
-            <div style="text-align:center;margin-top:14px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+            <div style="margin-top:14px;display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+              <button class="btn btn-danger" onclick="doResetRace('${div}')">Reset This Race</button>
               ${finished
                 ? `<button class="btn" onclick="doReopenRaceClock('${div}')">↻ Reopen Race</button>`
                 : `<button class="btn btn-primary" onclick="doFinishRace('${div}')">✓ Finish Race</button>`}
-              <button class="btn btn-danger" onclick="doResetRace('${div}')">Reset This Race</button>
             </div>
           `}
         </div>
@@ -2967,9 +2970,9 @@ function renderResultBlock(div) {
         <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();doExportDivCSV('${div}')">⬇ CSV</button>
       </div>
       <div class="result-section-body">
-        <div class="panel" style="margin-bottom:16px;">
+        <div class="panel" style="margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;">
           ${teamScores.length === 0 ? `<div class="ui" style="padding:24px;text-align:center;color:var(--ink-dim);">No finishers yet.</div>` : `
-          <table>
+          <table style="min-width:680px;">
             <thead><tr><th>RANK</th><th>TEAM</th><th>SCORE</th><th>FINISHERS</th><th>TOP 5</th><th>6TH</th><th>7TH</th></tr></thead>
             <tbody>
               ${teamScores.map(t => `<tr>
@@ -2985,21 +2988,20 @@ function renderResultBlock(div) {
           </table>`}
         </div>
         ${sorted.length > 0 ? `
-        <div class="panel">
-          <table>
-            <thead><tr><th>PLACE</th><th>SCORE PL</th><th>BIB</th><th>NAME</th><th>TEAM</th><th>GR</th><th>TIME</th></tr></thead>
+        <div class="panel" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+          <table style="min-width:520px;">
+            <thead><tr><th>PLACE</th><th class="col-hide-mobile" title="Scoring position: position among runners on teams with 5+ finishers. Non-scoring runners get a dash and don't displace.">SCORE POS</th><th>NAME</th><th>TIME</th><th>SCHOOL</th><th>BIB</th></tr></thead>
             <tbody>
               ${sorted.map(r => {
                 const runner = State.runnersByBib[r.bib];
                 const sp = scorePlaceLookup[r.bib];
                 return `<tr>
                   <td class="display" style="font-size:22px;color:${r.place<=3?"var(--gold)":"var(--ink)"};">${r.place}</td>
-                  <td class="mono" style="color:${sp?"var(--gold-2)":"var(--ink-dim)"};">${sp || "—"}</td>
-                  <td class="mono" style="color:var(--gold);">${esc(r.bib)}</td>
+                  <td class="mono col-hide-mobile" style="color:${sp?"var(--gold-2)":"var(--ink-dim)"};">${sp || "—"}</td>
                   <td class="ui">${esc(runner?.first || "")} ${esc(runner?.last || "")}</td>
+                  <td class="mono" style="font-variant-numeric:tabular-nums;color:var(--gold-2);font-weight:700;white-space:nowrap;">${fmtTime(r.time_ms)}</td>
                   <td class="ui" style="color:var(--ink-dim);">${esc(runner?.team || "")}</td>
-                  <td class="mono" style="color:var(--ink-dim);">${esc(runner?.grade || "")}</td>
-                  <td class="mono" style="font-variant-numeric:tabular-nums;">${fmtTime(r.time_ms)}</td>
+                  <td class="mono" style="color:var(--gold);">${esc(r.bib)}</td>
                 </tr>`;
               }).join("")}
             </tbody>
@@ -3052,12 +3054,14 @@ function buildCsvForDiv(div) {
   }
   rows.push([]);
   rows.push(["INDIVIDUAL FINISHERS"]);
-  rows.push(["Place", "Score Place", "Bib", "First", "Last", "Grade", "Gender", "Team", "Time"]);
+  rows.push(["Place", "Score Place", "First", "Last", "Time", "School", "Bib", "Grade", "Gender"]);
   for (const r of [...divResults].sort((a,b)=>a.place-b.place)) {
     const runner = State.runnersByBib[r.bib] || {};
-    rows.push([r.place, scorePlaceLookup[r.bib] || "", r.bib,
-      runner.first || "", runner.last || "", runner.grade || "",
-      runner.gender || "", runner.team || "", fmtTime(r.time_ms)]);
+    rows.push([r.place, scorePlaceLookup[r.bib] || "",
+      runner.first || "", runner.last || "",
+      fmtTime(r.time_ms),
+      runner.team || "", r.bib,
+      runner.grade || "", runner.gender || ""]);
   }
   return rows;
 }
