@@ -393,6 +393,33 @@
   @media (max-width: 700px) {
     .col-hide-mobile { display: none !important; }
   }
+
+  /* ============================ PUBLIC RESULTS PAGE ============================ */
+  .public-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+  .public-hero {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    gap: 20px; flex-wrap: wrap; margin-bottom: 20px;
+    padding-bottom: 20px; border-bottom: 1px solid var(--line);
+  }
+  .public-meet-info { flex: 1; min-width: 0; }
+  .public-title { font-size: 56px; line-height: 0.95; letter-spacing: -0.01em;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-2) 60%, var(--ink) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  @media (max-width: 700px) { .public-title { font-size: 36px; } }
+  .public-meta { font-size: 13px; color: var(--ink-dim); margin-top: 6px; }
+  .public-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+  .public-search { margin-bottom: 28px; position: relative; }
+  .public-search-results {
+    margin-top: 8px; max-height: 320px; overflow: auto;
+    position: absolute; left: 0; right: 0; z-index: 10;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+  }
+  .public-footer { margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--line);
+    text-align: center; }
+  .public-brand { font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-2) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-decoration: none; }
 </style>
 </head>
 <body>
@@ -400,6 +427,7 @@
 <div id="modal-root"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
 <script>
 /* ============================ CONFIG ============================ */
@@ -596,6 +624,8 @@ function parseHash() {
   if (h === "admin") return { name: "admin" };
   const lm = h.match(/^league\/(.+)$/);
   if (lm) return { name: "league", slug: decodeURIComponent(lm[1]) };
+  const pm = h.match(/^p\/([A-Z0-9-]{3,20})$/i);
+  if (pm) return { name: "public", code: pm[1].toUpperCase() };
   const m = h.match(/^m\/([A-Z0-9-]{3,20})(\/(details|roster|timer|recorder|results))?(\/([0-9A-Z]+))?$/i);
   if (m) return { name: "meet", code: m[1].toUpperCase(), view: m[3] || "hub", division: m[5] || null };
   return { name: "landing" };
@@ -615,8 +645,9 @@ async function handleRoute() {
   const nowTimerOrRec = next.name === "meet" && (next.view === "timer" || next.view === "recorder");
   if (wasTimerOrRec && !nowTimerOrRec) releaseWakeLock();
 
-  if (next.name !== "meet" && wasMeet) await teardownMeet();
+  if (next.name !== "meet" && next.name !== "public" && wasMeet) await teardownMeet();
   if (next.name === "meet" && !sameMeet) { State.loading = true; render(); await loadMeet(next.code); State.loading = false; }
+  else if (next.name === "public") { State.loading = true; render(); await loadMeet(next.code); State.loading = false; }
   else if (next.name === "league") { State.loading = true; render(); await loadLeague(next.slug); State.loading = false; }
   else if (next.name === "me") { State.loading = true; render(); await loadMyMeets(); State.loading = false; }
   else if (next.name === "admin") { State.loading = true; render(); await loadAdminData(); State.loading = false; }
@@ -920,6 +951,11 @@ function render() {
   if (r.name === "me")      return renderMe();
   if (r.name === "admin")   return renderAdmin();
   if (r.name === "league")  return renderLeague();
+  if (r.name === "public") {
+    if (State.loading) return renderLoading();
+    if (!State.meet) return renderNotFound(r.code);
+    return renderPublicResults();
+  }
   if (r.name === "meet") {
     if (State.loading) return renderLoading();
     if (!State.meet) return renderNotFound(r.code);
@@ -2857,7 +2893,140 @@ async function doUndo(div) {
   if (error) { alert("Failed: " + error.message); State.results.push(removed); render(); }
 }
 
-/* ============================ RESULTS ============================ */
+/* ============================ PUBLIC RESULTS (no chrome) ============================ */
+let _publicSearchTerm = "";
+let _publicSearchResults = [];
+
+async function doPublicSearch(query) {
+  _publicSearchTerm = query;
+  if (!query || query.trim().length < 2) { _publicSearchResults = []; renderPublicResults(); return; }
+  const q = query.trim();
+  // Search by code, name, or league slug
+  const { data, error } = await sb.from("public_meets").select("*")
+    .or(`code.ilike.%${q}%,name.ilike.%${q}%,league.ilike.%${q}%`)
+    .order("meet_date", { ascending: false })
+    .limit(20);
+  if (error) console.error("public search:", error);
+  _publicSearchResults = (data || []).filter(m => m.code !== State.meet?.code);
+  renderPublicResults();
+}
+
+function renderPublicResults() {
+  const code = State.meet.code;
+  const divs = computeDivisions().filter(d => resultsForDiv(d.division).length > 0);
+  const m = State.meet;
+  const publicLink = `${location.origin}${location.pathname}#/p/${code}`;
+  const isCompleted = m.status === "completed";
+
+  // Apply default-collapse logic same as the director's view
+  if (divs.length > 1) {
+    const firstDefault = sessionStorage.getItem("xc.resultsDefaultApplied");
+    if (firstDefault !== code) {
+      let latestDiv = divs[0].division;
+      let latestTs = 0;
+      for (const d of divs) {
+        const lastResult = resultsForDiv(d.division).slice(-1)[0];
+        if (lastResult) {
+          const ts = lastResult.recorded_at ? new Date(lastResult.recorded_at).getTime() : 0;
+          if (ts >= latestTs) { latestTs = ts; latestDiv = d.division; }
+        }
+      }
+      _collapsedDivs.clear();
+      divs.forEach(d => { if (d.division !== latestDiv) _collapsedDivs.add(d.division); });
+      sessionStorage.setItem("xc.resultsDefaultApplied", code);
+      sessionStorage.setItem("xc.collapsedDivs", JSON.stringify([..._collapsedDivs]));
+    }
+  }
+
+  $("app").innerHTML = `
+    <div class="public-wrap">
+      <div class="public-hero">
+        <div class="public-meet-info">
+          <div class="display public-title">${esc(m.name)} ${isCompleted ? '<span class="status-badge completed">✓ FINAL</span>' : '<span class="status-badge active">● LIVE</span>'}</div>
+          ${(m.course_name || m.location || m.distance || m.meet_date) ? `<div class="mono public-meta">
+            ${[m.course_name, m.location, m.distance, fmtDate(m.meet_date)].filter(Boolean).map(esc).join(" · ")}
+          </div>` : ""}
+          ${m.league ? `<div class="ui" style="margin-top:6px;font-size:13px;"><a href="#/league/${encodeURIComponent(m.league)}">All meets in ${esc(m.league)} →</a></div>` : ""}
+        </div>
+        <div class="public-actions">
+          <button class="btn btn-sm" onclick="doCopyLink('${esc(publicLink)}')">📋 Copy Link</button>
+          <button class="btn btn-sm" onclick="showQRModal('${esc(publicLink)}')">📱 QR Code</button>
+        </div>
+      </div>
+      <div id="link-copied" class="ok" style="display:none;text-align:right;">✓ Link copied.</div>
+
+      <!-- Search bar -->
+      <div class="public-search">
+        <input id="pub-search" class="field-input" placeholder="🔎 Search other meets, codes, or leagues…" value="${esc(_publicSearchTerm)}" />
+        ${_publicSearchResults.length > 0 ? `
+          <div class="panel public-search-results">
+            ${_publicSearchResults.map(r => `
+              <div class="meet-row" onclick="go('p/${r.code}')">
+                <div style="flex:1;min-width:0;">
+                  <div class="name">${esc(r.name)}</div>
+                  <div class="meta">${[r.course_name, r.location, fmtDate(r.meet_date)].filter(Boolean).map(esc).join(" · ") || "—"} ${r.league?` · LEAGUE: ${esc(r.league)}`:''}</div>
+                </div>
+                <div class="code-pill">${esc(r.code)}</div>
+              </div>
+            `).join("")}
+          </div>
+        ` : (_publicSearchTerm.length >= 2 ? `<div class="ui" style="text-align:center;padding:14px;color:var(--ink-dim);font-size:13px;">No matches found.</div>` : "")}
+      </div>
+
+      ${divs.length > 1 ? `
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+          <button class="btn btn-ghost btn-sm" onclick="expandAllResults()">▼ Expand All</button>
+          <button class="btn btn-ghost btn-sm" onclick="collapseAllResults()">▶ Collapse All</button>
+          <span class="ui" style="font-size:11px;color:var(--ink-dim);margin-left:8px;">Tap any race header to expand/collapse</span>
+        </div>` : ""}
+
+      ${divs.length === 0 ? `<div class="panel" style="padding:48px;text-align:center;color:var(--ink-dim);">No results recorded yet.</div>` :
+        divs.map(d => renderResultBlock(d.division)).join("")}
+
+      <div class="public-footer">
+        <a href="#/" class="public-brand">XC<span style="color:var(--ink);">·CHRONO</span></a>
+        <span class="mono" style="font-size:10px;color:var(--ink-dim);letter-spacing:0.15em;margin-left:8px;">OFFICIAL TIMING</span>
+      </div>
+    </div>`;
+
+  const searchInput = $("pub-search");
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      clearTimeout(window._pubSearchTimer);
+      window._pubSearchTimer = setTimeout(() => doPublicSearch(e.target.value), 200);
+    });
+  }
+}
+
+function showQRModal(url) {
+  $("modal-root").innerHTML = `
+    <div class="modal-back" onclick="if(event.target===this)closeModal()">
+      <div class="modal" style="max-width:380px;text-align:center;">
+        <div class="display" style="font-size:32px;margin-bottom:6px;">SCAN TO VIEW</div>
+        <div class="ui" style="font-size:13px;color:var(--ink-dim);margin-bottom:18px;">
+          Phone camera scans this — opens the live results page.
+        </div>
+        <div id="qr-canvas-wrap" style="background:#fff;padding:18px;border-radius:12px;display:inline-block;"></div>
+        <div class="mono" style="margin-top:14px;font-size:11px;color:var(--ink-dim);word-break:break-all;">${esc(url)}</div>
+        <div style="display:flex;gap:10px;margin-top:18px;justify-content:center;">
+          <button class="btn btn-primary" onclick="doCopyLink('${esc(url)}')">📋 Copy Link</button>
+          <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>`;
+  // Render QR after modal is in DOM
+  setTimeout(() => {
+    const wrap = $("qr-canvas-wrap");
+    if (!wrap || !window.QRCode) return;
+    const canvas = document.createElement("canvas");
+    wrap.appendChild(canvas);
+    QRCode.toCanvas(canvas, url, { width: 280, margin: 1, color: { dark: "#0c1424", light: "#ffffff" } }, (err) => {
+      if (err) console.error("QR error:", err);
+    });
+  }, 20);
+}
+
+
 const _collapsedDivs = new Set(); // divisions that are collapsed
 
 function toggleResultDiv(div) {
@@ -2888,7 +3057,7 @@ function renderResults() {
   const code = State.meet.code;
   const divs = computeDivisions().filter(d => resultsForDiv(d.division).length > 0);
   const m = State.meet;
-  const publicLink = `${location.origin}${location.pathname}#/m/${code}/results`;
+  const publicLink = `${location.origin}${location.pathname}#/p/${code}`;
   const isCompleted = m.status === "completed";
 
   // Default state: latest active race open (most recent finisher activity), rest collapsed.
@@ -2918,16 +3087,15 @@ function renderResults() {
     <div class="wrap">
       <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:16px;">
         <div>
-          <div class="mono" style="font-size:11px;color:var(--ink-dim);letter-spacing:0.2em;">${isCompleted?"OFFICIAL FINAL RESULTS":"LIVE RESULTS"}</div>
           <div class="display" style="font-size:72px;line-height:0.95;">${isCompleted?"FINAL":"LIVE"} <span style="background:linear-gradient(135deg,var(--gold),var(--gold-2));-webkit-background-clip:text;background-clip:text;color:transparent;">RESULTS</span></div>
           <div class="ui" style="font-size:13px;color:var(--ink);margin-top:8px;">${esc(m.name)} ${isCompleted?'<span class="status-badge completed">✓ COMPLETED</span>':'<span class="status-badge active">● ACTIVE</span>'}</div>
-          ${(m.course_name || m.location || m.distance || m.meet_date) ? `<div class="mono" style="font-size:12px;color:var(--ink-dim);margin-top:4px;">
-            ${[m.course_name, m.location, m.distance, fmtDate(m.meet_date)].filter(Boolean).map(esc).join(" · ")}
+          ${(m.course_name || m.location || m.distance || m.meet_date) ? `<div class="mono" style="font-size:12px;color:var(--ink-dim);margin-top:4px;">            ${[m.course_name, m.location, m.distance, fmtDate(m.meet_date)].filter(Boolean).map(esc).join(" · ")}
           </div>` : ""}
           ${m.league ? `<div class="ui" style="margin-top:6px;font-size:13px;"><a href="#/league/${encodeURIComponent(m.league)}">More meets in ${esc(m.league)} →</a></div>` : ""}
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
           <button class="btn btn-sm" onclick="doCopyLink('${esc(publicLink)}')">📋 Copy Public Link</button>
+          <button class="btn btn-sm" onclick="showQRModal('${esc(publicLink)}')">📱 QR Code</button>
           <button class="btn btn-sm" onclick="doExportAllCSV()">⬇ Export All Races (CSV)</button>
         </div>
       </div>
