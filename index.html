@@ -420,6 +420,96 @@
     background: linear-gradient(135deg, var(--gold) 0%, var(--gold-2) 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
     text-decoration: none; }
+
+  /* ============================ LABEL PRINTING ============================ */
+  .label-sheet {
+    background: #fff; color: #000;
+    margin: 24px auto;
+    padding: var(--lbl-margin-top) var(--lbl-margin-side) 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    display: grid;
+    grid-template-columns: repeat(var(--lbl-cols), var(--lbl-w));
+    column-gap: var(--lbl-gap-x);
+    row-gap: var(--lbl-gap-y);
+    width: var(--page-w);
+    box-sizing: border-box;
+  }
+  .label {
+    width: var(--lbl-w); height: var(--lbl-h);
+    padding: 0.08in 0.14in;
+    box-sizing: border-box;
+    display: flex; flex-direction: column; justify-content: center;
+    overflow: hidden;
+    border: 1px dashed #cdd2db;  /* visible on screen only */
+  }
+  .label-empty { border: 1px dashed #e5e7ed; }
+  .label .lbl-row { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; }
+  .label .lbl-bib {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: var(--lbl-bib-size); line-height: 1; color: #0c1424;
+    font-variant-numeric: tabular-nums; letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+  .label .lbl-div {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; color: #8a6a2e;
+    letter-spacing: 0.1em; padding: 2px 6px; border: 1px solid #c9a050; border-radius: 3px;
+    background: #fdf7e8;
+  }
+  .label .lbl-name {
+    font-family: 'Inter', sans-serif;
+    font-size: var(--lbl-name-size); font-weight: 700; color: #0c1424;
+    line-height: 1.1; margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .label .lbl-school {
+    font-family: 'Inter', sans-serif;
+    font-size: var(--lbl-school-size); color: #4a5572;
+    line-height: 1.1; margin-top: 1px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  /* Avery 5160 / 8160 — 30 per page, 1" x 2.625" */
+  .sheet-5160 {
+    --page-w: 8.5in;
+    --lbl-w: 2.625in; --lbl-h: 1in;
+    --lbl-cols: 3;
+    --lbl-margin-top: 0.5in; --lbl-margin-side: 0.1875in;
+    --lbl-gap-x: 0.125in; --lbl-gap-y: 0;
+    --lbl-bib-size: 36px; --lbl-name-size: 13px; --lbl-school-size: 10px;
+  }
+  /* Avery 5163 — 10 per page, 2" x 4" (shipping) */
+  .sheet-5163 {
+    --page-w: 8.5in;
+    --lbl-w: 4in; --lbl-h: 2in;
+    --lbl-cols: 2;
+    --lbl-margin-top: 0.5in; --lbl-margin-side: 0.15625in;
+    --lbl-gap-x: 0.1875in; --lbl-gap-y: 0;
+    --lbl-bib-size: 72px; --lbl-name-size: 22px; --lbl-school-size: 14px;
+  }
+  /* Avery 5164 — 6 per page, 3.33" x 4" */
+  .sheet-5164 {
+    --page-w: 8.5in;
+    --lbl-w: 4in; --lbl-h: 3.33in;
+    --lbl-cols: 2;
+    --lbl-margin-top: 0.5in; --lbl-margin-side: 0.15625in;
+    --lbl-gap-x: 0.1875in; --lbl-gap-y: 0;
+    --lbl-bib-size: 120px; --lbl-name-size: 30px; --lbl-school-size: 18px;
+  }
+
+  @media print {
+    @page { size: letter; margin: 0; }
+    body { background: #fff !important; }
+    body * { visibility: hidden; }
+    #labels-print-area, #labels-print-area * { visibility: visible; }
+    #labels-print-area { position: absolute; left: 0; top: 0; right: 0; }
+    .label-sheet {
+      margin: 0; box-shadow: none;
+      page-break-after: always;
+    }
+    .label { border: none; }   /* hide the dashed cut lines when printing */
+    .no-print { display: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -626,7 +716,7 @@ function parseHash() {
   if (lm) return { name: "league", slug: decodeURIComponent(lm[1]) };
   const pm = h.match(/^p\/([A-Z0-9-]{3,20})$/i);
   if (pm) return { name: "public", code: pm[1].toUpperCase() };
-  const m = h.match(/^m\/([A-Z0-9-]{3,20})(\/(details|roster|timer|recorder|results))?(\/([0-9A-Z]+))?$/i);
+  const m = h.match(/^m\/([A-Z0-9-]{3,20})(\/(details|roster|labels|timer|recorder|results))?(\/([0-9A-Z]+))?$/i);
   if (m) return { name: "meet", code: m[1].toUpperCase(), view: m[3] || "hub", division: m[5] || null };
   return { name: "landing" };
 }
@@ -962,6 +1052,7 @@ function render() {
     if (r.view === "hub")      return renderHub();
     if (r.view === "details")  return renderDetails();
     if (r.view === "roster")   return renderRoster();
+    if (r.view === "labels")   return renderLabels();
     if (r.view === "timer")    return renderTimer();
     if (r.view === "recorder") return renderRecorder();
     if (r.view === "results")  return renderResults();
@@ -1939,11 +2030,14 @@ function renderRoster() {
       </div>
       ${State.runners.length > 0 ? `
       <div class="panel">
-        <div style="padding:14px 22px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);">
+        <div style="padding:14px 22px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);flex-wrap:wrap;gap:10px;">
           <div class="display" style="font-size:22px;letter-spacing:0.05em;">ENTERED RUNNERS · ${State.runners.length}</div>
-          <select id="r-filter" class="mono" style="background:var(--bg-2);color:var(--ink);border:1px solid var(--line);padding:6px 10px;font-size:12px;border-radius:6px;" onchange="changeFilter(this.value)">
-            ${filterOptions.map(t => `<option value="${esc(t)}" ${t === _rosterFilterTeam ? "selected" : ""}>${esc(t)}</option>`).join("")}
-          </select>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="go('m/${code}/labels')">🏷️ Print Labels</button>
+            <select id="r-filter" class="mono" style="background:var(--bg-2);color:var(--ink);border:1px solid var(--line);padding:6px 10px;font-size:12px;border-radius:6px;" onchange="changeFilter(this.value)">
+              ${filterOptions.map(t => `<option value="${esc(t)}" ${t === _rosterFilterTeam ? "selected" : ""}>${esc(t)}</option>`).join("")}
+            </select>
+          </div>
         </div>
         <div style="max-height:400px;overflow:auto;">
           <table>
@@ -2240,6 +2334,210 @@ async function doReuseRoster(sourceCode) {
 
   alert(`✓ Copied ${count} runner${count===1?'':'s'} from ${selected.length} team${selected.length===1?'':'s'}.`);
   render();
+}
+
+/* ============================ LABELS ============================ */
+const LABEL_SIZES = {
+  "5160": { name: "Avery 5160 / 8160", desc: "30 per page · 1\" × 2⅝\"", per: 30, cls: "sheet-5160" },
+  "5163": { name: "Avery 5163", desc: "10 per page · 2\" × 4\" (shipping)", per: 10, cls: "sheet-5163" },
+  "5164": { name: "Avery 5164", desc: "6 per page · 3.33\" × 4\"", per: 6, cls: "sheet-5164" },
+};
+
+let _labelState = {
+  size: localStorage.getItem("xc.labelSize") || "5160",
+  sort: localStorage.getItem("xc.labelSort") || "bib",
+  teamFilter: "__all__",
+  divFilter: "__all__",
+  selected: new Set(),
+  initialized: false,
+};
+
+function renderLabels() {
+  const code = State.meet.code;
+  if (!MeetAuth.isAuthed(code)) { ensureAuth(code, () => render()); }
+
+  const teams = ["__all__", ...State.teams.map(t => t.name)];
+  const divs = computeDivisions().map(d => d.division);
+
+  // Filter runners by team + division
+  let visible = State.runners.filter(r => {
+    if (_labelState.teamFilter !== "__all__" && r.team !== _labelState.teamFilter) return false;
+    if (_labelState.divFilter !== "__all__" && divFromRunner(r) !== _labelState.divFilter) return false;
+    return true;
+  });
+
+  // Sort
+  visible.sort((a, b) => {
+    if (_labelState.sort === "name") {
+      return (a.last_name || "").localeCompare(b.last_name || "") ||
+             (a.first_name || "").localeCompare(b.first_name || "");
+    }
+    return (a.bib || "").localeCompare(b.bib || "");
+  });
+
+  // Initialize selection: all selected on first load
+  if (!_labelState.initialized) {
+    _labelState.selected = new Set(visible.map(r => r.bib));
+    _labelState.initialized = true;
+  }
+  // Re-sync selected to visible: anyone newly visible defaults checked, removed-from-visible stays in selected for memory but doesn't render
+  // (handled implicitly — we filter at render time)
+
+  const selectedRunners = visible.filter(r => _labelState.selected.has(r.bib));
+  const sizeInfo = LABEL_SIZES[_labelState.size];
+  const pages = chunkArray(selectedRunners, sizeInfo.per);
+
+  $("app").innerHTML = `
+    ${header(`PRINT LABELS · ${code}`, `<button class="btn btn-hub btn-sm" onclick="go('m/${code}')">← Hub</button>`)}
+    <div class="wrap no-print">
+      <div class="display" style="font-size:48px;margin-bottom:6px;">PRINT<span style="color:var(--gold)">·</span>LABELS</div>
+      <div class="ui" style="color:var(--ink-dim);font-size:13px;margin-bottom:24px;">
+        Buy Avery-compatible label sheets (any office store). Pick your sheet size, select runners, then hit <strong style="color:var(--ink)">Print</strong>. Use <strong style="color:var(--ink)">Cmd/Ctrl+P</strong> from anywhere on this page.
+      </div>
+
+      <div class="panel" style="padding:20px;margin-bottom:18px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;">
+          <div>
+            <div class="field-label">Sheet Size</div>
+            <select id="lbl-size" class="field-input" style="font-size:13px;padding:8px 10px;">
+              ${Object.entries(LABEL_SIZES).map(([k, v]) => `<option value="${k}" ${k===_labelState.size?'selected':''}>${esc(v.name)} (${esc(v.desc)})</option>`).join("")}
+            </select>
+          </div>
+          <div>
+            <div class="field-label">Team Filter</div>
+            <select id="lbl-team" class="field-input" style="font-size:13px;padding:8px 10px;">
+              ${teams.map(t => `<option value="${esc(t)}" ${t===_labelState.teamFilter?'selected':''}>${t==='__all__'?'All teams':esc(t)}</option>`).join("")}
+            </select>
+          </div>
+          <div>
+            <div class="field-label">Division Filter</div>
+            <select id="lbl-div" class="field-input" style="font-size:13px;padding:8px 10px;">
+              <option value="__all__" ${_labelState.divFilter==='__all__'?'selected':''}>All divisions</option>
+              ${divs.map(d => `<option value="${esc(d)}" ${d===_labelState.divFilter?'selected':''}>${esc(d)} · ${esc(divLabel(d))}</option>`).join("")}
+            </select>
+          </div>
+          <div>
+            <div class="field-label">Sort By</div>
+            <select id="lbl-sort" class="field-input" style="font-size:13px;padding:8px 10px;">
+              <option value="bib" ${_labelState.sort==='bib'?'selected':''}>Bib number</option>
+              <option value="name" ${_labelState.sort==='name'?'selected':''}>Last name</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div class="mono" style="font-size:12px;color:var(--ink-dim);">
+            ${selectedRunners.length} of ${visible.length} selected · ${pages.length} page${pages.length===1?'':'s'} to print
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-ghost btn-sm" onclick="labelSelectAll()">✓ All</button>
+            <button class="btn btn-ghost btn-sm" onclick="labelDeselectAll()">✕ None</button>
+            <button class="btn btn-primary btn-sm" onclick="window.print()" ${selectedRunners.length===0?'disabled':''}>🖨 Print</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Runner selection grid -->
+      <div class="panel" style="margin-bottom:20px;max-height:260px;overflow:auto;">
+        ${visible.length === 0 ? `<div class="ui" style="padding:24px;text-align:center;color:var(--ink-dim);">No runners match the filters.</div>` : `
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px;padding:8px;">
+            ${visible.map(r => {
+              const checked = _labelState.selected.has(r.bib);
+              const div = divFromRunner(r);
+              return `<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:${checked?'rgba(212,168,81,0.08)':'transparent'};border-radius:6px;cursor:pointer;">
+                <input type="checkbox" data-bib="${esc(r.bib)}" ${checked?'checked':''} style="width:16px;height:16px;accent-color:var(--gold);" onchange="toggleLabel('${esc(r.bib)}')" />
+                <span class="mono" style="color:var(--gold);font-weight:700;font-size:12px;min-width:42px;">${esc(r.bib)}</span>
+                <span class="ui" style="font-size:13px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(r.first_name)} ${esc(r.last_name)}</span>
+                <span class="mono" style="font-size:10px;color:var(--ink-dim);">${div||'—'}</span>
+              </label>`;
+            }).join("")}
+          </div>
+        `}
+      </div>
+
+      <div class="ui" style="font-size:12px;color:var(--ink-dim);margin-bottom:8px;">
+        ▼ Preview — what will be printed. Dashed lines show label boundaries (hidden when printing).
+      </div>
+    </div>
+
+    <div id="labels-print-area">
+      ${pages.length === 0 ? `<div class="no-print ui" style="text-align:center;padding:40px;color:var(--ink-dim);">No runners selected.</div>` :
+        pages.map(page => renderLabelSheet(page, sizeInfo)).join("")}
+    </div>
+
+    <div class="wrap no-print">
+      <div style="text-align:center;margin-top:20px;">
+        <button class="btn btn-primary" onclick="window.print()" ${selectedRunners.length===0?'disabled':''}>🖨 Print ${pages.length} Page${pages.length===1?'':'s'}</button>
+      </div>
+    </div>`;
+
+  // Wire up controls
+  $("lbl-size")?.addEventListener("change", (e) => {
+    _labelState.size = e.target.value;
+    localStorage.setItem("xc.labelSize", e.target.value);
+    renderLabels();
+  });
+  $("lbl-team")?.addEventListener("change", (e) => {
+    _labelState.teamFilter = e.target.value;
+    // Reset selection to all visible after filter change
+    _labelState.initialized = false;
+    renderLabels();
+  });
+  $("lbl-div")?.addEventListener("change", (e) => {
+    _labelState.divFilter = e.target.value;
+    _labelState.initialized = false;
+    renderLabels();
+  });
+  $("lbl-sort")?.addEventListener("change", (e) => {
+    _labelState.sort = e.target.value;
+    localStorage.setItem("xc.labelSort", e.target.value);
+    renderLabels();
+  });
+}
+
+function chunkArray(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
+
+function renderLabelSheet(pageRunners, sizeInfo) {
+  // Fill remaining slots with empty labels so the grid renders consistently
+  const empties = sizeInfo.per - pageRunners.length;
+  const runnerCells = pageRunners.map(r => {
+    const div = divFromRunner(r) || "";
+    return `<div class="label">
+      <div class="lbl-row">
+        <span class="lbl-bib">${esc(r.bib)}</span>
+        ${div ? `<span class="lbl-div">${esc(div)}</span>` : ""}
+      </div>
+      <div class="lbl-name">${esc(r.first_name)} ${esc(r.last_name)}</div>
+      <div class="lbl-school">${esc(r.team)}</div>
+    </div>`;
+  });
+  for (let i = 0; i < empties; i++) runnerCells.push(`<div class="label label-empty"></div>`);
+  return `<div class="label-sheet ${sizeInfo.cls}">${runnerCells.join("")}</div>`;
+}
+
+function toggleLabel(bib) {
+  if (_labelState.selected.has(bib)) _labelState.selected.delete(bib);
+  else _labelState.selected.add(bib);
+  renderLabels();
+}
+
+function labelSelectAll() {
+  // Re-derive the visible set, select them all
+  let visible = State.runners.filter(r => {
+    if (_labelState.teamFilter !== "__all__" && r.team !== _labelState.teamFilter) return false;
+    if (_labelState.divFilter !== "__all__" && divFromRunner(r) !== _labelState.divFilter) return false;
+    return true;
+  });
+  visible.forEach(r => _labelState.selected.add(r.bib));
+  renderLabels();
+}
+
+function labelDeselectAll() {
+  _labelState.selected.clear();
+  renderLabels();
 }
 
 /* ============================ DIVISION PICKER ============================ */
